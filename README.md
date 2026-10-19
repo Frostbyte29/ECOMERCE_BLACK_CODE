@@ -77,7 +77,19 @@ Guarda con Ctrl+S. Este archivo vive en tu computadora, fuera del repositorio. *
 
 Pulsa F5 con el perfil `BlackCode.Web`. En Desarrollo, la aplicación aplica las migraciones y carga los datos de demo (categorías, 6 anillos y los usuarios de prueba) al arrancar.
 
-### 5. Pruebas
+### 5. Cuentas de prueba
+
+| Pantalla | Ruta | Usuario |
+| -------- | ---- | ------- |
+| Tienda (cliente) | `/Cuenta/Login` | `cliente@demo.pe` con la clave de `Seed:ClientePassword` |
+| Panel (administrador) | `/Admin/Login` | `admin@blackcode.pe` con la clave de `Seed:AdminPassword` |
+
+- Registro de clientes en `/Cuenta/Registro`. El rol siempre es Cliente; nunca viene del formulario.
+- A los 5 intentos fallidos la cuenta se bloquea 15 minutos. Un administrador puede desbloquearla en **Panel → Usuarios**.
+- El login del panel rechaza a los clientes aunque la clave sea correcta, con el mismo mensaje genérico.
+- Si un administrador desactiva a un usuario, su sesión abierta se cierra en la siguiente petición.
+
+### 6. Pruebas
 
 Menú **Prueba → Explorador de pruebas → Ejecutar todas**, o `dotnet test` en la raíz del repositorio.
 
@@ -101,7 +113,7 @@ Menú **Prueba → Explorador de pruebas → Ejecutar todas**, o `dotnet test` e
 ## Cómo agregar una funcionalidad
 
 1. **Domain:** si necesita una entidad o campo nuevo, agrégalo con su configuración en `Infrastructure/Persistence/Configurations`.
-2. **Application/Features/\<Funcionalidad\>:** interfaz del servicio, su implementación y los DTO de entrada y salida. El servicio depende de interfaces (`IAppDbContext`, `ICurrentUser`, `TimeProvider`), nunca de clases concretas de Infrastructure.
+2. **Application/Features/\<Funcionalidad\>:** interfaz del servicio, su implementación y los DTO de entrada y salida. El servicio depende de interfaces (`IAppDbContext`, `IUsuarioActual`, `TimeProvider`), nunca de clases concretas de Infrastructure.
 3. Registra el servicio en `Application/DependencyInjection.cs`.
 4. **Web:** el controlador recibe el servicio por constructor, convierte DTO ↔ ViewModel y devuelve la vista.
 5. Vista Razor con su ViewModel, formularios con `asp-for` y `asp-validation-for`, y CSS propio de la pantalla.

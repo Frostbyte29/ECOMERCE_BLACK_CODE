@@ -1,0 +1,104 @@
+using BlackCode.Application.Abstractions;
+using BlackCode.Application.Common;
+using BlackCode.Domain.Usuarios;
+using Microsoft.EntityFrameworkCore;
+
+namespace BlackCode.Application.Features.Autenticacion;
+
+/// <summary>
+/// SRP: solo decide quién puede entrar y crea cuentas. No sabe de cookies (eso es Web),
+/// ni de cómo se hashea (IContrasenaService), ni de MySQL (IAppDbContext). DIP en las tres.
+/// </summary>
+public sealed class AutenticacionService(
+    IAppDbContext db,
+    IContrasenaService contrasenas,
+    TimeProvider reloj) : IAutenticacionService
+{
+    private const int LargoMinimoContrasena = 8;
+
+    private const string CredencialesInvalidas = "Correo o contraseña incorrectos.";
+
+    private const string CorreoYaRegistrado = "Ya existe una cuenta con ese correo.";
+
+    // OCP: nuevo portal = nueva entrada aquí, sin tocar IniciarSesionAsync.
+    private static readonly Dictionary<PortalAcceso, RolUsuario> RolPorPortal = new()
+    {
+        [PortalAcceso.Tienda] = RolUsuario.Cliente,
+        [PortalAcceso.Panel]  = RolUsuario.Admin,
+    };
+
+    public async Task<ResultadoAutenticacion> RegistrarAsync(SolicitudRegistro solicitud, CancellationToken ct = default)
+    {
+        if (!solicitud.AceptoTerminos)
+            return ResultadoAutenticacion.Fallo("Debes aceptar los términos y la política de privacidad.");
+        if (solicitud.Contrasena.Length < LargoMinimoContrasena)
+            return ResultadoAutenticacion.Fallo($"La contraseña debe tener al menos {LargoMinimoContrasena} caracteres.");
+
+        var correo = NormalizarCorreo(solicitud.Correo);
+        if (await db.Usuarios.AnyAsync(u => u.Correo == correo, ct))
+            return ResultadoAutenticacion.Fallo(CorreoYaRegistrado);
+
+        var ahora = Ahora();
+        var usuario = new Usuario
+        {
+            Correo = correo,
+            NombreCompleto = solicitud.NombreCompleto.Trim(),
+            Telefono = solicitud.Telefono.Trim(),
+            HashContrasena = contrasenas.Hashear(solicitud.Contrasena),
+            Rol = RolUsuario.Cliente,          // el rol NUNCA viene del formulario
+            TerminosAceptadosUtc = ahora,
+            CreadoUtc = ahora
+        };
+
+        db.Usuarios.Add(usuario);
+        try
+        {
+            await db.SaveChangesAsync(ct);
+        }
+        catch (DbUpdateException)
+        {
+            // Dos registros simultáneos con el mismo correo: el índice único de la base decide.
+            return ResultadoAutenticacion.Fallo(CorreoYaRegistrado);
+        }
+
+        return ResultadoAutenticacion.Ok(ASesion(usuario));
+    }
+
+    public async Task<ResultadoAutenticacion> IniciarSesionAsync(
+        SolicitudInicioSesion solicitud, PortalAcceso portal, CancellationToken ct = default)
+    {
+        var correo  = NormalizarCorreo(solicitud.Correo);
+        var usuario = await db.Usuarios.FirstOrDefaultAsync(u => u.Correo == correo, ct);
+        if (usuario is null) return ResultadoAutenticacion.Fallo(CredencialesInvalidas);
+
+        var verificacion = contrasenas.Verificar(usuario.HashContrasena, solicitud.Contrasena);
+        if (verificacion == ResultadoContrasena.Fallido)
+            return ResultadoAutenticacion.Fallo(CredencialesInvalidas);
+
+        // Antes de revelar cualquier detalle: el rol debe coincidir con el portal.
+        if (usuario.Rol != RolPorPortal[portal])
+            return ResultadoAutenticacion.Fallo(CredencialesInvalidas);
+
+        // Solo quien acertó la clave Y entró por su portal se entera de que está desactivado.
+        if (!usuario.Activo)
+            return ResultadoAutenticacion.Fallo("Tu cuenta está desactivada. Contáctanos para reactivarla.");
+
+        var ahora = Ahora();
+
+        if (verificacion == ResultadoContrasena.ExitosoRehashRequerido)
+            usuario.HashContrasena = contrasenas.Hashear(solicitud.Contrasena);
+
+        usuario.RegistrarAcceso(ahora);
+        await db.SaveChangesAsync(ct);
+        return ResultadoAutenticacion.Ok(ASesion(usuario));
+    }
+
+    public Task<bool> SesionSigueValidaAsync(int usuarioId, RolUsuario rol, CancellationToken ct = default)
+        => db.Usuarios.AsNoTracking().AnyAsync(u => u.Id == usuarioId && u.Activo && u.Rol == rol, ct);
+
+    private DateTime Ahora() => reloj.GetUtcNow().UtcDateTime;
+
+    private static string NormalizarCorreo(string correo) => Normalizacion.Correo(correo);
+
+    private static SesionUsuario ASesion(Usuario u) => new(u.Id, u.Correo, u.NombreCompleto, u.Rol);
+}

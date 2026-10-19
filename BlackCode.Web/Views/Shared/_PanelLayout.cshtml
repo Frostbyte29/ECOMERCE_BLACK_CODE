@@ -1,0 +1,69 @@
+@using BlackCode.Domain.Usuarios
+@{
+    var esAdmin = User.IsInRole(nameof(RolUsuario.Admin));
+    var nombreCompleto = User.Identity?.Name ?? string.Empty;
+    var primerNombre = nombreCompleto.Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ?? nombreCompleto;
+    var inicial = primerNombre.Length > 0 ? primerNombre[0].ToString().ToUpper() : "A";
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Panel BLACK CODE</title>
+    <link rel="icon" type="image/png" href="~/img/marca/logo-negro.png" media="(prefers-color-scheme: light)" />
+    <link rel="icon" type="image/png" href="~/img/marca/logo-blanco.png" media="(prefers-color-scheme: dark)" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/panel.css" asp-append-version="true" />
+</head>
+<body class="panel">
+
+    <header class="panel__barra">
+        <a class="panel__marca" asp-area="Admin" asp-controller="Clientes" asp-action="Index">
+            <img src="~/img/marca/logo-blanco.png" class="panel__marca-logo" alt="" />BLACK <span>CODE</span> <small>Panel</small>
+        </a>
+
+        @if (esAdmin)
+        {
+            <div class="panel__usuario">
+                <span class="panel__saludo">Hola, <strong>@primerNombre</strong></span>
+                <div class="panel__avatar-wrap dropdown">
+                    <button class="panel__avatar" type="button"
+                            data-bs-toggle="dropdown" aria-expanded="false" aria-label="Menú de usuario">
+                        @inicial
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end panel__dropdown">
+                        <li>
+                            <a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="Index">
+                                Ver tienda
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider" /></li>
+                        <li>
+                            <form asp-area="" asp-controller="Cuenta" asp-action="Logout" method="post">
+                                <button type="submit" class="dropdown-item panel__cerrar">Cerrar sesión</button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        }
+    </header>
+
+    <div class="panel__cuerpo">
+        @if (esAdmin)
+        {
+            <nav class="panel__sidebar" aria-label="Menú del panel">
+                @await Component.InvokeAsync("MenuPanel")
+            </nav>
+        }
+        <main class="panel__contenido">
+            @RenderBody()
+        </main>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

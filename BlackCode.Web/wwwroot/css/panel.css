@@ -1,0 +1,600 @@
+/* Panel de administración: Bootstrap para tablas y formularios. */
+
+/* ── Estructura base ──────────────────────────────────────────── */
+
+.panel {
+    min-height: 100vh;
+    background: #f5f5f4;
+    color: #111;
+    --color-negro:       #111;
+    --color-fondo:       #f5f5f4;
+    --color-linea:       #e5e5e5;
+    --color-texto-suave: #6b6b6b;
+}
+
+/* ── Barra superior ───────────────────────────────────────────── */
+
+.panel__barra {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 24px;
+    background: #111;
+    color: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.panel__marca {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 800;
+    letter-spacing: 4px;
+}
+
+.panel__marca-logo { height: 28px; width: auto; flex-shrink: 0; }
+.panel__marca span  { font-weight: 400; }
+.panel__marca small {
+    margin-left: 8px;
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #aaa;
+}
+
+/* ── Usuario / avatar ─────────────────────────────────────────── */
+
+.panel__usuario {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+}
+
+.panel__saludo { color: #ccc; }
+.panel__saludo strong { color: #fff; }
+
+.panel__avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #fff;
+    color: #111;
+    font-weight: 700;
+    font-size: 15px;
+    border: 2px solid rgba(255,255,255,.3);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color .2s;
+}
+
+.panel__avatar:hover,
+.panel__avatar:focus { border-color: #fff; outline: none; }
+
+/* ── Dropdown de usuario ─────────────────────────────────────── */
+
+.panel__dropdown { min-width: 180px; }
+
+.panel__cerrar { color: #dc3545 !important; }
+.panel__cerrar:hover { background: #fff5f5 !important; }
+
+/* ── Cuerpo: sidebar + contenido ─────────────────────────────── */
+
+.panel__cuerpo { display: flex; min-height: calc(100vh - 64px); }
+
+.panel__sidebar {
+    display: flex;
+    flex-direction: column;
+    width: 220px;
+    flex-shrink: 0;
+    padding: 24px 0 24px;
+    background: #1a1a1a;
+    min-height: 100%;
+}
+
+/* ── Ítems del menú lateral ───────────────────────────────────── */
+
+.panel__menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 24px;
+    color: #aaa;
+    text-decoration: none;
+    font-size: 14px;
+    border-left: 3px solid transparent;
+    transition: color .15s, background .15s;
+}
+
+.panel__menu-item:hover {
+    background: rgba(255,255,255,.05);
+    color: #fff;
+}
+
+.panel__menu-item--activo {
+    border-left-color: #fff;
+    color: #fff;
+    font-weight: 600;
+    background: rgba(255,255,255,.07);
+}
+
+.panel__menu-icono { flex-shrink: 0; }
+
+/* ── Contenido principal ─────────────────────────────────────── */
+
+.panel__contenido {
+    flex: 1;
+    min-width: 0;
+    padding: 28px 32px;
+}
+
+/* ── Avatar de iniciales en la tabla ─────────────────────────── */
+
+.cliente-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #e5e5e5;
+    color: #333;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+/* ── Interruptor de estado (blanco/negro, sin JS) ────────────── */
+
+.interruptor-negro {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.interruptor-negro .form-check-input:checked {
+    background-color: #111;
+    border-color: #111;
+}
+
+.interruptor-negro .form-check-input:focus {
+    box-shadow: 0 0 0 .25rem rgba(17,17,17,.25);
+}
+
+.interruptor-negro .texto-activo   { display: none; }
+.interruptor-negro .texto-inactivo { display: inline; }
+
+#Activo:checked ~ .texto-activo   { display: inline; }
+#Activo:checked ~ .texto-inactivo { display: none; }
+
+/* ── Encabezados ordenables ──────────────────────────────────── */
+
+.ordenable {
+    color: inherit;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.ordenable::after { content: ' ↕'; opacity: .35; font-size: .8em; }
+.ordenable--asc::after  { content: ' ↑'; opacity: 1; }
+.ordenable--desc::after { content: ' ↓'; opacity: 1; }
+.ordenable:hover { text-decoration: underline; }
+
+/* ── Acceso dividido (login admin) ───────────────────────────── */
+
+.acceso-dividido {
+    display: flex;
+    min-height: 100vh;
+}
+
+.acceso-dividido__foto {
+    flex: 1;
+    position: relative;
+    background: #111 url('/img/cuenta/login.jpg') center/cover no-repeat;
+    display: none;
+}
+
+.acceso-dividido__capa {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,.55);
+}
+
+.acceso-dividido__editorial {
+    position: absolute;
+    bottom: 48px;
+    left: 48px;
+    color: #fff;
+}
+
+.acceso-dividido__marca {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    opacity: .7;
+    margin-bottom: 12px;
+}
+
+.acceso-dividido__lema {
+    font-size: 2.4rem;
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: 1px;
+}
+
+.acceso-dividido__form {
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    padding: 48px 40px;
+    background: #fff;
+    position: relative;
+}
+
+.acceso-dividido__logo {
+    margin-bottom: 48px;
+}
+
+.acceso-dividido__contenido { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+
+@media (min-width: 900px) {
+    .acceso-dividido__foto { display: block; }
+    .acceso-dividido__form { min-height: 100vh; }
+}
+
+/* ── Responsive ──────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+    .panel__cuerpo { flex-direction: column; }
+    .panel__sidebar { width: auto; min-height: 0; flex-direction: row; padding: 0; }
+    .panel__menu-item { padding: 12px 16px; border-left: none; border-bottom: 3px solid transparent; }
+    .panel__menu-item--activo { border-left-color: transparent; border-bottom-color: #fff; }
+    .panel__contenido { padding: 20px 16px; }
+    .panel__marca small { display: none; }
+    .panel__saludo { display: none; }
+}
+
+/* ── Tarjeta de panel (contenedor general) ───────────────────── */
+
+.tarjeta-panel {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* ── Banda negra superior ────────────────────────────────────── */
+
+.banda-panel {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px 24px;
+    background: #111;
+    color: #fff;
+}
+
+.banda-panel__titulo    { font-size: 1.1rem; font-weight: 700; margin: 0; }
+.banda-panel__subtitulo { font-size: .8rem; color: #aaa; margin: 0; }
+
+.banda-panel__acciones {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-shrink: 0;
+}
+
+.banda-panel__contadores {
+    display: flex;
+    gap: 8px;
+}
+
+.contador-chip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 6px 14px;
+    background: rgba(255,255,255,.15);
+    border-radius: 20px;
+    min-width: 60px;
+}
+
+.contador-chip__numero  { font-size: 1.1rem; font-weight: 700; line-height: 1; }
+.contador-chip__etiqueta { font-size: .68rem; opacity: .8; margin-top: 2px; }
+
+/* Botón X de cierre en la banda */
+.banda-panel__cerrar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    color: rgba(255,255,255,.7);
+    text-decoration: none;
+    transition: color .15s, background .15s;
+}
+
+.banda-panel__cerrar:hover { color: #fff; background: rgba(255,255,255,.1); }
+
+/* ── Cuerpo y pie de la tarjeta ──────────────────────────────── */
+
+.tarjeta-panel__cuerpo { padding: 20px 24px; }
+
+.tarjeta-panel__pie {
+    padding: 12px 24px;
+    border-top: 1px solid #e5e5e5;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+/* ── Buscador con ícono ──────────────────────────────────────── */
+
+.buscador-panel {
+    position: relative;
+}
+
+.buscador-panel__icono {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6b6b6b;
+    pointer-events: none;
+}
+
+.buscador-panel .form-control { padding-left: 34px; }
+
+/* ── Pestañas de filtro ──────────────────────────────────────── */
+
+.pestanas-filtro {
+    display: flex;
+    border-bottom: 1px solid #e5e5e5;
+    margin-bottom: 16px;
+}
+
+.pestana-filtro {
+    padding: 10px 16px;
+    font-size: .875rem;
+    text-decoration: none;
+    color: #6b6b6b;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: color .15s;
+    white-space: nowrap;
+}
+
+.pestana-filtro:hover { color: #111; }
+
+.pestana-filtro--activa {
+    color: #111;
+    border-bottom-color: #111;
+    font-weight: 600;
+}
+
+/* ── Etiqueta de estado ──────────────────────────────────────── */
+
+.etiqueta-estado {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: .78rem;
+    font-weight: 600;
+    line-height: 1.6;
+}
+
+.etiqueta-estado--activo   { background: #111; color: #fff; }
+.etiqueta-estado--inactivo { background: #fff; border: 1px solid #e5e5e5; color: #6b6b6b; }
+
+/* ── Botón acción (lápiz) ────────────────────────────────────── */
+
+.btn-accion {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid #111;
+    border-radius: 4px;
+    color: #111;
+    background: transparent;
+    text-decoration: none;
+    transition: background .15s, color .15s;
+    flex-shrink: 0;
+}
+
+.btn-accion:hover { background: #111; color: #fff; }
+
+/* ── Estado vacío de tabla ───────────────────────────────────── */
+
+.estado-vacio {
+    padding: 48px 24px;
+    text-align: center;
+    color: #6b6b6b;
+}
+
+.estado-vacio p  { margin: 12px 0 4px; font-size: .95rem; }
+.estado-vacio a  { color: #111; font-size: .875rem; }
+
+/* ── Alerta éxito (paleta blanco/negro) ──────────────────────── */
+
+.alerta-ok {
+    border-left: 3px solid #111;
+    background: #fafafa;
+    color: #111;
+    border-radius: 4px;
+    padding: .75rem 1rem;
+    font-size: .9rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+/* ── Paginación (negro) ──────────────────────────────────────── */
+
+.pagina-activa .page-link,
+.pagina-activa .page-link:hover {
+    background: #111;
+    border-color: #111;
+    color: #fff;
+}
+
+/* ── Franja de identidad (Editar) ────────────────────────────── */
+
+.franja-identidad {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 24px;
+    border-bottom: 1px solid #e5e5e5;
+    flex-wrap: wrap;
+}
+
+.franja-identidad__datos { flex: 1; min-width: 0; }
+.franja-identidad__datos .nombre { font-weight: 700; margin: 0 0 2px; }
+.franja-identidad__datos .correo { color: #6b6b6b; font-size: .875rem; margin: 0 0 6px; }
+
+.franja-identidad__meta {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: .8rem;
+    color: #6b6b6b;
+    text-align: right;
+    margin-left: auto;
+}
+
+.cliente-avatar--grande {
+    width: 48px;
+    height: 48px;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+/* ── Sección de formulario ───────────────────────────────────── */
+
+.seccion-form {
+    padding: 20px 24px;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.seccion-form:last-of-type { border-bottom: none; }
+
+.seccion-form__titulo {
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #6b6b6b;
+    margin-bottom: 16px;
+}
+
+/* ── Estado de cuenta (recuadro con borde) ───────────────────── */
+
+.campo-estado {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    border: 1px solid #e5e5e5;
+    border-radius: 6px;
+    padding: 10px 14px;
+}
+
+.campo-estado .texto-ayuda { font-size: .8rem; color: #6b6b6b; }
+
+/* ── Pie del formulario ──────────────────────────────────────── */
+
+.pie-form {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    gap: 8px;
+}
+
+/* ── Anchos de columna tabla de clientes ─────────────────────── */
+
+.table-clientes .col-avatar   { width: 52px; }
+.table-clientes .col-estado   { width: 110px; }
+.table-clientes .col-acciones { width: 90px; text-align: center; }
+
+@media (min-width: 768px) {
+    .table-clientes .col-correo   { width: 220px; }
+    .table-clientes .col-telefono { width: 130px; }
+    .table-clientes .col-acceso   { width: 150px; }
+}
+
+/* ── Modal de panel ──────────────────────────────────────────── */
+
+.modal-panel {
+    position: fixed;
+    inset: 0;
+    z-index: 1050;
+    overflow-y: auto;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 16px;
+}
+
+.modal-panel__fondo {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .55);
+    z-index: 0;
+    display: block;
+}
+
+.modal-panel__caja {
+    background: #fff;
+    border-radius: 14px;
+    width: 100%;
+    max-width: 600px;
+    max-height: calc(100vh - 32px);
+    overflow-y: auto;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, .18);
+    position: relative;
+    z-index: 1;
+}
+
+.modal-panel__caja .seccion-form      { padding: 14px 20px; }
+.modal-panel__caja .franja-identidad  { padding: 12px 20px; }
+.modal-panel__caja .pie-form          { padding: 14px 20px; }
+.modal-panel__caja .banda-panel       { padding: 14px 20px; border-radius: 14px 14px 0 0; }
+
+/* ── Responsive adicional (tarjetas de panel) ────────────────── */
+
+@media (max-width: 767px) {
+    .banda-panel           { flex-wrap: wrap; gap: 12px; }
+    .banda-panel__acciones { flex-wrap: wrap; width: 100%; justify-content: space-between; }
+    .banda-panel__contadores { order: 1; }
+
+    .tarjeta-panel__cuerpo { padding: 16px; }
+    .tarjeta-panel__pie    { flex-direction: column; align-items: flex-start; }
+
+    .pie-form { flex-direction: column-reverse; gap: 8px; }
+    .pie-form .btn { width: 100%; text-align: center; }
+
+    .franja-identidad__meta { text-align: left; margin-left: 0; width: 100%; }
+
+    .modal-panel                    { padding: 8px; }
+    .modal-panel__caja              { max-height: calc(100vh - 16px); border-radius: 10px; }
+    .modal-panel__caja .banda-panel { border-radius: 10px 10px 0 0; }
+}
