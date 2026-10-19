@@ -130,4 +130,19 @@ public sealed class GestionClientesService(
 
     private void ActualizarContrasena(Usuario cliente, string nuevaContrasena)
         => cliente.HashContrasena = contrasenas.Hashear(nuevaContrasena);
+
+    // SRP: contar clientes por estado es una responsabilidad distinta a listarlos con filtros y paginación.
+    public async Task<ResumenClientes> ObtenerResumenAsync(CancellationToken ct = default)
+    {
+        var grupos = await db.Usuarios
+            .AsNoTracking()
+            .Where(u => u.Rol == RolUsuario.Cliente)
+            .GroupBy(u => u.Activo)
+            .Select(g => new { Activo = g.Key, Cantidad = g.Count() })
+            .ToListAsync(ct);
+
+        var activos   = grupos.FirstOrDefault(g => g.Activo)?.Cantidad  ?? 0;
+        var inactivos = grupos.FirstOrDefault(g => !g.Activo)?.Cantidad ?? 0;
+        return new ResumenClientes(activos + inactivos, activos, inactivos);
+    }
 }

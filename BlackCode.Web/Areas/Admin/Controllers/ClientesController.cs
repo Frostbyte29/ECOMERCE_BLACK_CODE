@@ -24,26 +24,31 @@ public class ClientesController(
         string? q, bool? activo, string? orden, string? dir,
         int pagina = 1, CancellationToken ct = default)
     {
-        var resultado = await clientes.ListarAsync(
-            new FiltroClientes(q, activo, pagina, Orden: orden, Dir: dir), ct);
+        var resultado = await clientes.ListarAsync(new FiltroClientes(q, activo, pagina, Orden: orden, Dir: dir), ct);
+        var resumen   = await clientes.ObtenerResumenAsync(ct);
 
         return View(new ClientesListaViewModel
         {
             Items = resultado.Items.Select(c => new ClienteFilaViewModel
             {
-                Id                  = c.Id,
-                NombreCompleto      = c.NombreCompleto,
-                Correo              = c.Correo,
-                Activo              = c.Activo,
+                Id                   = c.Id,
+                NombreCompleto       = c.NombreCompleto,
+                Correo               = c.Correo,
+                Telefono             = c.Telefono,
+                Activo               = c.Activo,
                 UltimoAccesoRelativo = FechaRelativa.Formatear(c.UltimoAccesoUtc, reloj.GetUtcNow()),
             }).ToList(),
-            Busqueda      = q,
-            Activo        = activo,
-            Pagina        = resultado.Pagina,
-            TotalPaginas  = resultado.TotalPaginas,
-            Total         = resultado.Total,
-            Orden         = orden,
-            Dir           = dir,
+            Busqueda       = q,
+            Activo         = activo,
+            Pagina         = resultado.Pagina,
+            TotalPaginas   = resultado.TotalPaginas,
+            Total          = resultado.Total,
+            TotalClientes  = resumen.Total,
+            Activos        = resumen.Activos,
+            Inactivos      = resumen.Inactivos,
+            TamanoPagina   = resultado.TamanoPagina,
+            Orden          = orden,
+            Dir            = dir,
         });
     }
 
@@ -80,11 +85,13 @@ public class ClientesController(
 
         return View(new EditarClienteViewModel
         {
-            Id             = cliente.Id,
-            Correo         = cliente.Correo,
-            NombreCompleto = cliente.NombreCompleto,
-            Telefono       = cliente.Telefono,
-            Activo         = cliente.Activo,
+            Id                   = cliente.Id,
+            Correo               = cliente.Correo,
+            NombreCompleto       = cliente.NombreCompleto,
+            Telefono             = cliente.Telefono,
+            Activo               = cliente.Activo,
+            UltimoAccesoRelativo = FechaRelativa.Formatear(cliente.UltimoAccesoUtc, reloj.GetUtcNow()),
+            ClienteDesde         = cliente.CreadoUtc.ToLocalTime().ToString("dd/MM/yyyy"),
         });
     }
 
@@ -109,12 +116,14 @@ public class ClientesController(
         return RedirectToAction(nameof(Index));
     }
 
-    // Recarga el Correo desde la base antes de devolver la vista; ese campo no viaja en el POST.
+    // Recarga desde la base los campos de solo display que no viajan en el POST.
     private async Task<IActionResult> VolverAEditar(int id, EditarClienteViewModel modelo, CancellationToken ct)
     {
         var cliente = await clientes.ObtenerAsync(id, ct);
         if (cliente is null) return NotFound();
-        modelo.Correo = cliente.Correo;
+        modelo.Correo               = cliente.Correo;
+        modelo.UltimoAccesoRelativo = FechaRelativa.Formatear(cliente.UltimoAccesoUtc, reloj.GetUtcNow());
+        modelo.ClienteDesde         = cliente.CreadoUtc.ToLocalTime().ToString("dd/MM/yyyy");
         return View(modelo);
     }
 }

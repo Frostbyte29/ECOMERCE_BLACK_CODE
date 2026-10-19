@@ -33,3 +33,5 @@ public sealed record SolicitudActualizarCliente(
     string? Telefono,
     bool Activo,
     string? NuevaContrasena);
+
+public sealed record ResumenClientes(int Total, int Activos, int Inactivos);

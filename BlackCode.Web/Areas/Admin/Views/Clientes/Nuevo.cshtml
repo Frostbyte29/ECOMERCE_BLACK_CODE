@@ -3,68 +3,71 @@
     ViewData["Title"] = "Nuevo cliente";
 }
 
-<div class="d-flex align-items-center gap-3 mb-4">
-    <a asp-action="Index" class="text-muted text-decoration-none">&larr; Clientes</a>
-    <h1 class="h4 mb-0">Nuevo cliente</h1>
-</div>
+<div class="tarjeta-panel" style="max-width:720px; margin-inline:auto">
 
-<div class="row">
-    <div class="col-lg-7">
-        <form asp-action="Nuevo" method="post" novalidate>
-            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
-
-            <div class="card mb-4">
-                <div class="card-header fw-semibold">Datos del cliente</div>
-                <div class="card-body">
-
-                    <div class="mb-3">
-                        <label asp-for="NombreCompleto" class="form-label"></label>
-                        <input asp-for="NombreCompleto" class="form-control" placeholder="Nombre completo" autocomplete="name" />
-                        <span asp-validation-for="NombreCompleto" class="text-danger small"></span>
-                    </div>
-
-                    <div class="mb-3">
-                        <label asp-for="Correo" class="form-label"></label>
-                        <input asp-for="Correo" class="form-control" placeholder="correo@ejemplo.com" autocomplete="email" />
-                        <span asp-validation-for="Correo" class="text-danger small"></span>
-                    </div>
-
-                    <div class="mb-3">
-                        <label asp-for="Telefono" class="form-label"></label>
-                        <input asp-for="Telefono" class="form-control" placeholder="9XXXXXXXX" inputmode="numeric" maxlength="9" autocomplete="tel" />
-                        <span asp-validation-for="Telefono" class="text-danger small"></span>
-                    </div>
-
-                </div>
-            </div>
-
-            <div class="card mb-4">
-                <div class="card-header fw-semibold">Contraseña</div>
-                <div class="card-body">
-
-                    <div class="mb-3">
-                        <label asp-for="Contrasena" class="form-label"></label>
-                        <input asp-for="Contrasena" class="form-control"
-                               placeholder="Mínimo 8 caracteres" autocomplete="new-password" />
-                        <span asp-validation-for="Contrasena" class="text-danger small"></span>
-                    </div>
-
-                    <div class="mb-1">
-                        <label asp-for="ConfirmarContrasena" class="form-label"></label>
-                        <input asp-for="ConfirmarContrasena" class="form-control"
-                               placeholder="Repetir contraseña" autocomplete="new-password" />
-                        <span asp-validation-for="ConfirmarContrasena" class="text-danger small"></span>
-                    </div>
-
-                </div>
-            </div>
-
-            <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-dark">Crear cliente</button>
-                <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
-            </div>
-        </form>
+    <div class="banda-panel">
+        <div>
+            <h1 class="banda-panel__titulo">Nuevo cliente</h1>
+            <p class="banda-panel__subtitulo">Registra un nuevo cliente en el sistema</p>
+        </div>
+        <a asp-action="Index" class="banda-panel__cerrar" aria-label="Cerrar">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+        </a>
     </div>
+
+    <form asp-action="Nuevo" method="post" novalidate>
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger mx-4 mt-3" role="alert"></div>
+
+        <div class="seccion-form">
+            <h2 class="seccion-form__titulo">Datos personales</h2>
+
+            <div class="mb-3">
+                <label asp-for="NombreCompleto" class="form-label"></label>
+                <input asp-for="NombreCompleto" class="form-control" placeholder="Nombre completo" autocomplete="name" />
+                <span asp-validation-for="NombreCompleto" class="text-danger small"></span>
+            </div>
+
+            <div class="row g-2">
+                <div class="col-md-6">
+                    <label asp-for="Correo" class="form-label"></label>
+                    <input asp-for="Correo" class="form-control" placeholder="correo@ejemplo.com" autocomplete="email" />
+                    <span asp-validation-for="Correo" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Telefono" class="form-label"></label>
+                    <input asp-for="Telefono" class="form-control" placeholder="9XXXXXXXX" inputmode="numeric" maxlength="9" autocomplete="tel" />
+                    <span asp-validation-for="Telefono" class="text-danger small"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="seccion-form">
+            <h2 class="seccion-form__titulo">Contraseña</h2>
+
+            <div class="row g-2">
+                <div class="col-md-6">
+                    <label asp-for="Contrasena" class="form-label"></label>
+                    <input asp-for="Contrasena" class="form-control"
+                           placeholder="Mínimo 8 caracteres" autocomplete="new-password" />
+                    <span asp-validation-for="Contrasena" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="ConfirmarContrasena" class="form-label"></label>
+                    <input asp-for="ConfirmarContrasena" class="form-control"
+                           placeholder="Repetir contraseña" autocomplete="new-password" />
+                    <span asp-validation-for="ConfirmarContrasena" class="text-danger small"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="pie-form">
+            <a asp-action="Index" class="btn btn-outline-dark">Cancelar</a>
+            <button type="submit" class="btn btn-dark">Crear cliente</button>
+        </div>
+    </form>
+
 </div>
 
 @section Scripts {

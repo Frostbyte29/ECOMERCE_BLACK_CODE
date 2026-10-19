@@ -6,8 +6,10 @@ public class EditarClienteViewModel : IValidatableObject
 {
     public int Id { get; init; }
 
-    // Solo display; nunca se envía de vuelta al controlador en el POST (el campo no tiene <input>).
-    public string Correo { get; set; } = string.Empty;
+    // Solo display; ninguna de estas propiedades viaja en el POST.
+    public string Correo               { get; set; } = string.Empty;
+    public string UltimoAccesoRelativo { get; set; } = string.Empty;
+    public string ClienteDesde         { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "El nombre es obligatorio.")]
     [StringLength(120, MinimumLength = 3, ErrorMessage = "El nombre debe tener entre 3 y 120 caracteres.")]
