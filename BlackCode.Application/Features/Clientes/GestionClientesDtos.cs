@@ -20,3 +20,16 @@ public sealed record ClienteResumen(
     bool Activo,
     DateTime? UltimoAccesoUtc,
     DateTime CreadoUtc);
+
+public sealed record SolicitudCrearCliente(
+    string NombreCompleto,
+    string Correo,
+    string? Telefono,
+    string Contrasena);
+
+public sealed record SolicitudActualizarCliente(
+    int Id,
+    string NombreCompleto,
+    string? Telefono,
+    bool Activo,
+    string? NuevaContrasena);

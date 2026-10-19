@@ -8,8 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace BlackCode.Web.Areas.Admin.Controllers;
 
 /// <summary>
-/// Admin → Clientes: lista con filtros y ordenamiento, activar o desactivar.
-/// Controlador delgado: las reglas viven en IGestionClientesService (DIP).
+/// Admin → Clientes: lista, nuevo, editar.
+/// Controlador delgado: todas las reglas de negocio viven en IGestionClientesService (DIP).
 /// </summary>
 [Area("Admin")]
 [Authorize(Roles = nameof(RolUsuario.Admin))]
@@ -17,6 +17,8 @@ public class ClientesController(
     IGestionClientesService clientes,
     TimeProvider reloj) : Controller
 {
+    // ── Lista ──────────────────────────────────────────────────────────────
+
     [HttpGet]
     public async Task<IActionResult> Index(
         string? q, bool? activo, string? orden, string? dir,
@@ -29,37 +31,90 @@ public class ClientesController(
         {
             Items = resultado.Items.Select(c => new ClienteFilaViewModel
             {
-                Id = c.Id,
-                NombreCompleto = c.NombreCompleto,
-                Correo = c.Correo,
-                Activo = c.Activo,
+                Id                  = c.Id,
+                NombreCompleto      = c.NombreCompleto,
+                Correo              = c.Correo,
+                Activo              = c.Activo,
                 UltimoAccesoRelativo = FechaRelativa.Formatear(c.UltimoAccesoUtc, reloj.GetUtcNow()),
             }).ToList(),
-            Busqueda = q,
-            Activo = activo,
-            Pagina = resultado.Pagina,
-            TotalPaginas = resultado.TotalPaginas,
-            Total = resultado.Total,
-            Orden = orden,
-            Dir = dir,
+            Busqueda      = q,
+            Activo        = activo,
+            Pagina        = resultado.Pagina,
+            TotalPaginas  = resultado.TotalPaginas,
+            Total         = resultado.Total,
+            Orden         = orden,
+            Dir           = dir,
+        });
+    }
+
+    // ── Nuevo cliente ──────────────────────────────────────────────────────
+
+    [HttpGet]
+    public IActionResult Nuevo() => View(new NuevoClienteViewModel());
+
+    [HttpPost]
+    public async Task<IActionResult> Nuevo(NuevoClienteViewModel modelo, CancellationToken ct)
+    {
+        if (!ModelState.IsValid) return View(modelo);
+
+        var resultado = await clientes.CrearAsync(
+            new SolicitudCrearCliente(modelo.NombreCompleto, modelo.Correo, modelo.Telefono, modelo.Contrasena), ct);
+
+        if (!resultado.Exitoso)
+        {
+            ModelState.AddModelError(string.Empty, resultado.Error!);
+            return View(modelo);
+        }
+
+        TempData["Ok"] = "Cliente creado correctamente.";
+        return RedirectToAction(nameof(Index));
+    }
+
+    // ── Editar cliente ─────────────────────────────────────────────────────
+
+    [HttpGet]
+    public async Task<IActionResult> Editar(int id, CancellationToken ct)
+    {
+        var cliente = await clientes.ObtenerAsync(id, ct);
+        if (cliente is null) return NotFound();
+
+        return View(new EditarClienteViewModel
+        {
+            Id             = cliente.Id,
+            Correo         = cliente.Correo,
+            NombreCompleto = cliente.NombreCompleto,
+            Telefono       = cliente.Telefono,
+            Activo         = cliente.Activo,
         });
     }
 
     [HttpPost]
-    public async Task<IActionResult> CambiarEstado(int id, bool activo, string? returnUrl, CancellationToken ct)
+    public async Task<IActionResult> Editar(int id, EditarClienteViewModel modelo, CancellationToken ct)
     {
-        var resultado = await clientes.CambiarEstadoAsync(id, activo, ct);
-        Notificar(resultado.Exitoso, resultado.Error, activo ? "Cliente activado." : "Cliente desactivado.");
-        return VolverALista(returnUrl);
+        if (id != modelo.Id) return BadRequest();
+
+        if (!ModelState.IsValid) return await VolverAEditar(id, modelo, ct);
+
+        var resultado = await clientes.ActualizarClienteAsync(
+            new SolicitudActualizarCliente(
+                modelo.Id, modelo.NombreCompleto, modelo.Telefono, modelo.Activo, modelo.NuevaContrasena), ct);
+
+        if (!resultado.Exitoso)
+        {
+            ModelState.AddModelError(string.Empty, resultado.Error!);
+            return await VolverAEditar(id, modelo, ct);
+        }
+
+        TempData["Ok"] = "Cambios guardados.";
+        return RedirectToAction(nameof(Index));
     }
 
-    private void Notificar(bool exitoso, string? error, string mensajeOk)
+    // Recarga el Correo desde la base antes de devolver la vista; ese campo no viaja en el POST.
+    private async Task<IActionResult> VolverAEditar(int id, EditarClienteViewModel modelo, CancellationToken ct)
     {
-        if (exitoso) TempData["Ok"] = mensajeOk;
-        else TempData["Error"] = error;
+        var cliente = await clientes.ObtenerAsync(id, ct);
+        if (cliente is null) return NotFound();
+        modelo.Correo = cliente.Correo;
+        return View(modelo);
     }
-
-    // POST-Redirect-GET: vuelve a la lista con los mismos filtros; si recargan no se repite la acción.
-    private IActionResult VolverALista(string? returnUrl)
-        => Url.IsLocalUrl(returnUrl) ? LocalRedirect(returnUrl!) : RedirectToAction(nameof(Index));
 }

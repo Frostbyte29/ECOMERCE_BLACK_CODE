@@ -1,4 +1,5 @@
 using BlackCode.Application.Abstractions;
+using BlackCode.Application.Common;
 using BlackCode.Domain.Usuarios;
 using Microsoft.EntityFrameworkCore;
 
@@ -90,7 +91,7 @@ public sealed class AutenticacionService(
 
     private DateTime Ahora() => reloj.GetUtcNow().UtcDateTime;
 
-    private static string NormalizarCorreo(string correo) => correo.Trim().ToLowerInvariant();
+    private static string NormalizarCorreo(string correo) => Normalizacion.Correo(correo);
 
     private static SesionUsuario ASesion(Usuario u) => new(u.Id, u.Correo, u.NombreCompleto, u.Rol);
 }
