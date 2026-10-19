@@ -1,0 +1,47 @@
+@using BlackCode.Domain.Usuarios
+@{
+    var esAdmin = User.IsInRole(nameof(RolUsuario.Admin));
+    var controladorActual = ViewContext.RouteData.Values["controller"]?.ToString();
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Panel BLACK CODE</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/panel.css" asp-append-version="true" />
+</head>
+<body class="panel">
+    <header class="panel__barra">
+        <a class="panel__marca" asp-area="Admin" asp-controller="Usuarios" asp-action="Index">BLACK <span>CODE</span> <small>Panel</small></a>
+        @if (esAdmin)
+        {
+            <div class="panel__sesion">
+                <span>@User.Identity?.Name</span>
+                <a asp-area="" asp-controller="Home" asp-action="Index" class="btn btn-sm btn-outline-light">Ver tienda</a>
+                <form asp-area="" asp-controller="Cuenta" asp-action="Logout" method="post">
+                    <button type="submit" class="btn btn-sm btn-light">Cerrar sesión</button>
+                </form>
+            </div>
+        }
+    </header>
+
+    <div class="panel__cuerpo">
+        @if (esAdmin)
+        {
+            <nav class="panel__menu" aria-label="Menú del panel">
+                <a asp-area="Admin" asp-controller="Usuarios" asp-action="Index"
+                   class="@(controladorActual == "Usuarios" ? "activo" : null)">Usuarios</a>
+            </nav>
+        }
+        <main class="panel__contenido">
+            @RenderBody()
+        </main>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

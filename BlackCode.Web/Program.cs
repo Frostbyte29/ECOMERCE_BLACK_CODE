@@ -33,6 +33,8 @@ builder.Services
         options.Cookie.HttpOnly = true;
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
         options.Cookie.SameSite = SameSiteMode.Lax;
+        options.Events.OnRedirectToLogin = EventosCookie.RedirigirAlLogin;
+        options.Events.OnValidatePrincipal = EventosCookie.ValidarSesion;
     });
 builder.Services.AddAuthorization();
 

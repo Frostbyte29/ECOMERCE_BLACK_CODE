@@ -1,0 +1,63 @@
+@model LoginViewModel
+@{
+    ViewData["Title"] = "Iniciar sesión";
+}
+<link rel="stylesheet" href="~/css/cuenta.css" asp-append-version="true" />
+
+<section class="cuenta">
+    <div class="cuenta__panel">
+        <div class="cuenta__contenido">
+            <p class="cuenta__etiqueta">Bienvenido de nuevo</p>
+            <h1 class="cuenta__titulo">Iniciar sesión</h1>
+            <p class="cuenta__subtitulo">Accede a tu cuenta para continuar, ver tus pedidos y disfrutar una experiencia personalizada.</p>
+
+            <form asp-controller="Cuenta" asp-action="Login" method="post" class="cuenta__form" novalidate>
+                <input type="hidden" asp-for="ReturnUrl" />
+                <div asp-validation-summary="ModelOnly" class="cuenta__error" role="alert"></div>
+
+                <div>
+                    <label asp-for="Correo" class="cuenta__label"></label>
+                    <div class="cuenta__campo">
+                        <input asp-for="Correo" placeholder="tu@correo.com" autocomplete="email" />
+                    </div>
+                    <span asp-validation-for="Correo" class="cuenta__campo-error"></span>
+                </div>
+
+                <div>
+                    <label asp-for="Contrasena" class="cuenta__label"></label>
+                    <div class="cuenta__campo">
+                        <input asp-for="Contrasena" placeholder="Ingresa tu contraseña" autocomplete="current-password" />
+                        <button type="button" class="cuenta__ojo" data-mostrar-contrasena="Contrasena" aria-pressed="false" aria-label="Mostrar contraseña">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z" /><circle cx="12" cy="12" r="3" /></svg>
+                        </button>
+                    </div>
+                    <span asp-validation-for="Contrasena" class="cuenta__campo-error"></span>
+                </div>
+
+                <div class="cuenta__fila">
+                    <label class="cuenta__check">
+                        <input asp-for="MantenerSesion" />
+                        <span>Mantener mi sesión activa</span>
+                    </label>
+                    <a href="#" class="cuenta__link" data-alternar-ayuda="ayuda-contrasena">¿Olvidaste tu contraseña?</a>
+                </div>
+                <p id="ayuda-contrasena" class="cuenta__ayuda" hidden>
+                    Escríbenos por WhatsApp desde el número con el que te registraste y te ayudamos a recuperar tu acceso.
+                </p>
+
+                <button type="submit" class="cuenta__boton cuenta__boton--oscuro">Ingresar <span aria-hidden="true">→</span></button>
+
+                <div class="cuenta__separador">o</div>
+
+                <a asp-controller="Cuenta" asp-action="Registro" asp-route-returnUrl="@Model.ReturnUrl"
+                   class="cuenta__boton cuenta__boton--claro">Crear una cuenta <span aria-hidden="true">→</span></a>
+            </form>
+        </div>
+    </div>
+    <div class="cuenta__foto cuenta__foto--login" role="img" aria-label="Hombre con anillo y pulsera de acero"></div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/cuenta.js" asp-append-version="true"></script>
+}

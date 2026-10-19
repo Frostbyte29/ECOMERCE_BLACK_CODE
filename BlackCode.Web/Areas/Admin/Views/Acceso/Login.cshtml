@@ -1,0 +1,44 @@
+@model LoginViewModel
+@{
+    ViewData["Title"] = "Acceso administrador";
+}
+<link rel="stylesheet" href="~/css/cuenta.css" asp-append-version="true" />
+
+<section class="acceso-admin">
+    <div class="acceso-admin__tarjeta">
+        <p class="cuenta__etiqueta">Panel BLACK CODE</p>
+        <h1 class="cuenta__titulo">Acceso administrador</h1>
+        <p class="cuenta__subtitulo">Solo personal autorizado.</p>
+
+        <form asp-area="Admin" asp-controller="Acceso" asp-action="Login" method="post" class="cuenta__form" novalidate>
+            <input type="hidden" asp-for="ReturnUrl" />
+            <div asp-validation-summary="ModelOnly" class="cuenta__error" role="alert"></div>
+
+            <div>
+                <label asp-for="Correo" class="cuenta__label"></label>
+                <div class="cuenta__campo">
+                    <input asp-for="Correo" placeholder="admin@correo.com" autocomplete="username" />
+                </div>
+                <span asp-validation-for="Correo" class="cuenta__campo-error"></span>
+            </div>
+
+            <div>
+                <label asp-for="Contrasena" class="cuenta__label"></label>
+                <div class="cuenta__campo">
+                    <input asp-for="Contrasena" autocomplete="current-password" />
+                    <button type="button" class="cuenta__ojo" data-mostrar-contrasena="Contrasena" aria-pressed="false" aria-label="Mostrar contraseña">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z" /><circle cx="12" cy="12" r="3" /></svg>
+                    </button>
+                </div>
+                <span asp-validation-for="Contrasena" class="cuenta__campo-error"></span>
+            </div>
+
+            <button type="submit" class="cuenta__boton cuenta__boton--oscuro">Ingresar al panel <span aria-hidden="true">→</span></button>
+        </form>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/cuenta.js" asp-append-version="true"></script>
+}

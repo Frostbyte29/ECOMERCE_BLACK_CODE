@@ -1,7 +1,7 @@
 namespace BlackCode.Domain.Catalogo;
 
 // Anillos: una variante por talla ("7", "8", "9"...).
-// Cadenas y pulseras: una sola variante con Talla = "Única".
+// Cadenas y pulseras: una sola variante con Talla = "Única" de momento.
 public class VarianteProducto
 {
     public int Id { get; set; }

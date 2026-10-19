@@ -1,0 +1,108 @@
+@model RegistroViewModel
+@{
+    ViewData["Title"] = "Crear cuenta";
+}
+<link rel="stylesheet" href="~/css/cuenta.css" asp-append-version="true" />
+
+<section class="cuenta cuenta--registro">
+    <div class="cuenta__panel">
+        <div class="cuenta__contenido">
+            <nav class="cuenta__migas" aria-label="Ruta">
+                <a asp-controller="Home" asp-action="Index">Inicio</a> &rsaquo; <span>Crear cuenta</span>
+            </nav>
+            <h1 class="cuenta__titulo">Crear cuenta</h1>
+            <p class="cuenta__subtitulo">Únete a BLACK CODE y accede a nuestras colecciones, promociones y novedades exclusivas.</p>
+
+            <form asp-controller="Cuenta" asp-action="Registro" method="post" class="cuenta__form" novalidate>
+                <input type="hidden" asp-for="ReturnUrl" />
+                <div asp-validation-summary="ModelOnly" class="cuenta__error" role="alert"></div>
+
+                <div>
+                    <label asp-for="NombreCompleto" class="cuenta__solo-lector"></label>
+                    <div class="cuenta__campo">
+                        <span class="cuenta__icono" aria-hidden="true">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4" /><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6" /></svg>
+                        </span>
+                        <input asp-for="NombreCompleto" placeholder="Nombre completo" autocomplete="name" />
+                    </div>
+                    <span asp-validation-for="NombreCompleto" class="cuenta__campo-error"></span>
+                </div>
+
+                <div>
+                    <label asp-for="Correo" class="cuenta__solo-lector"></label>
+                    <div class="cuenta__campo">
+                        <span class="cuenta__icono" aria-hidden="true">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="1" /><path d="m3 6 9 7 9-7" /></svg>
+                        </span>
+                        <input asp-for="Correo" placeholder="Correo electrónico" autocomplete="email" />
+                    </div>
+                    <span asp-validation-for="Correo" class="cuenta__campo-error"></span>
+                </div>
+
+                <div>
+                    <label asp-for="Telefono" class="cuenta__solo-lector"></label>
+                    <div class="cuenta__campo">
+                        <span class="cuenta__icono" aria-hidden="true">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 3h4l2 5-2.5 1.5a11 11 0 0 0 6 6L16 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 5a2 2 0 0 1 2-2Z" /></svg>
+                        </span>
+                        <input asp-for="Telefono" placeholder="Teléfono" inputmode="numeric" maxlength="9" autocomplete="tel" />
+                    </div>
+                    <span asp-validation-for="Telefono" class="cuenta__campo-error"></span>
+                </div>
+
+                <div>
+                    <label asp-for="Contrasena" class="cuenta__solo-lector"></label>
+                    <div class="cuenta__campo">
+                        <span class="cuenta__icono" aria-hidden="true">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="10" width="14" height="11" rx="1" /><path d="M8 10V7a4 4 0 0 1 8 0v3" /></svg>
+                        </span>
+                        <input asp-for="Contrasena" placeholder="Contraseña" autocomplete="new-password" />
+                        <button type="button" class="cuenta__ojo" data-mostrar-contrasena="Contrasena" aria-pressed="false" aria-label="Mostrar contraseña">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z" /><circle cx="12" cy="12" r="3" /></svg>
+                        </button>
+                    </div>
+                    <span asp-validation-for="Contrasena" class="cuenta__campo-error"></span>
+                </div>
+
+                <div>
+                    <label asp-for="ConfirmarContrasena" class="cuenta__solo-lector"></label>
+                    <div class="cuenta__campo">
+                        <span class="cuenta__icono" aria-hidden="true">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="10" width="14" height="11" rx="1" /><path d="M8 10V7a4 4 0 0 1 8 0v3" /></svg>
+                        </span>
+                        <input asp-for="ConfirmarContrasena" placeholder="Confirmar contraseña" autocomplete="new-password" />
+                        <button type="button" class="cuenta__ojo" data-mostrar-contrasena="ConfirmarContrasena" aria-pressed="false" aria-label="Mostrar contraseña">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z" /><circle cx="12" cy="12" r="3" /></svg>
+                        </button>
+                    </div>
+                    <span asp-validation-for="ConfirmarContrasena" class="cuenta__campo-error"></span>
+                </div>
+
+                <div>
+                    <label class="cuenta__check">
+                        <input asp-for="AceptoTerminos" />
+                        <span>
+                            Acepto los <a asp-controller="Home" asp-action="Privacy">Términos y Condiciones</a>
+                            y la <a asp-controller="Home" asp-action="Privacy">Política de Privacidad</a> de BLACK CODE.
+                        </span>
+                    </label>
+                    <span asp-validation-for="AceptoTerminos" class="cuenta__campo-error"></span>
+                </div>
+
+                <button type="submit" class="cuenta__boton cuenta__boton--oscuro cuenta__boton--espaciado">Registrarme <span aria-hidden="true">→</span></button>
+
+                <p class="cuenta__pie">
+                    ¿Ya tienes una cuenta?
+                    <a asp-controller="Cuenta" asp-action="Login" asp-route-returnUrl="@Model.ReturnUrl" class="cuenta__link">Iniciar sesión</a>
+                    <span aria-hidden="true">→</span>
+                </p>
+            </form>
+        </div>
+    </div>
+    <div class="cuenta__foto cuenta__foto--registro" role="img" aria-label="Manos con anillo y cadena de acero"></div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/cuenta.js" asp-append-version="true"></script>
+}

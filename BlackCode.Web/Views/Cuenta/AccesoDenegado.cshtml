@@ -1,0 +1,12 @@
+@{
+    ViewData["Title"] = "Acceso denegado";
+}
+<link rel="stylesheet" href="~/css/cuenta.css" asp-append-version="true" />
+
+<section class="acceso-admin">
+    <div class="acceso-admin__tarjeta">
+        <h1 class="cuenta__titulo">Acceso denegado</h1>
+        <p class="cuenta__subtitulo">Tu cuenta no tiene permiso para ver esta sección.</p>
+        <a asp-controller="Home" asp-action="Index" class="cuenta__boton cuenta__boton--oscuro">Volver al inicio</a>
+    </div>
+</section>
