@@ -1,8 +1,35 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@model IReadOnlyList<BlackCode.Web.Models.Product>
+@{
+    ViewData["Title"] = "Inicio";
 }
-
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<section class="hero">
+    <img src="/images/products/portada-blackcode.jpg" alt="Joyería masculina en tonos oscuros" />
+    <div class="hero-shade"></div>
+    <div class="hero-copy">
+        <p class="eyebrow">BLACK CODE</p>
+        <h1>Bienvenido<br />a tu próxima pieza.</h1>
+        <p class="hero-subtitle">NUEVAS PIEZAS, LA MISMA ACTITUD.</p>
+        <a class="button button-light" href="#productos">EXPLORAR LO NUEVO <span>→</span></a>
+    </div>
+</section>
+<section class="section products-section" id="productos">
+    <div class="section-heading"><div><h2>Recomendados para ti</h2><p>Piezas que hablan por sí solas.</p></div><span class="text-link">VER TODOS →</span></div>
+    <div class="product-grid">
+        @foreach (var product in Model)
+        {
+            <a class="product-card" asp-controller="Productos" asp-action="Detalle" asp-route-id="@product.Id">
+                <div class="product-image"><img src="@product.ImageUrl" alt="@product.Name" loading="lazy" /></div>
+                <h3>@product.Name</h3>
+                <p class="price">S/ @product.Price.ToString("0.00")</p>
+            </a>
+        }
+    </div>
+</section>
+<section class="section account-section" id="cuenta">
+    <div class="section-heading"><div><h2>Mi cuenta</h2><p>Gestiona tu cuenta de forma rápida y segura.</p></div></div>
+    <div class="account-grid">
+        <a class="account-tile" href="#pedidos"><span class="tile-icon">◇</span><h3>Mis pedidos</h3><p>Revisa el estado de tus pedidos y sigue su envío.</p><b>→</b></a>
+        <a class="account-tile" href="#favoritos"><span class="tile-icon">♡</span><h3>Favoritos</h3><p>Descubre nuevamente las piezas que te inspiran.</p><b>→</b></a>
+        <a class="account-tile" href="#direcciones"><span class="tile-icon">⌖</span><h3>Direcciones</h3><p>Administra tus direcciones de envío.</p><b>→</b></a>
+    </div>
+</section>

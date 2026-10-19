@@ -1,0 +1,10 @@
+Coloca aquí tus imágenes propias con estos nombres exactos:
+- portada-blackcode.jpg (imagen horizontal para el banner principal)
+- anillo-obsidiana.jpg
+- cadena-atlas.jpg
+- pulsera-nox.jpg
+- collar-eclipse.jpg
+- anillo-monolito.jpg
+
+Recomendación: imágenes JPG o WebP, buena iluminación, fondo limpio y producto centrado.
+Las rutas guardadas en MySQL apuntan a /images/products/nombre-archivo.jpg.

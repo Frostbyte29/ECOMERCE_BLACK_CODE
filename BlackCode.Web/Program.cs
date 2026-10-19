@@ -1,29 +1,50 @@
+using BlackCode.Web.Data;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllersWithViews();
+
+var connectionString = builder.Configuration.GetConnectionString("BlackCode")
+    ?? throw new InvalidOperationException("No se encontró la cadena de conexión 'BlackCode'.");
+
+builder.Services.AddDbContext<BlackCodeContext>(options =>
+    options.UseMySql(
+        connectionString,
+        ServerVersion.AutoDetect(connectionString)));
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseExceptionHandler("/Error");
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 app.UseRouting();
-
-app.UseAuthorization();
-
-app.MapStaticAssets();
-
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
+// Inserta los productos de demostración solo cuando la tabla ya existe y está vacía.
+// La base de datos y la tabla se crean aplicando primero las migraciones.
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<BlackCodeContext>();
+    try
+    {
+        if (await db.Database.CanConnectAsync())
+        {
+            await DbInitializer.SeedAsync(db);
+        }
+    }
+    catch (Exception ex)
+    {
+        app.Logger.LogWarning(ex,
+            "No se pudo comprobar o inicializar la base de datos. Verifica MySQL y aplica las migraciones.");
+    }
+}
 
 app.Run();

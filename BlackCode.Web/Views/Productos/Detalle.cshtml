@@ -1,0 +1,47 @@
+@model BlackCode.Web.Controllers.ProductoDetalleViewModel
+@{
+    ViewData["Title"] = Model.Product?.Name ?? "Producto";
+}
+@if (Model.Product is null)
+{
+    <section class="not-found"><h1>Producto no encontrado</h1><a class="button button-dark" asp-controller="Home" asp-action="Index">VOLVER A LA TIENDA</a></section>
+}
+else
+{
+    <div class="breadcrumbs"><a asp-controller="Home" asp-action="Index">Inicio</a> › <a asp-controller="Home" asp-action="Index" asp-fragment="productos">@Model.Product.Category</a> › @Model.Product.Name</div>
+    <section class="detail-layout">
+        <div class="gallery">
+            <div class="gallery-thumbs"><button type="button" class="thumb active" aria-label="Imagen principal"><img src="@Model.Product.ImageUrl" alt="" /></button><button type="button" class="thumb" aria-label="Ver otra imagen"><img src="@Model.Product.ImageUrl" alt="" /></button><button type="button" class="thumb" aria-label="Ver detalle"><img src="@Model.Product.ImageUrl" alt="" /></button></div>
+            <div class="main-product-image"><img src="@Model.Product.ImageUrl" alt="@Model.Product.Name" /></div>
+        </div>
+        <div class="product-info">
+            <p class="eyebrow">@Model.Product.Category.ToUpperInvariant()</p>
+            <h1>@Model.Product.Name</h1>
+            <div class="product-meta"><span class="detail-price">S/ @Model.Product.Price.ToString("0.00")</span><span class="rating">★★★★★ <small>(24)</small></span></div>
+            <p class="description">@Model.Product.Description</p>
+            <div class="specs"><div><span>MATERIAL</span><b>@Model.Product.Material</b></div><div><span>ACABADO</span><b>@Model.Product.Finish</b></div></div>
+            <form class="buy-form" onsubmit="return false;">
+                <div class="size-heading"><label for="size">TALLA</label><a href="#guia-tallas">Guía de tallas →</a></div>
+                <div class="sizes">
+                    @foreach (var size in Model.Product.Sizes)
+                    {
+                        <label class="size-option"><input type="radio" name="size" value="@size" checked="@(size == "9")" /><span>@size</span></label>
+                    }
+                </div>
+                <label class="quantity-label" for="quantity">CANTIDAD</label>
+                <div class="buy-row"><input id="quantity" type="number" min="1" value="1" /><span class="stock"><i></i> En stock<br />Listo para enviar</span></div>
+                <button class="button button-dark full-width" type="button" onclick="alert('Demo: en el siguiente paso conectaremos el carrito.')">🛒 AGREGAR AL CARRITO</button>
+                <button class="button button-outline full-width" type="button" onclick="alert('Demo: aquí iniciaremos el proceso de compra.')">COMPRAR AHORA</button>
+            </form>
+            <div class="service-points"><div>♧ <span><b>Envíos a todo el Perú</b><small>2–5 días hábiles</small></span></div><div>◇ <span><b>Pago seguro</b><small>Datos protegidos</small></span></div><div>□ <span><b>Cambios fáciles</b><small>Hasta 30 días</small></span></div></div>
+        </div>
+    </section>
+    <section class="section related-section"><div class="section-heading"><div><h2>También te puede interesar</h2></div><a class="text-link" asp-controller="Home" asp-action="Index" asp-fragment="productos">VER TODOS →</a></div>
+        <div class="product-grid">
+            @foreach (var product in Model.RelatedProducts)
+            {
+                <a class="product-card" asp-controller="Productos" asp-action="Detalle" asp-route-id="@product.Id"><div class="product-image"><img src="@product.ImageUrl" alt="@product.Name" loading="lazy" /></div><h3>@product.Name</h3><p class="price">S/ @product.Price.ToString("0.00")</p></a>
+            }
+        </div>
+    </section>
+}
