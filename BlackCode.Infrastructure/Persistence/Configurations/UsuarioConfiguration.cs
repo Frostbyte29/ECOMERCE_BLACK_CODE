@@ -20,6 +20,7 @@ public sealed class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
         b.Property(u => u.Activo).HasColumnName("activo");
         b.Property(u => u.IntentosFallidos).HasColumnName("intentos_fallidos");
         b.Property(u => u.BloqueadoHastaUtc).HasColumnName("bloqueado_hasta_utc");
+        b.Property(u => u.UltimoAccesoUtc).HasColumnName("ultimo_acceso_utc");
         b.Property(u => u.TerminosAceptadosUtc).HasColumnName("terminos_aceptados_utc");
         b.Property(u => u.CreadoUtc).HasColumnName("creado_utc");
     }

@@ -1,5 +1,6 @@
 using BlackCode.Application.Features.Autenticacion;
-using BlackCode.Application.Features.Usuarios;
+using BlackCode.Application.Features.Clientes;
+using BlackCode.Application.Features.Cuenta;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BlackCode.Application;
@@ -15,8 +16,11 @@ public static class DependencyInjection
         // Features/Autenticacion
         services.AddScoped<IAutenticacionService, AutenticacionService>();
 
-        // Features/Usuarios
-        services.AddScoped<IGestionUsuariosService, GestionUsuariosService>();
+        // Features/Cuenta
+        services.AddScoped<ICuentaService, CuentaService>();
+
+        // Features/Clientes
+        services.AddScoped<IGestionClientesService, GestionClientesService>();
 
         return services;
     }

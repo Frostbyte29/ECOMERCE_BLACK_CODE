@@ -1,10 +1,13 @@
 /* Pantallas de cuenta: Iniciar sesión, Crear cuenta y Acceso administrador. */
 
-.cuenta {
+:root {
     --cuenta-tinta: #111;
     --cuenta-gris: #6b6b6b;
     --cuenta-linea: #dcdcdc;
     --cuenta-error: #a12622;
+}
+
+.cuenta {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     min-height: 640px;
@@ -246,7 +249,7 @@
     width: 100%;
     max-width: 400px;
     padding: 40px 36px;
-    border: 1px solid var(--cuenta-linea, #dcdcdc);
+    border: 1px solid var(--cuenta-linea);
     background: #fff;
 }
 
@@ -257,10 +260,7 @@
     .cuenta__panel { padding: 40px 16px; }
 }
 
+/* Las variables --cuenta-* se definen en :root; .acceso-admin hereda sin redeclaración. */
 .acceso-admin {
-    --cuenta-tinta: #111;
-    --cuenta-gris: #6b6b6b;
-    --cuenta-linea: #dcdcdc;
-    --cuenta-error: #a12622;
     color: var(--cuenta-tinta);
 }

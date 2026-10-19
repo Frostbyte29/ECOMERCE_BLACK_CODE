@@ -38,7 +38,16 @@ public static class EventosCookie
         if (idValido && rolValido)
         {
             var autenticacion = context.HttpContext.RequestServices.GetRequiredService<IAutenticacionService>();
-            if (await autenticacion.SesionSigueValidaAsync(usuarioId, rol, context.HttpContext.RequestAborted)) return;
+            try
+            {
+                // Si el cliente cancela la petición (p.ej. navegando a otra página), atrapamos
+                // OperationCanceledException y salimos sin tocar la sesión: el error es de red, no de credenciales.
+                if (await autenticacion.SesionSigueValidaAsync(usuarioId, rol, context.HttpContext.RequestAborted)) return;
+            }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
         }
 
         context.RejectPrincipal();

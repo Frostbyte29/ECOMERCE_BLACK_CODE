@@ -1,0 +1,46 @@
+@using System.Security.Claims
+@using BlackCode.Domain.Usuarios
+@{
+    var autenticado = User.Identity?.IsAuthenticated == true;
+    var esAdmin = User.IsInRole(nameof(RolUsuario.Admin));
+    var nombreCompleto = User.FindFirstValue(ClaimTypes.Name) ?? string.Empty;
+    var primerNombre = nombreCompleto.Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ?? "Hola";
+}
+
+<div class="menu-cuenta" id="menu-cuenta">
+    <button type="button"
+            class="menu-cuenta__btn"
+            aria-haspopup="true"
+            aria-expanded="false"
+            aria-controls="menu-cuenta-dropdown"
+            id="menu-cuenta-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <circle cx="12" cy="8" r="4" />
+            <path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6" />
+        </svg>
+        @if (autenticado)
+        {
+            <span class="menu-cuenta__hola">Hola, @primerNombre</span>
+        }
+    </button>
+
+    <div class="menu-cuenta__dropdown" id="menu-cuenta-dropdown" role="menu" hidden>
+        @if (!autenticado)
+        {
+            <a class="menu-cuenta__item" asp-controller="Cuenta" asp-action="Login" role="menuitem">Iniciar sesión</a>
+            <a class="menu-cuenta__item" asp-controller="Cuenta" asp-action="Registro" role="menuitem">Crear cuenta</a>
+        }
+        else
+        {
+            <a class="menu-cuenta__item" asp-controller="Cuenta" asp-action="Index" role="menuitem">Mi cuenta</a>
+            <a class="menu-cuenta__item" href="#" role="menuitem">Mis pedidos</a>
+            @if (esAdmin)
+            {
+                <a class="menu-cuenta__item" asp-area="Admin" asp-controller="Usuarios" asp-action="Index" role="menuitem">Panel</a>
+            }
+            <form class="menu-cuenta__form" asp-controller="Cuenta" asp-action="Logout" method="post">
+                <button type="submit" role="menuitem">Cerrar sesión</button>
+            </form>
+        }
+    </div>
+</div>

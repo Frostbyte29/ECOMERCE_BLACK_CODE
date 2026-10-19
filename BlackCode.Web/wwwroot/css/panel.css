@@ -1,10 +1,14 @@
-/* Panel de administración: sobrio, Bootstrap para tablas y formularios. */
+/* Panel de administración: Bootstrap para tablas y formularios. */
+
+/* ── Estructura base ──────────────────────────────────────────── */
 
 .panel {
     min-height: 100vh;
     background: #f5f5f4;
     color: #111;
 }
+
+/* ── Barra superior ───────────────────────────────────────────── */
 
 .panel__barra {
     display: flex;
@@ -14,17 +18,23 @@
     padding: 14px 24px;
     background: #111;
     color: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
 .panel__marca {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
     color: #fff;
     text-decoration: none;
     font-weight: 800;
     letter-spacing: 4px;
 }
 
-.panel__marca span { font-weight: 400; }
-
+.panel__marca-logo { height: 28px; width: auto; flex-shrink: 0; }
+.panel__marca span  { font-weight: 400; }
 .panel__marca small {
     margin-left: 8px;
     font-size: 11px;
@@ -34,37 +44,87 @@
     color: #aaa;
 }
 
-.panel__sesion {
+/* ── Usuario / avatar ─────────────────────────────────────────── */
+
+.panel__usuario {
     display: flex;
     align-items: center;
     gap: 12px;
     font-size: 14px;
 }
 
-.panel__sesion form { margin: 0; }
+.panel__saludo { color: #ccc; }
+.panel__saludo strong { color: #fff; }
 
-.panel__cuerpo { display: flex; }
-
-.panel__menu {
-    display: flex;
-    flex-direction: column;
-    width: 200px;
-    min-height: calc(100vh - 60px);
-    padding: 20px 0;
+.panel__avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
     background: #fff;
-    border-right: 1px solid #e5e5e5;
+    color: #111;
+    font-weight: 700;
+    font-size: 15px;
+    border: 2px solid rgba(255,255,255,.3);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color .2s;
 }
 
-.panel__menu a {
-    padding: 10px 24px;
-    color: #333;
+.panel__avatar:hover,
+.panel__avatar:focus { border-color: #fff; outline: none; }
+
+/* ── Dropdown de usuario ─────────────────────────────────────── */
+
+.panel__dropdown { min-width: 180px; }
+
+.panel__cerrar { color: #dc3545 !important; }
+.panel__cerrar:hover { background: #fff5f5 !important; }
+
+/* ── Cuerpo: sidebar + contenido ─────────────────────────────── */
+
+.panel__cuerpo { display: flex; min-height: calc(100vh - 64px); }
+
+.panel__sidebar {
+    display: flex;
+    flex-direction: column;
+    width: 220px;
+    flex-shrink: 0;
+    padding: 24px 0 24px;
+    background: #1a1a1a;
+    min-height: 100%;
+}
+
+/* ── Ítems del menú lateral ───────────────────────────────────── */
+
+.panel__menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 24px;
+    color: #aaa;
     text-decoration: none;
     font-size: 14px;
     border-left: 3px solid transparent;
+    transition: color .15s, background .15s;
 }
 
-.panel__menu a:hover { background: #f5f5f4; }
-.panel__menu a.activo { border-left-color: #111; font-weight: 600; color: #111; }
+.panel__menu-item:hover {
+    background: rgba(255,255,255,.05);
+    color: #fff;
+}
+
+.panel__menu-item--activo {
+    border-left-color: #fff;
+    color: #fff;
+    font-weight: 600;
+    background: rgba(255,255,255,.07);
+}
+
+.panel__menu-icono { flex-shrink: 0; }
+
+/* ── Contenido principal ─────────────────────────────────────── */
 
 .panel__contenido {
     flex: 1;
@@ -72,8 +132,150 @@
     padding: 28px 32px;
 }
 
+/* ── Avatar de iniciales en la tabla ─────────────────────────── */
+
+.cliente-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #e5e5e5;
+    color: #333;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+/* ── Interruptor de estado ───────────────────────────────────── */
+
+.estado-form { margin: 0; }
+
+.interruptor {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #555;
+    user-select: none;
+}
+
+.interruptor input[type="checkbox"] {
+    position: relative;
+    width: 36px;
+    height: 20px;
+    appearance: none;
+    -webkit-appearance: none;
+    background: #ccc;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background .2s;
+    flex-shrink: 0;
+}
+
+.interruptor input[type="checkbox"]::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #fff;
+    transition: transform .2s;
+}
+
+.interruptor input[type="checkbox"]:checked { background: #198754; }
+.interruptor input[type="checkbox"]:checked::after { transform: translateX(16px); }
+.interruptor input[type="checkbox"]:focus { outline: 2px solid #0d6efd; outline-offset: 2px; }
+
+/* ── Encabezados ordenables ──────────────────────────────────── */
+
+.ordenable {
+    color: inherit;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.ordenable::after { content: ' ↕'; opacity: .35; font-size: .8em; }
+.ordenable--asc::after  { content: ' ↑'; opacity: 1; }
+.ordenable--desc::after { content: ' ↓'; opacity: 1; }
+.ordenable:hover { text-decoration: underline; }
+
+/* ── Acceso dividido (login admin) ───────────────────────────── */
+
+.acceso-dividido {
+    display: flex;
+    min-height: 100vh;
+}
+
+.acceso-dividido__foto {
+    flex: 1;
+    position: relative;
+    background: #111 url('/img/cuenta/login.jpg') center/cover no-repeat;
+    display: none;
+}
+
+.acceso-dividido__capa {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,.55);
+}
+
+.acceso-dividido__editorial {
+    position: absolute;
+    bottom: 48px;
+    left: 48px;
+    color: #fff;
+}
+
+.acceso-dividido__marca {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    opacity: .7;
+    margin-bottom: 12px;
+}
+
+.acceso-dividido__lema {
+    font-size: 2.4rem;
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: 1px;
+}
+
+.acceso-dividido__form {
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    padding: 48px 40px;
+    background: #fff;
+    position: relative;
+}
+
+.acceso-dividido__logo {
+    margin-bottom: 48px;
+}
+
+.acceso-dividido__contenido { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+
+@media (min-width: 900px) {
+    .acceso-dividido__foto { display: block; }
+    .acceso-dividido__form { min-height: 100vh; }
+}
+
+/* ── Responsive ──────────────────────────────────────────────── */
+
 @media (max-width: 768px) {
     .panel__cuerpo { flex-direction: column; }
-    .panel__menu { width: auto; min-height: 0; flex-direction: row; padding: 0; }
+    .panel__sidebar { width: auto; min-height: 0; flex-direction: row; padding: 0; }
+    .panel__menu-item { padding: 12px 16px; border-left: none; border-bottom: 3px solid transparent; }
+    .panel__menu-item--activo { border-left-color: transparent; border-bottom-color: #fff; }
     .panel__contenido { padding: 20px 16px; }
+    .panel__marca small { display: none; }
+    .panel__saludo { display: none; }
 }

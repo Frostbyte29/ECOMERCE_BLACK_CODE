@@ -1,50 +1,94 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - BlackCode.Web</title>
-    <script type="importmap"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/BlackCode.Web.styles.css" asp-append-version="true" />
+    <title>@ViewData["Title"] - BLACK CODE</title>
+    <link rel="icon" type="image/png" href="~/img/marca/logo-negro.png" media="(prefers-color-scheme: light)" />
+    <link rel="icon" type="image/png" href="~/img/marca/logo-blanco.png" media="(prefers-color-scheme: dark)" />
+    <link rel="stylesheet" href="~/css/blackcode.css" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">BlackCode.Web</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - BlackCode.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+<div class="announcement">
+    ENVÍOS A TODO EL PERÚ <span>|</span> CAMBIOS FÁCILES <span>|</span> PAGA SEGURO
+</div>
+
+<header class="site-header">
+    <a class="brand" asp-controller="Home" asp-action="Index"><img src="~/img/marca/logo-negro.png" class="brand__logo" alt="" />BLACK <span>CODE</span></a>
+
+    <nav class="main-nav" aria-label="Navegación principal">
+        <a asp-controller="Home" asp-action="Index">Inicio</a>
+        <a href="#">Colecciones</a>
+        <a href="#">Anillos</a>
+        <a href="#">Cadenas</a>
+        <a href="#">Pulseras</a>
+        <a href="#">Nosotros</a>
+    </nav>
+
+    <div class="header-actions">
+        <span class="search-icon" aria-hidden="true">⌕</span>
+        @await Component.InvokeAsync("MenuCuenta")
+        <a href="#" aria-label="Favoritos">♡</a>
+        <a href="#" aria-label="Carrito">♧</a>
+    </div>
+</header>
+
+<main>
+    @RenderBody()
+</main>
+
+<footer class="footer">
+    <div class="footer__grid">
+        <div class="footer__marca">
+            <a class="brand" asp-controller="Home" asp-action="Index">BLACK <span>CODE</span></a>
+            <p>Diseñado para marcar la diferencia.</p>
         </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+        <div class="footer__col">
+            <h4>Comprar</h4>
+            <ul>
+                <li><a href="#">Anillos</a></li>
+                <li><a href="#">Cadenas</a></li>
+                <li><a href="#">Pulseras</a></li>
+                <li><a href="#">Colecciones</a></li>
+            </ul>
+        </div>
+        <div class="footer__col">
+            <h4>Nosotros</h4>
+            <ul>
+                <li><a href="#">Quiénes somos</a></li>
+                <li><a href="#">Nuestra historia</a></li>
+            </ul>
+        </div>
+        <div class="footer__col">
+            <h4>Ayuda</h4>
+            <ul>
+                <li><a href="#">Preguntas frecuentes</a></li>
+                <li><a href="#">Envíos y devoluciones</a></li>
+                <li><a asp-controller="Cuenta" asp-action="Index">Mi cuenta</a></li>
+            </ul>
+        </div>
+        <div class="footer__col">
+            <h4>Síguenos</h4>
+            <ul>
+                <li><a href="#">Instagram</a></li>
+                <li><a href="#">TikTok</a></li>
+                <li><a href="#">Facebook</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer__bottom">
+        <span>&copy; @DateTime.Now.Year BLACK CODE. Todos los derechos reservados.</span>
+        <div class="footer__legal">
+            <a href="/terminos">Términos y Condiciones</a>
+            <a href="/privacidad">Política de Privacidad</a>
+        </div>
+    </div>
+</footer>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/js/menu-cuenta.js" asp-append-version="true"></script>
+@await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

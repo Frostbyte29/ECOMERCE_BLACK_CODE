@@ -34,13 +34,12 @@ public class AccesoController(IAutenticacionService autenticacion, TimeProvider 
             return View(modelo);
         }
 
-        await CookieSesion.IniciarAsync(HttpContext, resultado.Sesion!, persistente: false, reloj.GetUtcNow());
+        await CookieSesion.IniciarAsync(HttpContext, resultado.Sesion!, modelo.MantenerSesion, reloj.GetUtcNow());
         return RedirigirLocal(modelo.ReturnUrl);
     }
 
-    // Destino por defecto del panel: Usuarios, hasta que exista el dashboard.
     private IActionResult RedirigirLocal(string? returnUrl)
         => Url.IsLocalUrl(returnUrl)
             ? LocalRedirect(returnUrl!)
-            : RedirectToAction("Index", "Usuarios", new { area = "Admin" });
+            : RedirectToAction("Index", "Clientes", new { area = "Admin" });
 }

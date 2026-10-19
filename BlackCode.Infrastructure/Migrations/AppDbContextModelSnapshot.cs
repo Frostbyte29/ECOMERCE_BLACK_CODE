@@ -625,6 +625,10 @@ namespace BlackCode.Infrastructure.Migrations
                         .HasColumnType("datetime(6)")
                         .HasColumnName("terminos_aceptados_utc");
 
+                    b.Property<DateTime?>("UltimoAccesoUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("ultimo_acceso_utc");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Correo")

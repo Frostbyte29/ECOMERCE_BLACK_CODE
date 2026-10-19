@@ -15,10 +15,7 @@ public sealed class AutenticacionService(
 {
     private const int LargoMinimoContrasena = 8;
 
-    // Mismo mensaje para correo inexistente, clave incorrecta y cuenta bloqueada:
-    // quien ataca no puede saber si el correo existe.
-    private const string CredencialesInvalidas =
-        "Correo o contraseña incorrectos, o la cuenta está bloqueada temporalmente. Intenta de nuevo en unos minutos.";
+    private const string CredencialesInvalidas = "Correo o contraseña incorrectos.";
 
     private const string CorreoYaRegistrado = "Ya existe una cuenta con ese correo.";
 
@@ -66,16 +63,11 @@ public sealed class AutenticacionService(
         var usuario = await db.Usuarios.FirstOrDefaultAsync(u => u.Correo == correo, ct);
         if (usuario is null) return ResultadoAutenticacion.Fallo(CredencialesInvalidas);
 
-        var ahora = Ahora();
-        if (usuario.EstaBloqueado(ahora)) return ResultadoAutenticacion.Fallo(CredencialesInvalidas);
-
         var verificacion = contrasenas.Verificar(usuario.HashContrasena, solicitud.Contrasena);
         if (verificacion == ResultadoContrasena.Fallido)
-        {
-            usuario.RegistrarIntentoFallido(ahora);   // la regla del bloqueo vive en Domain
-            await db.SaveChangesAsync(ct);
             return ResultadoAutenticacion.Fallo(CredencialesInvalidas);
-        }
+
+        var ahora = Ahora();
 
         // Solo quien ya acertó la clave se entera de que su cuenta está desactivada.
         if (!usuario.Activo)
@@ -88,7 +80,7 @@ public sealed class AutenticacionService(
         if (verificacion == ResultadoContrasena.ExitosoRehashRequerido)
             usuario.HashContrasena = contrasenas.Hashear(solicitud.Contrasena);
 
-        usuario.ReiniciarIntentos();
+        usuario.RegistrarAcceso(ahora);
         await db.SaveChangesAsync(ct);
         return ResultadoAutenticacion.Ok(ASesion(usuario));
     }

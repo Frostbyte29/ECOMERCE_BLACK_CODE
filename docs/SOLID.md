@@ -15,4 +15,5 @@
 | SRP | `BlackCode.Web/Security/CookieSesion.cs` | Armar la cookie es trabajo de Web; los servicios de Application no conocen `HttpContext` | Equipo |
 | DIP | `AutenticacionService` depende de `IAppDbContext`, `IContrasenaService` y `TimeProvider` | Ninguna clase concreta de Infrastructure; el reloj se inyecta y los tests son deterministas | Equipo |
 | ISP | `GestionUsuariosService` usa `IUsuarioActual` | Solo pide quién actúa y si es admin | Equipo |
+| SRP | `BlackCode.Web/ViewComponents/MenuCuentaViewComponent.cs` | Renderizar el estado de sesión en el header es responsabilidad de Web; lee claims, no inyecta servicios de datos | Carlos |
 | | | | |
