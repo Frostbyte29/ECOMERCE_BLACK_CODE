@@ -20,6 +20,13 @@ public sealed class AutenticacionService(
 
     private const string CorreoYaRegistrado = "Ya existe una cuenta con ese correo.";
 
+    // OCP: nuevo portal = nueva entrada aquí, sin tocar IniciarSesionAsync.
+    private static readonly Dictionary<PortalAcceso, RolUsuario> RolPorPortal = new()
+    {
+        [PortalAcceso.Tienda] = RolUsuario.Cliente,
+        [PortalAcceso.Panel]  = RolUsuario.Admin,
+    };
+
     public async Task<ResultadoAutenticacion> RegistrarAsync(SolicitudRegistro solicitud, CancellationToken ct = default)
     {
         if (!solicitud.AceptoTerminos)
@@ -58,9 +65,9 @@ public sealed class AutenticacionService(
     }
 
     public async Task<ResultadoAutenticacion> IniciarSesionAsync(
-        SolicitudInicioSesion solicitud, bool soloAdmin, CancellationToken ct = default)
+        SolicitudInicioSesion solicitud, PortalAcceso portal, CancellationToken ct = default)
     {
-        var correo = NormalizarCorreo(solicitud.Correo);
+        var correo  = NormalizarCorreo(solicitud.Correo);
         var usuario = await db.Usuarios.FirstOrDefaultAsync(u => u.Correo == correo, ct);
         if (usuario is null) return ResultadoAutenticacion.Fallo(CredencialesInvalidas);
 
@@ -68,15 +75,15 @@ public sealed class AutenticacionService(
         if (verificacion == ResultadoContrasena.Fallido)
             return ResultadoAutenticacion.Fallo(CredencialesInvalidas);
 
-        var ahora = Ahora();
+        // Antes de revelar cualquier detalle: el rol debe coincidir con el portal.
+        if (usuario.Rol != RolPorPortal[portal])
+            return ResultadoAutenticacion.Fallo(CredencialesInvalidas);
 
-        // Solo quien ya acertó la clave se entera de que su cuenta está desactivada.
+        // Solo quien acertó la clave Y entró por su portal se entera de que está desactivado.
         if (!usuario.Activo)
             return ResultadoAutenticacion.Fallo("Tu cuenta está desactivada. Contáctanos para reactivarla.");
 
-        // Un Cliente con la clave correcta en el login de admin: mismo mensaje genérico, sin sesión.
-        if (soloAdmin && usuario.Rol != RolUsuario.Admin)
-            return ResultadoAutenticacion.Fallo(CredencialesInvalidas);
+        var ahora = Ahora();
 
         if (verificacion == ResultadoContrasena.ExitosoRehashRequerido)
             usuario.HashContrasena = contrasenas.Hashear(solicitud.Contrasena);

@@ -1,9 +1,16 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace BlackCode.Web.ViewModels;
 
 public class NuevoClienteViewModel
 {
+    [BindNever]
+    [ValidateNever]
+    public ClientesListaViewModel? Lista { get; set; }
+
+
     [Required(ErrorMessage = "El nombre es obligatorio.")]
     [StringLength(120, MinimumLength = 3, ErrorMessage = "El nombre debe tener entre 3 y 120 caracteres.")]
     [Display(Name = "Nombre completo")]

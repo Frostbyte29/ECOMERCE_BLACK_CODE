@@ -8,7 +8,7 @@ namespace BlackCode.Web.Areas.Admin.Controllers;
 
 /// <summary>
 /// Login de administrador en /Admin/Login. Usa el MISMO IAutenticacionService y la MISMA cookie que el cliente;
-/// lo único distinto es soloAdmin: true y que la sesión nunca es persistente.
+/// lo único distinto es PortalAcceso.Panel: un Cliente con la clave correcta NO entra.
 /// No lleva [Authorize]: es la puerta de entrada del panel.
 /// </summary>
 [Area("Admin")]
@@ -27,7 +27,7 @@ public class AccesoController(IAutenticacionService autenticacion, TimeProvider 
         if (!ModelState.IsValid) return View(modelo);
 
         var resultado = await autenticacion.IniciarSesionAsync(
-            new SolicitudInicioSesion(modelo.Correo, modelo.Contrasena), soloAdmin: true, ct);
+            new SolicitudInicioSesion(modelo.Correo, modelo.Contrasena), PortalAcceso.Panel, ct);
         if (!resultado.Exitoso)
         {
             ModelState.AddModelError(string.Empty, resultado.Error!);

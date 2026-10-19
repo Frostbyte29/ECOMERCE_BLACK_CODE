@@ -32,7 +32,7 @@ public class CuentaController(
         if (!ModelState.IsValid) return View(modelo);
 
         var resultado = await autenticacion.IniciarSesionAsync(
-            new SolicitudInicioSesion(modelo.Correo, modelo.Contrasena), soloAdmin: false, ct);
+            new SolicitudInicioSesion(modelo.Correo, modelo.Contrasena), PortalAcceso.Tienda, ct);
         if (!resultado.Exitoso)
         {
             ModelState.AddModelError(string.Empty, resultado.Error!);

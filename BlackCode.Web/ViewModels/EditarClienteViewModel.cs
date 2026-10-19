@@ -1,10 +1,16 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace BlackCode.Web.ViewModels;
 
 public class EditarClienteViewModel : IValidatableObject
 {
     public int Id { get; init; }
+
+    [BindNever]
+    [ValidateNever]
+    public ClientesListaViewModel? Lista { get; set; }
 
     // Solo display; ninguna de estas propiedades viaja en el POST.
     public string Correo               { get; set; } = string.Empty;

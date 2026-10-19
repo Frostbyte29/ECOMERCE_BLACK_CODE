@@ -6,8 +6,12 @@ public interface IAutenticacionService
 {
     Task<ResultadoAutenticacion> RegistrarAsync(SolicitudRegistro solicitud, CancellationToken ct = default);
 
-    /// <param name="soloAdmin">true desde /Admin/Login: un Cliente con la clave correcta NO entra.</param>
-    Task<ResultadoAutenticacion> IniciarSesionAsync(SolicitudInicioSesion solicitud, bool soloAdmin, CancellationToken ct = default);
+    /// <param name="portal">
+    /// Portal desde el que se autentica. Determina el rol permitido:
+    /// Tienda → Cliente, Panel → Admin. Quien entra por el portal equivocado
+    /// recibe el mensaje genérico sin revelar si la cuenta existe o la clave es correcta.
+    /// </param>
+    Task<ResultadoAutenticacion> IniciarSesionAsync(SolicitudInicioSesion solicitud, PortalAcceso portal, CancellationToken ct = default);
 
     /// <summary>
     /// La cookie lo consulta en cada petición: si el usuario fue desactivado

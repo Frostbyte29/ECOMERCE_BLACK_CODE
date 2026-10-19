@@ -19,3 +19,14 @@ public sealed record ResultadoAutenticacion(bool Exitoso, string? Error, SesionU
     public static ResultadoAutenticacion Ok(SesionUsuario sesion) => new(true, null, sesion);
     public static ResultadoAutenticacion Fallo(string error) => new(false, error, null);
 }
+
+/// <summary>
+/// Identifica desde qué portal se inicia sesión.
+/// OCP: agregar un portal nuevo solo requiere una entrada aquí y en RolPorPortal,
+/// sin modificar IniciarSesionAsync.
+/// </summary>
+public enum PortalAcceso
+{
+    Tienda,
+    Panel,
+}

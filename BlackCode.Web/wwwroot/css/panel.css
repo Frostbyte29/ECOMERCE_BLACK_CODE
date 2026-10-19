@@ -505,17 +505,19 @@
     margin-bottom: 16px;
 }
 
-/* ── Fila estado de cuenta ───────────────────────────────────── */
+/* ── Estado de cuenta (recuadro con borde) ───────────────────── */
 
-.fila-estado {
+.campo-estado {
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 16px;
+    border: 1px solid #e5e5e5;
+    border-radius: 6px;
+    padding: 10px 14px;
 }
 
-.fila-estado p { margin: 0; }
-.fila-estado .texto-ayuda { font-size: .8rem; color: #6b6b6b; margin-top: 2px; }
+.campo-estado .texto-ayuda { font-size: .8rem; color: #6b6b6b; }
 
 /* ── Pie del formulario ──────────────────────────────────────── */
 
@@ -539,6 +541,44 @@
     .table-clientes .col-acceso   { width: 150px; }
 }
 
+/* ── Modal de panel ──────────────────────────────────────────── */
+
+.modal-panel {
+    position: fixed;
+    inset: 0;
+    z-index: 1050;
+    overflow-y: auto;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 16px;
+}
+
+.modal-panel__fondo {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .55);
+    z-index: 0;
+    display: block;
+}
+
+.modal-panel__caja {
+    background: #fff;
+    border-radius: 14px;
+    width: 100%;
+    max-width: 600px;
+    max-height: calc(100vh - 32px);
+    overflow-y: auto;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, .18);
+    position: relative;
+    z-index: 1;
+}
+
+.modal-panel__caja .seccion-form      { padding: 14px 20px; }
+.modal-panel__caja .franja-identidad  { padding: 12px 20px; }
+.modal-panel__caja .pie-form          { padding: 14px 20px; }
+.modal-panel__caja .banda-panel       { padding: 14px 20px; border-radius: 14px 14px 0 0; }
+
 /* ── Responsive adicional (tarjetas de panel) ────────────────── */
 
 @media (max-width: 767px) {
@@ -553,4 +593,8 @@
     .pie-form .btn { width: 100%; text-align: center; }
 
     .franja-identidad__meta { text-align: left; margin-left: 0; width: 100%; }
+
+    .modal-panel                    { padding: 8px; }
+    .modal-panel__caja              { max-height: calc(100vh - 16px); border-radius: 10px; }
+    .modal-panel__caja .banda-panel { border-radius: 10px 10px 0 0; }
 }
