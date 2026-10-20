@@ -1,0 +1,6 @@
+@model int
+<ol class="checkout-steps">
+    <li class="@(Model >= 1 ? "done" : "")">1. Envío</li>
+    <li class="@(Model >= 2 ? "done" : "")">2. Pago</li>
+    <li class="@(Model >= 3 ? "done" : "")">3. Confirmación</li>
+</ol>

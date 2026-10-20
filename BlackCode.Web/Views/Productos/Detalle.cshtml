@@ -20,7 +20,8 @@ else
             <div class="product-meta"><span class="detail-price">S/ @Model.Product.Price.ToString("0.00")</span><span class="rating">★★★★★ <small>(24)</small></span></div>
             <p class="description">@Model.Product.Description</p>
             <div class="specs"><div><span>MATERIAL</span><b>@Model.Product.Material</b></div><div><span>ACABADO</span><b>@Model.Product.Finish</b></div></div>
-            <form class="buy-form" onsubmit="return false;">
+            <form class="buy-form" asp-controller="Carrito" asp-action="Agregar" method="post">
+                <input type="hidden" name="productId" value="@Model.Product.Id" />
                 <div class="size-heading"><label for="size">TALLA</label><a href="#guia-tallas">Guía de tallas →</a></div>
                 <div class="sizes">
                     @foreach (var size in Model.Product.Sizes)
@@ -29,9 +30,9 @@ else
                     }
                 </div>
                 <label class="quantity-label" for="quantity">CANTIDAD</label>
-                <div class="buy-row"><input id="quantity" type="number" min="1" value="1" /><span class="stock"><i></i> En stock<br />Listo para enviar</span></div>
-                <button class="button button-dark full-width" type="button" onclick="alert('Demo: en el siguiente paso conectaremos el carrito.')">🛒 AGREGAR AL CARRITO</button>
-                <button class="button button-outline full-width" type="button" onclick="alert('Demo: aquí iniciaremos el proceso de compra.')">COMPRAR AHORA</button>
+                <div class="buy-row"><input id="quantity" name="quantity" type="number" min="1" max="@CartService.MaxQuantityPerLine" value="1" /><span class="stock"><i></i> En stock<br />Listo para enviar</span></div>
+                <button class="button button-dark full-width" type="submit">🛒 AGREGAR AL CARRITO</button>
+                <button class="button button-outline full-width" type="submit" name="buyNow" value="true">COMPRAR AHORA</button>
             </form>
             <div class="service-points"><div>♧ <span><b>Envíos a todo el Perú</b><small>2–5 días hábiles</small></span></div><div>◇ <span><b>Pago seguro</b><small>Datos protegidos</small></span></div><div>□ <span><b>Cambios fáciles</b><small>Hasta 30 días</small></span></div></div>
         </div>

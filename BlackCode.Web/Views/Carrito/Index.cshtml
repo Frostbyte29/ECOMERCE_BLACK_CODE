@@ -1,0 +1,57 @@
+@model CartSummary
+@{
+    ViewData["Title"] = "Carrito";
+}
+<section class="section page-narrow">
+    <div class="section-heading"><div><h2>Tu carrito</h2><p>@Model.ItemCount PIEZA(S)</p></div><a class="text-link" asp-controller="Home" asp-action="Index" asp-fragment="productos">SEGUIR COMPRANDO →</a></div>
+
+    @if (Model.IsEmpty)
+    {
+        <div class="empty-state">
+            <p>Tu carrito está vacío.</p>
+            <a class="button button-dark" asp-controller="Home" asp-action="Index" asp-fragment="productos">EXPLORAR PIEZAS</a>
+        </div>
+    }
+    else
+    {
+        <div class="checkout-layout">
+            <div>
+                @foreach (var line in Model.Lines)
+                {
+                    <div class="cart-line">
+                        <a asp-controller="Productos" asp-action="Detalle" asp-route-id="@line.Product.Id" class="cart-thumb"><img src="@line.Product.ImageUrl" alt="@line.Product.Name" /></a>
+                        <div class="cart-line-info">
+                            <b>@line.Product.Name</b>
+                            <small>@line.Product.Category@(line.Size is null ? "" : $" · Talla {line.Size}")</small>
+                            <small>S/ @line.Product.Price.ToString("0.00") c/u</small>
+                        </div>
+                        <form asp-action="Actualizar" method="post" class="qty-form">
+                            <input type="hidden" name="productId" value="@line.Product.Id" />
+                            <input type="hidden" name="size" value="@line.Size" />
+                            <input type="number" name="quantity" min="1" max="@CartService.MaxQuantityPerLine" value="@line.Quantity" aria-label="Cantidad" onchange="this.form.submit()" />
+                        </form>
+                        <span class="cart-line-total">S/ @line.LineTotal.ToString("0.00")</span>
+                        <form asp-action="Eliminar" method="post">
+                            <input type="hidden" name="productId" value="@line.Product.Id" />
+                            <input type="hidden" name="size" value="@line.Size" />
+                            <button type="submit" class="link-button" aria-label="Quitar">✕</button>
+                        </form>
+                    </div>
+                }
+            </div>
+            <aside class="summary-box">
+                <h3>Resumen</h3>
+                <div class="summary-totals">
+                    <div><span>Subtotal</span><span>S/ @Model.Subtotal.ToString("0.00")</span></div>
+                    <div><span>Envío</span><span>@(Model.ShippingCost == 0 ? "Gratis" : "S/ " + Model.ShippingCost.ToString("0.00"))</span></div>
+                    <div class="summary-total"><span>Total</span><span>S/ @Model.Total.ToString("0.00")</span></div>
+                </div>
+                @if (Model.ShippingCost > 0)
+                {
+                    <p class="muted small">Te faltan S/ @((CartService.FreeShippingFrom - Model.Subtotal).ToString("0.00")) para el envío gratis.</p>
+                }
+                <a class="button button-dark full-width" asp-controller="Checkout" asp-action="Index">CONTINUAR CON LA COMPRA →</a>
+            </aside>
+        </div>
+    }
+</section>

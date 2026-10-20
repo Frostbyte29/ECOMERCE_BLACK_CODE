@@ -1,0 +1,26 @@
+@model Order
+@{
+    ViewData["Title"] = "Pedido confirmado";
+    var lastPayment = Model.Payments.OrderByDescending(p => p.CreatedAt).FirstOrDefault();
+}
+<section class="section page-narrow">
+    <partial name="_Steps" model="3" />
+    <div class="confirm-hero">
+        <span class="confirm-icon">✓</span>
+        <h2>¡Gracias por tu compra!</h2>
+        <p>Tu pedido <b>@Model.Code</b> fue registrado.</p>
+        <partial name="_OrderStatusBadge" model="Model.Status" />
+        @if (lastPayment?.Method == PaymentMethod.ContraEntrega)
+        {
+            <p class="muted small">Recuerda tener listo S/ @Model.Total.ToString("0.00") al momento de la entrega.</p>
+        }
+    </div>
+    <div class="checkout-layout">
+        <div><partial name="_OrderInfo" model="Model" /></div>
+        <aside>
+            <partial name="_OrderItems" model="Model" />
+            <a class="button button-dark full-width" asp-controller="Pedidos" asp-action="Index">VER MIS PEDIDOS</a>
+            <a class="button button-outline full-width" asp-controller="Home" asp-action="Index">SEGUIR COMPRANDO</a>
+        </aside>
+    </div>
+</section>

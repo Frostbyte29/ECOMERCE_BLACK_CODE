@@ -1,0 +1,73 @@
+@model BlackCode.Web.Controllers.AdminPedidosViewModel
+@{
+    ViewData["Title"] = "Panel de pedidos";
+    var totalOrders = Model.CountByStatus.Values.Sum();
+
+    Dictionary<string, string> RouteFor(int page, OrderStatus? status) => new()
+    {
+        ["page"] = page.ToString(),
+        ["status"] = status?.ToString() ?? "",
+        ["search"] = Model.Search ?? "",
+        ["from"] = Model.From?.ToString("yyyy-MM-dd") ?? "",
+        ["to"] = Model.To?.ToString("yyyy-MM-dd") ?? ""
+    };
+}
+<section class="section admin">
+    <div class="section-heading"><div><h2>Gestión de pedidos</h2><p>PANEL DE ADMINISTRACIÓN</p></div></div>
+
+    <div class="stat-grid">
+        <div class="stat"><span>Ventas de hoy</span><b>S/ @Model.RevenueToday.ToString("0.00")</b></div>
+        <div class="stat"><span>Ventas del mes</span><b>S/ @Model.RevenueMonth.ToString("0.00")</b></div>
+        <div class="stat"><span>Por atender</span><b>@(Model.CountByStatus.GetValueOrDefault(OrderStatus.Pagado) + Model.CountByStatus.GetValueOrDefault(OrderStatus.EnPreparacion))</b></div>
+        <div class="stat"><span>Pedidos totales</span><b>@totalOrders</b></div>
+    </div>
+
+    <div class="status-chips">
+        <a class="chip @(Model.Status is null ? "active" : "")" asp-action="Index" asp-all-route-data="RouteFor(1, null)">Todos (@totalOrders)</a>
+        @foreach (var s in Enum.GetValues<OrderStatus>())
+        {
+            <a class="chip @(Model.Status == s ? "active" : "")" asp-action="Index" asp-all-route-data="RouteFor(1, s)">@OrderService.DisplayName(s) (@Model.CountByStatus.GetValueOrDefault(s))</a>
+        }
+    </div>
+
+    <form method="get" asp-action="Index" class="admin-filters">
+        <input type="hidden" name="status" value="@Model.Status" />
+        <input type="search" name="search" value="@Model.Search" placeholder="Código, cliente o correo" />
+        <label>Desde <input type="date" name="from" value="@Model.From?.ToString("yyyy-MM-dd")" /></label>
+        <label>Hasta <input type="date" name="to" value="@Model.To?.ToString("yyyy-MM-dd")" /></label>
+        <button type="submit" class="button button-dark">FILTRAR</button>
+        <a asp-action="Index" class="text-link">LIMPIAR</a>
+    </form>
+
+    @if (Model.Orders.Count == 0)
+    {
+        <div class="empty-state"><p>No hay pedidos con esos filtros.</p></div>
+    }
+    else
+    {
+        <div class="table-wrap">
+            <table class="admin-table">
+                <thead><tr><th>Código</th><th>Fecha</th><th>Cliente</th><th>Piezas</th><th>Total</th><th>Estado</th><th></th></tr></thead>
+                <tbody>
+                    @foreach (var o in Model.Orders)
+                    {
+                        <tr>
+                            <td><b>@o.Code</b></td>
+                            <td>@PeruTime.Format(o.CreatedAt)</td>
+                            <td>@o.ShippingName<small>@o.User?.Email</small></td>
+                            <td>@o.ItemCount</td>
+                            <td>S/ @o.Total.ToString("0.00")</td>
+                            <td><partial name="_OrderStatusBadge" model="o.Status" /></td>
+                            <td><a class="text-link" asp-action="Detalle" asp-route-id="@o.Id">GESTIONAR →</a></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="pager">
+            <span>@Model.TotalCount pedido(s) · Página @Model.Page de @Model.TotalPages</span>
+            @if (Model.Page > 1) { <a class="text-link" asp-action="Index" asp-all-route-data="RouteFor(Model.Page - 1, Model.Status)">← ANTERIOR</a> }
+            @if (Model.Page < Model.TotalPages) { <a class="text-link" asp-action="Index" asp-all-route-data="RouteFor(Model.Page + 1, Model.Status)">SIGUIENTE →</a> }
+        </div>
+    }
+</section>
