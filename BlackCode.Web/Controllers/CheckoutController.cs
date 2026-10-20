@@ -137,8 +137,11 @@ public class CheckoutController(
         if (!result.Success)
         {
             ModelState.AddModelError("", result.Message);
-            // No se devuelven los datos sensibles de la tarjeta al formulario.
+            // No se devuelven los datos sensibles de la tarjeta al formulario
+            // (hay que quitarlos también del ModelState, que es de donde los lee la vista).
             model.CardNumber = model.CardCvv = null;
+            ModelState.Remove(nameof(PaymentViewModel.CardNumber));
+            ModelState.Remove(nameof(PaymentViewModel.CardCvv));
             model.Order = order;
             return View(model);
         }
