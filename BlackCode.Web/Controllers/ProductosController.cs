@@ -22,7 +22,9 @@ public class CatalogoViewModel
     public string? Category { get; init; }
     public string? Material { get; init; }
     public string? Size { get; init; }
+    public decimal? MinPrice { get; init; }
     public decimal? MaxPrice { get; init; }
+    public decimal PriceCeiling { get; init; }
     public string Sort { get; init; } = "relevancia";
 }
 
@@ -55,13 +57,20 @@ public class ProductosController(BlackCodeContext context) : Controller
 
     [HttpGet("Productos")]
     public async Task<IActionResult> Index(string? q, string? categoria, string? material,
-        string? talla, decimal? precioMax, string ordenar = "relevancia")
+        string? talla, decimal? precioMin, decimal? precioMax, string ordenar = "relevancia")
     {
         var allProducts = await context.Products.AsNoTracking().OrderBy(p => p.Id).ToListAsync();
         q = q?.Trim();
         categoria = categoria?.Trim();
         material = material?.Trim();
         talla = talla?.Trim();
+        precioMin = precioMin is >= 0 ? precioMin : null;
+        precioMax = precioMax is >= 0 ? precioMax : null;
+        if (precioMin.HasValue && precioMax.HasValue && precioMin > precioMax)
+            (precioMin, precioMax) = (precioMax, precioMin);
+        var highestPrice = allProducts.Count == 0 ? 0 : allProducts.Max(p => p.Price);
+        var priceCeiling = Math.Max(50m,
+            Math.Ceiling(Math.Max(highestPrice, Math.Max(precioMin ?? 0, precioMax ?? 0)) / 50m) * 50m);
 
         IEnumerable<Product> filtered = allProducts;
         if (!string.IsNullOrWhiteSpace(q))
@@ -74,6 +83,8 @@ public class ProductosController(BlackCodeContext context) : Controller
             filtered = filtered.Where(p => p.Material.Equals(material, StringComparison.OrdinalIgnoreCase));
         if (!string.IsNullOrWhiteSpace(talla))
             filtered = filtered.Where(p => p.Sizes.Contains(talla, StringComparer.OrdinalIgnoreCase));
+        if (precioMin is >= 0)
+            filtered = filtered.Where(p => p.Price >= precioMin);
         if (precioMax is >= 0)
             filtered = filtered.Where(p => p.Price <= precioMax);
 
@@ -96,7 +107,9 @@ public class ProductosController(BlackCodeContext context) : Controller
             Category = categoria,
             Material = material,
             Size = talla,
+            MinPrice = precioMin,
             MaxPrice = precioMax,
+            PriceCeiling = priceCeiling,
             Sort = ordenar
         });
     }

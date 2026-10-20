@@ -57,22 +57,26 @@ Al arrancar se puede crear un administrador de prueba si `SeedAdmin:Email` y `Se
 
 | Rol | Correo | Contraseña | Cómo se crea |
 |---|---|---|---|
-| Admin | `admin@blackcode.test` | `Admin123*` | Automático al arrancar (`SeedAdmin` en `appsettings.json`) |
-| Cliente | `cliente@blackcode.test` | `Cliente123` | Registrándose en `/Cuenta/Registro` |
+| Admin de demostración | `admin@blackcode.pe` | La configurada en `SeedDemo:AdminPassword` | Se crea al arrancar solo si esa clave está configurada |
+| Cliente de demostración | `cliente@demo.pe` | La configurada en `SeedDemo:ClientePassword` | Se crea al arrancar solo si esa clave está configurada |
+| Cliente nuevo | El correo que registres | La que elijas al registrarte | Registro en `/Cuenta/Registro` |
+
+También se puede crear otro administrador con `SeedAdmin:Email` y `SeedAdmin:Password` configurados en User Secrets o variables de entorno. Las contraseñas no están en el repositorio.
 
 ## Cómo levantarlo
 
-1. Si tu MySQL local no usa `root` / `123456`, guarda tu conexión sin tocar `appsettings.json`:
+1. Configura la conexión a tu MySQL sin guardar la contraseña en `appsettings.json`:
    `dotnet user-secrets set "ConnectionStrings:BlackCode" "Server=localhost;Port=3306;Database=blackcode_db;User=root;Password=TU_CLAVE;"`
 2. Crea las tablas: `dotnet ef database update` (dentro de `BlackCode.Web`)
 3. `dotnet run`
 
-Probado de punta a punta el 20/10/2026: carrito, registro, checkout, pago con tarjeta (rechazada y aprobada),
-Yape/Plin, contra entrega, envío gratis, historial, cancelación del cliente, panel admin (filtros, búsqueda,
-cambios de estado, seguimiento, reembolso al cancelar) y bloqueo de acceso a pedidos ajenos y al panel.
+El commit `dadef22` informa pruebas realizadas el 20/10/2026 de carrito, registro, checkout,
+pagos de demostración, historial y panel admin. Las pruebas automatizadas en `e2e` verifican los flujos de
+invitado, cuenta y administración, además de tarjeta rechazada y aprobada, cancelación y vencimiento del pedido.
+La pantalla de Yape/Plin se comprueba, pero su pago y los cambios de estado con reembolso requieren una
+verificación específica antes de darlos por cubiertos por estas pruebas.
 
-> Si tu base ya tiene la tabla `Products` creada a mano, borra la base (`DROP DATABASE blackcode_db;`) antes del paso 2,
-> o ejecuta del script `pedidos_pagos.sql` solo la parte que no sea `Products`.
+> Si tu base ya tiene tablas creadas manualmente, revisa el esquema y las migraciones antes de actualizarla. No borres una base con datos de trabajo para aplicar estas instrucciones.
 
 ## Pendiente / ideas
 

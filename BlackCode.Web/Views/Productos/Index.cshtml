@@ -1,6 +1,10 @@
 @model BlackCode.Web.Controllers.CatalogoViewModel
+@using System.Globalization
 @{
     ViewData["Title"] = Model.Category ?? (string.IsNullOrWhiteSpace(Model.Search) ? "Productos" : "Búsqueda");
+    var priceCeiling = Model.PriceCeiling.ToString("0.##", CultureInfo.InvariantCulture);
+    var selectedMinPrice = (Model.MinPrice ?? 0).ToString("0.##", CultureInfo.InvariantCulture);
+    var selectedMaxPrice = (Model.MaxPrice ?? Model.PriceCeiling).ToString("0.##", CultureInfo.InvariantCulture);
 }
 <section class="catalog-page">
     <div class="catalog-breadcrumb"><a asp-controller="Home" asp-action="Index">Inicio</a><span>›</span><span>@(Model.Category ?? "Productos")</span></div>
@@ -11,7 +15,7 @@
                 <input type="hidden" name="q" value="@Model.Search" />
                 <div class="filter-group">
                     <label for="filter-category">Categoría</label>
-                    <select id="filter-category" name="categoria">
+                    <select id="filter-category" name="categoria" data-brand-select>
                         <option value="">Todas</option>
                         @foreach (var category in Model.Categories)
                         {
@@ -20,12 +24,23 @@
                     </select>
                 </div>
                 <div class="filter-group">
-                    <label for="filter-price">Precio máximo</label>
-                    <input id="filter-price" name="precioMax" type="number" min="0" step="0.01" value="@Model.MaxPrice" placeholder="S/ Sin límite" />
+                    <span class="filter-label" id="filter-price-label">Precio</span>
+                    <div class="price-range" data-price-range>
+                        <div class="price-range-track">
+                            <span class="price-range-active"></span>
+                            <input type="range" min="0" max="@priceCeiling" step="0.01" value="@selectedMinPrice" data-price-min-range aria-label="Precio mínimo" />
+                            <input type="range" min="0" max="@priceCeiling" step="0.01" value="@selectedMaxPrice" data-price-max-range aria-label="Precio máximo" />
+                        </div>
+                        <div class="price-range-fields">
+                            <label for="filter-price-min"><span>S/</span><input id="filter-price-min" name="precioMin" type="number" min="0" max="@priceCeiling" step="0.01" value="@selectedMinPrice" aria-label="Precio mínimo" /></label>
+                            <span aria-hidden="true">—</span>
+                            <label for="filter-price-max"><span>S/</span><input id="filter-price-max" name="precioMax" type="number" min="0" max="@priceCeiling" step="0.01" value="@selectedMaxPrice" aria-label="Precio máximo" /></label>
+                        </div>
+                    </div>
                 </div>
                 <div class="filter-group">
                     <label for="filter-size">Talla</label>
-                    <select id="filter-size" name="talla">
+                    <select id="filter-size" name="talla" data-brand-select>
                         <option value="">Todas</option>
                         @foreach (var size in Model.Sizes)
                         {
@@ -35,7 +50,7 @@
                 </div>
                 <div class="filter-group">
                     <label for="filter-material">Material</label>
-                    <select id="filter-material" name="material">
+                    <select id="filter-material" name="material" data-brand-select>
                         <option value="">Todos</option>
                         @foreach (var material in Model.Materials)
                         {
@@ -68,9 +83,10 @@
                     <input type="hidden" name="categoria" value="@Model.Category" />
                     <input type="hidden" name="material" value="@Model.Material" />
                     <input type="hidden" name="talla" value="@Model.Size" />
-                    <input type="hidden" name="precioMax" value="@Model.MaxPrice" />
+                    <input type="hidden" name="precioMin" value="@(Model.MinPrice?.ToString("0.##", CultureInfo.InvariantCulture))" />
+                    <input type="hidden" name="precioMax" value="@(Model.MaxPrice?.ToString("0.##", CultureInfo.InvariantCulture))" />
                     <label for="catalog-sort">Ordenar por</label>
-                    <select id="catalog-sort" name="ordenar" onchange="this.form.submit()">
+                    <select id="catalog-sort" name="ordenar" data-brand-select onchange="this.form.submit()">
                         <option value="relevancia" selected="@(Model.Sort == "relevancia")">Más relevantes</option>
                         <option value="precio-asc" selected="@(Model.Sort == "precio-asc")">Menor precio</option>
                         <option value="precio-desc" selected="@(Model.Sort == "precio-desc")">Mayor precio</option>

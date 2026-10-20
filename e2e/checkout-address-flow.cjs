@@ -96,6 +96,8 @@ async function exercise(browser, viewport, group) {
         await page.locator('.checkout-confirm-button').click();
         assert.equal(page.url(), paymentUrl);
         assert.match(await page.locator('.form-errors').innerText(), /rechazado/i);
+        assert.equal(await page.locator('#CardNumber').inputValue(), '');
+        assert.equal(await page.locator('#CardCvv').inputValue(), '');
         await page.locator('#CardNumber').fill('4111111111111111');
         await page.locator('#CardHolder').fill('Prueba Checkout');
         await page.locator('#CardExpiry').fill('12/29');
