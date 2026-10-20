@@ -53,12 +53,23 @@ Para poder probar, se agregó ASP.NET Core Identity con roles `Admin` y `Cliente
 puede reemplazar ese controlador y sus vistas manteniendo esas rutas.
 Al arrancar se crea un administrador de prueba con los datos de `SeedAdmin` en `appsettings.json`.
 
+## Cuentas de prueba (solo para desarrollo local)
+
+| Rol | Correo | Contraseña | Cómo se crea |
+|---|---|---|---|
+| Admin | `admin@blackcode.test` | `Admin123*` | Automático al arrancar (`SeedAdmin` en `appsettings.json`) |
+| Cliente | `cliente@blackcode.test` | `Cliente123` | Registrándose en `/Cuenta/Registro` |
+
 ## Cómo levantarlo
 
-1. Guarda tu conexión a MySQL sin tocar `appsettings.json`:
+1. Si tu MySQL local no usa `root` / `123456`, guarda tu conexión sin tocar `appsettings.json`:
    `dotnet user-secrets set "ConnectionStrings:BlackCode" "Server=localhost;Port=3306;Database=blackcode_db;User=root;Password=TU_CLAVE;"`
 2. Crea las tablas: `dotnet ef database update` (dentro de `BlackCode.Web`)
 3. `dotnet run`
+
+Probado de punta a punta el 20/10/2026: carrito, registro, checkout, pago con tarjeta (rechazada y aprobada),
+Yape/Plin, contra entrega, envío gratis, historial, cancelación del cliente, panel admin (filtros, búsqueda,
+cambios de estado, seguimiento, reembolso al cancelar) y bloqueo de acceso a pedidos ajenos y al panel.
 
 > Si tu base ya tiene la tabla `Products` creada a mano, borra la base (`DROP DATABASE blackcode_db;`) antes del paso 2,
 > o ejecuta del script `pedidos_pagos.sql` solo la parte que no sea `Products`.
