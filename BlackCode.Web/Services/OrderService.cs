@@ -10,6 +10,7 @@ public record OperationResult(bool Success, string Message);
 
 public class OrderService(BlackCodeContext context)
 {
+    private static readonly TimeSpan PaymentWindow = TimeSpan.FromDays(3);
     // Cambios de estado permitidos desde el panel de administración.
     private static readonly Dictionary<OrderStatus, OrderStatus[]> Transitions = new()
     {
@@ -24,6 +25,7 @@ public class OrderService(BlackCodeContext context)
     public static IReadOnlyList<OrderStatus> AllowedTransitions(OrderStatus status) => Transitions[status];
 
     public static bool CustomerCanCancel(Order order) => order.Status == OrderStatus.PendientePago;
+    public static DateTime PaymentDueAt(Order order) => order.CreatedAt.Add(PaymentWindow);
 
     public IQueryable<Order> QueryWithDetails() => context.Orders
         .Include(o => o.User)
@@ -73,6 +75,11 @@ public class OrderService(BlackCodeContext context)
         if (order.Status != OrderStatus.PendientePago)
             return new(false, "Este pedido ya no está pendiente de pago.");
 
+        if (PaymentDueAt(order) <= DateTime.UtcNow)
+            return new(false, "El plazo de 3 días para pagar este pedido ya venció.");
+        if (!Enum.IsDefined(input.Method))
+            return new(false, "Elige un método de pago válido.");
+
         var payment = new Payment { Method = input.Method, Amount = order.Total };
 
         switch (input.Method)
@@ -88,13 +95,13 @@ public class OrderService(BlackCodeContext context)
                 if (digits.EndsWith("0002"))
                 {
                     payment.Status = PaymentStatus.Rechazado;
-                    payment.Message = "Pago rechazado por el banco emisor (fondos insuficientes).";
+                    payment.Message = "Pago de prueba rechazado. No hubo ningún cargo bancario.";
                 }
                 else
                 {
                     payment.Status = PaymentStatus.Aprobado;
                     payment.TransactionId = NewTransactionId();
-                    payment.Message = "Pago con tarjeta aprobado.";
+                    payment.Message = "Pago de prueba con tarjeta aprobado. No hubo ningún cargo bancario.";
                 }
                 break;
             }
@@ -105,24 +112,84 @@ public class OrderService(BlackCodeContext context)
                     return new(false, "Ingresa el número de operación de Yape/Plin (6 a 10 dígitos).");
                 payment.Status = PaymentStatus.Aprobado;
                 payment.TransactionId = "YP-" + code;
-                payment.Message = "Pago con Yape/Plin confirmado.";
+                payment.Message = "Pago de prueba con Yape/Plin aprobado. No hubo transferencia real.";
                 break;
             }
             case PaymentMethod.ContraEntrega:
                 payment.Status = PaymentStatus.Pendiente;
-                payment.Message = "Se cobrará al momento de la entrega.";
+                payment.Message = "Pedido de prueba registrado con pago contra entrega pendiente.";
                 break;
         }
 
+        if (payment.Status != PaymentStatus.Rechazado)
+        {
+            await using var transaction = await context.Database.BeginTransactionAsync();
+            var now = DateTime.UtcNow;
+            var claimed = await context.Orders
+                .Where(o => o.Id == order.Id && o.Status == OrderStatus.PendientePago && o.CreatedAt > now - PaymentWindow)
+                .ExecuteUpdateAsync(setters => setters.SetProperty(o => o.Status,
+                    payment.Status == PaymentStatus.Aprobado ? OrderStatus.Pagado : OrderStatus.EnPreparacion));
+            if (claimed == 0)
+                return new(false, "El pedido ya se pagó, se canceló o venció su plazo de pago.");
+
+            order.Payments.Add(payment);
+            if (payment.Status == PaymentStatus.Aprobado)
+                AddStatus(order, OrderStatus.Pagado, "Pasarela", payment.Message);
+            else
+                AddStatus(order, OrderStatus.EnPreparacion, "Cliente", "Pedido confirmado con pago contra entrega.");
+
+            await context.SaveChangesAsync();
+            await transaction.CommitAsync();
+            return new(true, payment.Message ?? "");
+        }
+
         order.Payments.Add(payment);
-
-        if (payment.Status == PaymentStatus.Aprobado)
-            AddStatus(order, OrderStatus.Pagado, "Pasarela", payment.Message);
-        else if (input.Method == PaymentMethod.ContraEntrega)
-            AddStatus(order, OrderStatus.EnPreparacion, "Cliente", "Pedido confirmado con pago contra entrega.");
-
         await context.SaveChangesAsync();
-        return new(payment.Status != PaymentStatus.Rechazado, payment.Message ?? "");
+        return new(false, payment.Message ?? "");
+    }
+
+    public async Task<int> ExpirePendingOrdersAsync(int? orderId = null, string? userId = null)
+    {
+        var expiredCount = 0;
+        while (true)
+        {
+            var cutoff = DateTime.UtcNow - PaymentWindow;
+            var query = context.Orders.AsNoTracking()
+                .Where(o => o.Status == OrderStatus.PendientePago && o.CreatedAt <= cutoff);
+            if (orderId.HasValue) query = query.Where(o => o.Id == orderId.Value);
+            if (userId is not null) query = query.Where(o => o.UserId == userId);
+            var ids = await query.OrderBy(o => o.Id).Select(o => o.Id).Take(100).ToListAsync();
+            if (ids.Count == 0) break;
+
+            foreach (var id in ids)
+            {
+                await using var transaction = await context.Database.BeginTransactionAsync();
+                var changed = await context.Orders
+                    .Where(o => o.Id == id && o.Status == OrderStatus.PendientePago && o.CreatedAt <= cutoff)
+                    .ExecuteUpdateAsync(setters => setters
+                        .SetProperty(o => o.Status, OrderStatus.Cancelado)
+                        .SetProperty(o => o.UpdatedAt, DateTime.UtcNow));
+                if (changed == 0) continue;
+
+                await context.Payments
+                    .Where(p => p.OrderId == id && p.Status == PaymentStatus.Pendiente)
+                    .ExecuteUpdateAsync(setters => setters
+                        .SetProperty(p => p.Status, PaymentStatus.Rechazado)
+                        .SetProperty(p => p.Message, "Pago pendiente anulado al vencer el plazo de 3 días."));
+                context.OrderStatusHistory.Add(new OrderStatusHistory
+                {
+                    OrderId = id,
+                    Status = OrderStatus.Cancelado,
+                    ChangedBy = "Sistema",
+                    Note = "Pedido cancelado al vencer los 3 días para pagar."
+                });
+                await context.SaveChangesAsync();
+                await transaction.CommitAsync();
+                expiredCount++;
+            }
+            if (ids.Count < 100) break;
+        }
+        return expiredCount;
     }
 
     public async Task<OperationResult> ChangeStatusAsync(Order order, OrderStatus newStatus, string changedBy, string? note, string? trackingNumber)
@@ -144,7 +211,7 @@ public class OrderService(BlackCodeContext context)
             {
                 p.Status = PaymentStatus.Aprobado;
                 p.TransactionId ??= NewTransactionId();
-                p.Message = "Cobrado en la entrega.";
+                p.Message = "Pago contra entrega marcado como recibido en la demostración.";
             }
         }
 
@@ -160,9 +227,16 @@ public class OrderService(BlackCodeContext context)
     {
         if (!CustomerCanCancel(order))
             return new(false, "Solo puedes cancelar pedidos que aún no fueron pagados.");
+        await using var transaction = await context.Database.BeginTransactionAsync();
+        var changed = await context.Orders
+            .Where(o => o.Id == order.Id && o.Status == OrderStatus.PendientePago)
+            .ExecuteUpdateAsync(setters => setters.SetProperty(o => o.Status, OrderStatus.Cancelado));
+        if (changed == 0)
+            return new(false, "El pedido ya se pagó o se canceló.");
         CancelPayments(order);
         AddStatus(order, OrderStatus.Cancelado, "Cliente", "Cancelado por el cliente.");
         await context.SaveChangesAsync();
+        await transaction.CommitAsync();
         return new(true, $"El pedido {order.Code} fue cancelado.");
     }
 
@@ -174,7 +248,7 @@ public class OrderService(BlackCodeContext context)
     {
         foreach (var p in order.Payments)
         {
-            if (p.Status == PaymentStatus.Aprobado) { p.Status = PaymentStatus.Reembolsado; p.Message = "Reembolsado por cancelación."; }
+            if (p.Status == PaymentStatus.Aprobado) { p.Status = PaymentStatus.Reembolsado; p.Message = "Reembolso simulado por cancelación. No se movió dinero."; }
             else if (p.Status == PaymentStatus.Pendiente) { p.Status = PaymentStatus.Rechazado; p.Message = "Anulado por cancelación."; }
         }
     }

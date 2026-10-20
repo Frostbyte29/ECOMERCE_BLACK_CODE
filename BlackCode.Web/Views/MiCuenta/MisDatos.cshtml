@@ -1,0 +1,18 @@
+@model ProfileViewModel
+@{
+    ViewData["Title"] = "Mis datos";
+}
+<div class="account-shell">
+    <partial name="_AccountNav" />
+    <section class="account-main">
+        <p class="eyebrow">PERFIL</p><h1>Mis datos</h1>
+        <form asp-action="MisDatos" method="post" class="form-card account-form">
+            <div asp-validation-summary="ModelOnly" class="form-errors"></div>
+            <div class="field"><label asp-for="FullName"></label><input asp-for="FullName" autocomplete="name" /><span asp-validation-for="FullName"></span></div>
+            <div class="field"><label asp-for="Email"></label><input asp-for="Email" readonly aria-describedby="email-note" /></div>
+            <p id="email-note" class="account-note">El correo de acceso no se cambia desde este formulario.</p>
+            <div class="field"><label asp-for="PhoneNumber"></label><input asp-for="PhoneNumber" type="tel" autocomplete="tel" /><span asp-validation-for="PhoneNumber"></span></div>
+            <button class="button button-dark" type="submit">GUARDAR CAMBIOS</button>
+        </form>
+    </section>
+</div>

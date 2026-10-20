@@ -1,0 +1,17 @@
+@{
+    var section = ViewContext.RouteData.Values["controller"]?.ToString();
+    var action = ViewContext.RouteData.Values["action"]?.ToString();
+}
+<aside class="account-sidebar">
+    <p class="eyebrow">TU ESPACIO</p>
+    <h2>Mi cuenta</h2>
+    <nav aria-label="Secciones de mi cuenta">
+        <a asp-controller="MiCuenta" asp-action="Index" aria-current="@(section == "MiCuenta" && action == "Index" ? "page" : null)">Resumen</a>
+        <a asp-controller="Pedidos" asp-action="Index" aria-current="@(section == "Pedidos" ? "page" : null)">Mis pedidos</a>
+        <a asp-controller="Favoritos" asp-action="Index" aria-current="@(section == "Favoritos" ? "page" : null)">Favoritos</a>
+        <a asp-controller="MiCuenta" asp-action="Direcciones" aria-current="@(section == "MiCuenta" && (action == "Direcciones" || action == "NuevaDireccion" || action == "EditarDireccion") ? "page" : null)">Direcciones</a>
+        <a asp-controller="MiCuenta" asp-action="MisDatos" aria-current="@(section == "MiCuenta" && action == "MisDatos" ? "page" : null)">Mis datos</a>
+        <a asp-controller="MiCuenta" asp-action="CambiarContrasena" aria-current="@(section == "MiCuenta" && action == "CambiarContrasena" ? "page" : null)">Cambiar contraseña</a>
+    </nav>
+    <form asp-controller="Cuenta" asp-action="Logout" method="post"><button type="submit">Cerrar sesión</button></form>
+</aside>

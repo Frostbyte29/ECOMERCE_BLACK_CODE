@@ -18,6 +18,7 @@ public class PedidosController(
     public async Task<IActionResult> Index()
     {
         var userId = userManager.GetUserId(User);
+        await orders.ExpirePendingOrdersAsync(userId: userId);
         var list = await context.Orders.AsNoTracking()
             .Include(o => o.Items)
             .Where(o => o.UserId == userId)
@@ -28,6 +29,7 @@ public class PedidosController(
 
     public async Task<IActionResult> Detalle(int id)
     {
+        await orders.ExpirePendingOrdersAsync(orderId: id, userId: userManager.GetUserId(User));
         var order = await FindOwnOrderAsync(id);
         return order is null ? NotFound() : View(order);
     }
@@ -35,6 +37,7 @@ public class PedidosController(
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Cancelar(int id)
     {
+        await orders.ExpirePendingOrdersAsync(orderId: id, userId: userManager.GetUserId(User));
         var order = await FindOwnOrderAsync(id);
         if (order is null) return NotFound();
 

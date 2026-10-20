@@ -44,14 +44,14 @@ Para integrar una pasarela real (Culqi, Niubiz, Mercado Pago) solo hay que reemp
 - Controladores: `CarritoController`, `CheckoutController`, `PedidosController`, `AdminPedidosController`
 - Vistas: `Views/Carrito`, `Views/Checkout`, `Views/Pedidos`, `Views/AdminPedidos`, `Views/Shared/_Order*.cshtml`
 - Estilos: `wwwroot/css/pedidos.css` (separado de `site.css`)
-- Migración: `Data/Migrations/*_InicialPedidosPagos.cs` · script SQL equivalente: `pedidos_pagos.sql`
+- Migración: `Data/Migrations/*_InicialPedidosPagos.cs`. `pedidos_pagos.sql` está incompleto y no crea el esquema completo; utiliza `dotnet ef database update`.
 
 ## Usuarios (temporal)
 
 Para poder probar, se agregó ASP.NET Core Identity con roles `Admin` y `Cliente`, y un login mínimo en
 `CuentaController` (`/Cuenta/Login`, `/Cuenta/Registro`, `/Cuenta/Logout`). El módulo de usuarios del equipo
 puede reemplazar ese controlador y sus vistas manteniendo esas rutas.
-Al arrancar se crea un administrador de prueba con los datos de `SeedAdmin` en `appsettings.json`.
+Al arrancar se puede crear un administrador de prueba si `SeedAdmin:Email` y `SeedAdmin:Password` están configurados en User Secrets o variables de entorno. No se incluyen credenciales en `appsettings.json`.
 
 ## Cómo levantarlo
 

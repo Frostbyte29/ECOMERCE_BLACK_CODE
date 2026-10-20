@@ -13,9 +13,9 @@ public enum PaymentMethod
 public enum PaymentStatus
 {
     [Display(Name = "Pendiente")] Pendiente,
-    [Display(Name = "Aprobado")] Aprobado,
-    [Display(Name = "Rechazado")] Rechazado,
-    [Display(Name = "Reembolsado")] Reembolsado
+    [Display(Name = "Aprobado (demo)")] Aprobado,
+    [Display(Name = "Rechazado (demo)")] Rechazado,
+    [Display(Name = "Reembolso simulado")] Reembolsado
 }
 
 public class Payment

@@ -1,0 +1,26 @@
+@model AddressViewModel
+@{
+    ViewData["Title"] = Model.Id.HasValue ? "Editar dirección" : "Nueva dirección";
+}
+<div class="account-shell">
+    <partial name="_AccountNav" />
+    <section class="account-main">
+        <p class="eyebrow">DATOS DE ENVÍO</p>
+        <h1>@ViewData["Title"]</h1>
+        <form asp-action="GuardarDireccion" method="post" class="form-card account-form">
+            <input asp-for="Id" type="hidden" />
+            <div asp-validation-summary="ModelOnly" class="form-errors"></div>
+            <div class="form-grid">
+                <div class="field field-wide"><label asp-for="Label"></label><input asp-for="Label" placeholder="Casa, trabajo..." /><span asp-validation-for="Label"></span></div>
+                <div class="field field-wide"><label asp-for="RecipientName"></label><input asp-for="RecipientName" autocomplete="name" /><span asp-validation-for="RecipientName"></span></div>
+                <div class="field"><label asp-for="Phone"></label><input asp-for="Phone" type="tel" autocomplete="tel" /><span asp-validation-for="Phone"></span></div>
+                <div class="field"><label asp-for="City"></label><input asp-for="City" autocomplete="address-level1" /><span asp-validation-for="City"></span></div>
+                <div class="field field-wide"><label asp-for="Street"></label><input asp-for="Street" autocomplete="street-address" /><span asp-validation-for="Street"></span></div>
+                <div class="field"><label asp-for="District"></label><input asp-for="District" autocomplete="address-level2" /><span asp-validation-for="District"></span></div>
+                <div class="field"><label asp-for="Reference"></label><input asp-for="Reference" /><span asp-validation-for="Reference"></span></div>
+            </div>
+            <label class="account-check"><input asp-for="IsDefault" /> @Html.DisplayNameFor(m => m.IsDefault)</label>
+            <div class="account-form-actions"><button class="button button-dark" type="submit">GUARDAR DIRECCIÓN</button><a asp-action="Direcciones">Cancelar</a></div>
+        </form>
+    </section>
+</div>

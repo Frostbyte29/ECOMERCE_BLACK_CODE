@@ -11,11 +11,41 @@ public class BlackCodeContext(DbContextOptions<BlackCodeContext> options) : Iden
     public DbSet<OrderItem> OrderItems => Set<OrderItem>();
     public DbSet<Payment> Payments => Set<Payment>();
     public DbSet<OrderStatusHistory> OrderStatusHistory => Set<OrderStatusHistory>();
+    public DbSet<Favorite> Favorites => Set<Favorite>();
+    public DbSet<SavedAddress> SavedAddresses => Set<SavedAddress>();
+    public DbSet<ProductInventory> ProductInventories => Set<ProductInventory>();
+    public DbSet<StockMovement> StockMovements => Set<StockMovement>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.Entity<Product>().HasIndex(p => p.Name);
+
+        modelBuilder.Entity<Favorite>(favorite =>
+        {
+            favorite.HasIndex(f => new { f.UserId, f.ProductId }).IsUnique();
+            favorite.HasOne(f => f.User).WithMany().HasForeignKey(f => f.UserId).OnDelete(DeleteBehavior.Cascade);
+            favorite.HasOne(f => f.Product).WithMany().HasForeignKey(f => f.ProductId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<SavedAddress>(address =>
+        {
+            address.HasIndex(a => a.UserId);
+            address.HasOne(a => a.User).WithMany().HasForeignKey(a => a.UserId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<ProductInventory>(inventory =>
+        {
+            inventory.HasKey(i => i.ProductId);
+            inventory.HasOne(i => i.Product).WithOne().HasForeignKey<ProductInventory>(i => i.ProductId).OnDelete(DeleteBehavior.Cascade);
+            inventory.HasMany(i => i.Movements).WithOne(m => m.Inventory).HasForeignKey(m => m.ProductId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<StockMovement>(movement =>
+        {
+            movement.HasIndex(m => m.ChangedAt);
+            movement.HasOne(m => m.ChangedByUser).WithMany().HasForeignKey(m => m.ChangedByUserId).OnDelete(DeleteBehavior.Restrict);
+        });
 
         modelBuilder.Entity<Order>(order =>
         {

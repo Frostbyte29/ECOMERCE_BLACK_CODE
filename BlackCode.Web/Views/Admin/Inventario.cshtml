@@ -1,0 +1,42 @@
+@model AdminInventoryViewModel
+@{
+    ViewData["Title"] = "Inventario";
+}
+<div class="admin-shell">
+    <partial name="_AdminNav" />
+    <section class="admin-main">
+        <partial name="_AdminTopbar" />
+        <p class="eyebrow">ADMINISTRACIÓN</p><h1>Inventario</h1>
+        <p class="admin-intro">Consulta tus productos y registra cantidades reales. Los productos sin cantidad figuran como “sin definir”.</p>
+        <form method="get" asp-action="Inventario" class="admin-inventory-search"><label class="sr-only" for="inventory-search">Buscar producto o categoría</label><input id="inventory-search" type="search" name="search" value="@Model.Search" placeholder="Buscar producto o categoría" /><button class="button button-dark" type="submit">BUSCAR</button></form>
+        <div class="table-wrap"><table class="admin-table inventory-table"><thead><tr><th>Producto</th><th>Categoría</th><th>Precio</th><th>Cantidad</th><th>Mínimo</th><th>Estado</th><th></th></tr></thead><tbody>
+            @foreach (var product in Model.Products)
+            {
+                var inventory = Model.InventoryByProduct.GetValueOrDefault(product.Id);
+                <tr>
+                    <td><div class="inventory-product"><img src="@product.ImageUrl" alt="" /><strong>@product.Name</strong></div></td>
+                    <td>@product.Category</td><td>S/ @product.Price.ToString("0.00")</td>
+                    <td>@(inventory?.Quantity?.ToString() ?? "Sin definir")</td>
+                    <td>@(inventory?.MinimumQuantity?.ToString() ?? "Sin definir")</td>
+                    <td>@if (inventory?.Quantity is null) { <span>Sin definir</span> } else if (inventory.MinimumQuantity.HasValue && inventory.Quantity <= inventory.MinimumQuantity) { <span class="stock-low">En el mínimo</span> } else { <span class="stock-ok">Registrado</span> }</td>
+                    <td><a asp-action="EditarStock" asp-route-id="@product.Id">AJUSTAR →</a></td>
+                </tr>
+            }
+        </tbody></table></div>
+        @if (Model.Products.Count == 0) { <p>No encontramos productos con esa búsqueda.</p> }
+        <section class="admin-panel stock-history">
+            <h2>Movimientos recientes</h2>
+            @if (Model.RecentMovements.Count == 0) { <p>Aún no hay ajustes de stock.</p> }
+            else
+            {
+                <div class="table-wrap"><table class="admin-table"><thead><tr><th>Fecha</th><th>Producto</th><th>Antes</th><th>Después</th><th>Motivo</th></tr></thead><tbody>
+                    @foreach (var movement in Model.RecentMovements)
+                    {
+                        <tr><td>@PeruTime.Format(movement.ChangedAt)</td><td>@movement.Inventory?.Product?.Name</td><td>@(movement.PreviousQuantity?.ToString() ?? "Sin definir")</td><td>@movement.NewQuantity</td><td>@movement.Reason</td></tr>
+                    }
+                </tbody></table></div>
+            }
+        </section>
+        <p class="admin-chart-note">Este registro es informativo. Las compras no descuentan existencias ni se bloquean por stock.</p>
+    </section>
+</div>

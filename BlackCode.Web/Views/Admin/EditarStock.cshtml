@@ -1,0 +1,22 @@
+@model StockEditViewModel
+@{
+    ViewData["Title"] = "Ajustar stock";
+}
+<div class="admin-shell">
+    <partial name="_AdminNav" />
+    <section class="admin-main">
+        <partial name="_AdminTopbar" />
+        <p class="eyebrow">INVENTARIO</p><h1>Ajustar stock</h1>
+        <p class="admin-intro">@Model.ProductName</p>
+        <form asp-action="EditarStock" asp-route-id="@Model.ProductId" method="post" class="form-card account-form">
+            <input asp-for="ProductId" type="hidden" />
+            <div asp-validation-summary="ModelOnly" class="form-errors"></div>
+            <p>Cantidad anterior: @(Model.PreviousQuantity?.ToString() ?? "sin definir")</p>
+            <div class="field"><label asp-for="Quantity"></label><input asp-for="Quantity" type="number" min="0" required /><span asp-validation-for="Quantity"></span></div>
+            <div class="field"><label asp-for="MinimumQuantity"></label><input asp-for="MinimumQuantity" type="number" min="0" /><span asp-validation-for="MinimumQuantity"></span></div>
+            <div class="field"><label asp-for="Reason"></label><textarea asp-for="Reason" rows="3" placeholder="Por ejemplo: conteo físico o recepción de productos" required></textarea><span asp-validation-for="Reason"></span></div>
+            <p class="account-note">Este ajuste no modifica pedidos ni bloquea compras.</p>
+            <div class="account-form-actions"><button class="button button-dark" type="submit">GUARDAR AJUSTE</button><a asp-action="Inventario">Cancelar</a></div>
+        </form>
+    </section>
+</div>

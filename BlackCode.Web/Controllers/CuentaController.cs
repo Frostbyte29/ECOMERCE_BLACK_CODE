@@ -15,6 +15,9 @@ public class LoginViewModel
     [Display(Name = "Contraseña")]
     public string Password { get; set; } = "";
 
+    [Display(Name = "Mantener sesión iniciada")]
+    public bool RememberMe { get; set; }
+
     public string? ReturnUrl { get; set; }
 }
 
@@ -28,9 +31,18 @@ public class RegisterViewModel
     [Display(Name = "Correo")]
     public string Email { get; set; } = "";
 
+    [RegularExpression(@"^\+?\d{7,15}$", ErrorMessage = "Ingresa un teléfono válido o deja este campo vacío.")]
+    [Display(Name = "Teléfono (opcional)")]
+    public string? PhoneNumber { get; set; }
+
     [Required(ErrorMessage = "Ingresa una contraseña."), StringLength(100, MinimumLength = 6, ErrorMessage = "Mínimo 6 caracteres."), DataType(DataType.Password)]
     [Display(Name = "Contraseña")]
     public string Password { get; set; } = "";
+
+    [Required(ErrorMessage = "Confirma tu contraseña."), DataType(DataType.Password)]
+    [Compare(nameof(Password), ErrorMessage = "Las contraseñas no coinciden.")]
+    [Display(Name = "Confirmar contraseña")]
+    public string ConfirmPassword { get; set; } = "";
 
     public string? ReturnUrl { get; set; }
 }
@@ -48,10 +60,12 @@ public class CuentaController(
     {
         if (!ModelState.IsValid) return View(model);
 
-        var result = await signInManager.PasswordSignInAsync(model.Email, model.Password, isPersistent: true, lockoutOnFailure: false);
+        var result = await signInManager.PasswordSignInAsync(model.Email.Trim(), model.Password, isPersistent: model.RememberMe, lockoutOnFailure: true);
         if (!result.Succeeded)
         {
-            ModelState.AddModelError("", "Correo o contraseña incorrectos.");
+            ModelState.AddModelError("", result.IsLockedOut
+                ? "Demasiados intentos. Espera unos minutos e inténtalo de nuevo."
+                : "Correo o contraseña incorrectos.");
             return View(model);
         }
         return LocalRedirect(Url.IsLocalUrl(model.ReturnUrl) ? model.ReturnUrl! : "/");
@@ -64,7 +78,8 @@ public class CuentaController(
     {
         if (!ModelState.IsValid) return View(model);
 
-        var user = new ApplicationUser { UserName = model.Email, Email = model.Email, FullName = model.FullName.Trim() };
+        var email = model.Email.Trim();
+        var user = new ApplicationUser { UserName = email, Email = email, FullName = model.FullName.Trim(), PhoneNumber = model.PhoneNumber?.Trim() };
         var result = await userManager.CreateAsync(user, model.Password);
         if (!result.Succeeded)
         {
@@ -73,7 +88,7 @@ public class CuentaController(
         }
 
         await userManager.AddToRoleAsync(user, Roles.Cliente);
-        await signInManager.SignInAsync(user, isPersistent: true);
+        await signInManager.SignInAsync(user, isPersistent: false);
         return LocalRedirect(Url.IsLocalUrl(model.ReturnUrl) ? model.ReturnUrl! : "/");
     }
 

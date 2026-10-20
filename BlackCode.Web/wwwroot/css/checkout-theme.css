@@ -1,0 +1,91 @@
+.checkout-page{max-width:1420px;margin:0 auto;padding-top:30px;padding-bottom:76px}
+.checkout-breadcrumb{display:flex;align-items:center;gap:10px;color:#858585;font-size:11px;margin-bottom:22px}
+.checkout-breadcrumb a:hover{text-decoration:underline;color:#111}
+.checkout-breadcrumb strong{color:#111;font-weight:500}
+.checkout-page-heading{margin-bottom:25px}
+.checkout-page-heading .eyebrow{letter-spacing:2.8px;margin-bottom:8px}
+.checkout-page-heading h1{font:400 clamp(38px,4.1vw,58px)/1.08 Georgia,serif;margin:0 0 9px}
+.checkout-page-heading>p:last-child{font-size:12px;color:#666;margin:0;line-height:1.6}
+.checkout-page .checkout-steps{max-width:780px;margin-bottom:27px;border:0;gap:10px}
+.checkout-page .checkout-steps li{display:flex;align-items:center;gap:9px;flex:1;color:#898989;border:0;border-top:1px solid #dcdcdc;margin:0;padding:12px 0 0;font-size:10px;letter-spacing:1.3px}
+.checkout-page .checkout-steps li.done{color:#111;border-top-color:#111}
+.checkout-page .checkout-steps li span{width:23px;height:23px;display:grid;place-items:center;border:1px solid #aaa;border-radius:50%;font-size:10px;letter-spacing:0}
+.checkout-page .checkout-steps li.done span{background:#111;border-color:#111;color:#fff}
+.checkout-page .checkout-layout{grid-template-columns:minmax(0,1.42fr) minmax(310px,.88fr);gap:34px}
+.checkout-page .form-card{padding:0;border:0;min-width:0}
+.checkout-form-intro{font-size:12px;color:#666;margin:0 0 22px;line-height:1.6}
+.checkout-page .checkout-section-heading{align-items:center;border-top:1px solid #e2e2e2;padding-top:21px;margin:25px 0 17px;gap:16px}
+.checkout-page .checkout-section-heading:first-child{margin-top:0}
+.checkout-page .checkout-section-heading>span{width:29px;height:29px;display:grid;place-items:center;flex:none;background:#111;border-radius:50%;font:400 14px Georgia,serif;color:#fff}
+.checkout-page .checkout-section-heading h3{font-size:22px;margin-bottom:4px}
+.checkout-page .checkout-section-heading p{font-size:11px}
+.checkout-page .shipping-choice-grid{grid-template-columns:1fr;gap:9px;margin-bottom:21px}
+.checkout-page .shipping-choice{min-height:0;padding:16px 18px;align-items:start;gap:16px;background:#fff}
+.checkout-page .shipping-choice:hover{border-color:#999}
+.checkout-page .shipping-choice input{width:17px;height:17px;margin:1px 0 0}
+.checkout-page .shipping-choice-body{gap:5px;font-size:12px}
+.checkout-page .shipping-choice-body strong{font-size:13px}
+.checkout-page .shipping-choice-new{align-items:center}
+.checkout-page .checkout-new-address{border-top:0;padding-top:0;margin-bottom:17px}
+.checkout-page .checkout-new-address h3{font-size:19px;margin:0 0 16px}
+.checkout-page .field input,.checkout-page .field textarea{min-height:44px;border-color:#d8d8d8}
+.checkout-page .field textarea{min-height:76px}
+.checkout-page .field label{font-size:10px;letter-spacing:1.2px;color:#4d4d4d}
+.checkout-page .form-grid{gap:13px 16px}
+.checkout-page .checkout-no-address{border:1px solid #e1e1e1;background:#fafafa}
+.checkout-delivery-row{display:flex;align-items:center;gap:14px;border:1px solid #d8d8d8;padding:16px 18px;min-height:69px}
+.checkout-delivery-icon{width:32px;height:32px;display:grid;place-items:center;flex:none}
+.checkout-delivery-icon svg{width:28px;height:28px;fill:none;stroke:#111;stroke-width:1.3;stroke-linejoin:round}
+.checkout-delivery-row>div{display:flex;flex-direction:column;gap:4px;min-width:0}
+.checkout-delivery-row strong{font-size:12px;font-weight:600}
+.checkout-delivery-row small{font-size:10px;color:#777}
+.checkout-delivery-row>b{margin-left:auto;white-space:nowrap;font-size:12px;font-weight:500}
+.checkout-page .checkout-shipping-form>.button,.checkout-page .checkout-payment-form>.button{min-height:50px;margin-top:18px}
+.checkout-page .checkout-summary,.checkout-page .checkout-order-summary{background:#f7f7f7;padding:27px 28px;border:0;position:sticky;top:20px}
+.checkout-page .checkout-order-summary .summary-box{padding:0;border:0;background:none}
+.checkout-page .checkout-order-summary .checkout-confirm-button{width:100%;min-height:50px;margin:22px 0 0;padding:0 14px;text-align:center}
+.payment-deadline{display:flex;flex-direction:column;gap:5px;border:1px solid #dedede;background:#fff;padding:13px 15px;margin:18px 0 0;font-size:11px;line-height:1.5}
+.payment-deadline strong{font-size:12px;color:#111}
+.payment-deadline span{color:#666}
+.account-main>.payment-deadline{margin:0 0 22px}
+.checkout-page .checkout-cancel-form .button{width:100%;min-height:44px;margin:3px 0 0;background:transparent}
+.checkout-summary-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;border-bottom:1px solid #ddd;padding-bottom:16px;margin-bottom:7px}
+.checkout-summary-head h2{font:400 22px Georgia,serif;margin:0}
+.checkout-summary-head a{font-size:10px;text-decoration:underline;white-space:nowrap}
+.checkout-page .summary-box h3{display:none}
+.checkout-page .summary-line{grid-template-columns:67px minmax(0,1fr) auto;gap:13px;padding:15px 0;border-bottom:1px solid #e5e5e5}
+.checkout-page .summary-line img{width:67px;height:67px;background:#eee}
+.checkout-page .summary-line-info b{font:400 15px Georgia,serif}
+.checkout-page .summary-line-info small{font-size:10px;line-height:1.5}
+.checkout-page .summary-line>span{font-size:11px;white-space:nowrap}
+.checkout-page .summary-totals{border:0;margin-top:15px;padding:0;gap:12px}
+.checkout-page .summary-totals>div{gap:12px}
+.checkout-page .summary-total{font:400 20px Georgia,serif;margin-top:5px;padding-top:15px}
+.checkout-demo-disclaimer{border-top:1px solid #ddd;padding-top:14px;margin:17px 0 0;font-size:11px;line-height:1.6;color:#666}
+.checkout-order-address{display:flex;flex-direction:column;gap:5px;border:1px solid #d8d8d8;padding:16px 18px;font-size:12px;line-height:1.5}
+.checkout-order-address strong{font-size:13px}
+.checkout-order-address span{color:#666}
+.checkout-page .pay-methods{display:grid;grid-template-columns:1fr;gap:9px;margin:0 0 19px}
+.checkout-page .pay-method{display:block;position:relative}
+.checkout-page .pay-method>span{display:grid;grid-template-columns:31px minmax(0,1fr) auto;align-items:center;gap:14px;min-height:72px;padding:11px 17px 11px 51px;border-color:#d8d8d8;text-align:left;background:#fff;color:#111}
+.checkout-page .pay-method-option span{min-height:0;padding:0;border:0;background:transparent;text-align:left;cursor:inherit}
+.checkout-page .pay-method>span:before{content:"";position:absolute;left:18px;top:50%;transform:translateY(-50%);width:14px;height:14px;border-radius:50%;border:1px solid #999;background:#fff}
+.checkout-page .pay-method input:checked+span{border-color:#111;box-shadow:inset 0 0 0 1px #111;background:#fff;color:#111}
+.checkout-page .pay-method input:checked+span:before{border:5px solid #111}
+.checkout-page .pay-method-option .pay-method-icon{display:block}
+.checkout-page .pay-method-icon svg{width:30px;height:30px;fill:none;stroke:#111;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;display:block}
+.checkout-page .pay-method-option .pay-method-copy{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:4px;min-width:0}
+.checkout-page .pay-method b{font-size:12px;font-weight:600}
+.checkout-page .pay-method small{color:#777;font-size:10px;line-height:1.35}
+.checkout-page .pay-method-option .pay-method-brands{display:flex;align-items:center;gap:13px;justify-content:flex-end;white-space:nowrap}
+.checkout-page .pay-brand-visa{color:#1434cb;font:italic 900 21px Arial,Helvetica,sans-serif;letter-spacing:-1.5px}
+.checkout-page .pay-brand-mastercard{display:flex;align-items:center;width:37px;height:23px}
+.pay-brand-mastercard i{width:22px;height:22px;border-radius:50%;background:#eb001b;display:block}
+.pay-brand-mastercard i+i{background:#f79e1b;margin-left:-8px;mix-blend-mode:multiply}
+.checkout-page .pay-brand-app{display:block;width:32px;height:32px;object-fit:contain}
+.checkout-page .pay-panel{border:1px solid #e4e4e4;padding:20px;margin:0 0 5px}
+.checkout-page .pay-panel .demo-note{margin-bottom:0}
+@media(max-width:960px){.checkout-page .checkout-layout{grid-template-columns:minmax(0,1fr) 300px;gap:22px}.checkout-page .checkout-summary,.checkout-page .checkout-order-summary{padding:21px}}
+@media(max-width:760px){.checkout-page{padding-top:22px;padding-bottom:44px}.checkout-page .checkout-layout{grid-template-columns:1fr;gap:28px}.checkout-page .checkout-summary,.checkout-page .checkout-order-summary{position:static;order:2}.checkout-page .checkout-steps{max-width:none}.checkout-page .checkout-section-heading{margin-top:21px}.checkout-page-heading h1{font-size:40px}}
+@media(max-width:420px){.checkout-page .checkout-steps{gap:5px}.checkout-page .checkout-steps li{font-size:9px;letter-spacing:.2px;gap:5px}.checkout-page .checkout-steps li span{width:20px;height:20px}.checkout-page .summary-line{grid-template-columns:57px minmax(0,1fr) auto;gap:8px}.checkout-page .summary-line img{width:57px;height:57px}.checkout-page .summary-line-info b{font-size:13px}.checkout-page .checkout-summary,.checkout-page .checkout-order-summary{padding:18px}}
+@media(max-width:520px){.checkout-page .pay-method>span{grid-template-columns:26px minmax(0,1fr) auto;gap:8px;padding:10px 10px 10px 37px}.checkout-page .pay-method>span:before{left:11px}.checkout-page .pay-method-icon svg{width:26px;height:26px}.checkout-page .pay-method-option .pay-method-brands{gap:4px}.checkout-page .pay-brand-visa{font-size:16px}.checkout-page .pay-brand-mastercard{width:26px;height:18px}.pay-brand-mastercard i{width:18px;height:18px}.pay-brand-mastercard i+i{margin-left:-10px}.checkout-page .pay-brand-app{width:25px;height:25px}}

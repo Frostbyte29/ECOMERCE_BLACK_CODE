@@ -1,0 +1,25 @@
+@model List<Product>
+@{
+    ViewData["Title"] = "Mis favoritos";
+}
+<div class="account-shell">
+    <partial name="_AccountNav" />
+    <section class="account-main">
+        <p class="eyebrow">PIEZAS QUE TE GUSTAN</p>
+        <h1>Mis favoritos</h1>
+        <p class="account-intro"><span data-favorite-count>@Model.Count</span> pieza(s) guardada(s).</p>
+        @if (Model.Count == 0)
+        {
+            <div class="account-empty"><p>Aún no has guardado favoritos.</p><a class="button button-dark" asp-controller="Productos" asp-action="Index">EXPLORAR PRODUCTOS</a></div>
+        }
+        else
+        {
+            <div class="product-grid favorites-grid">
+                @foreach (var product in Model)
+                {
+                    <partial name="_ProductCard" model="product" />
+                }
+            </div>
+        }
+    </section>
+</div>

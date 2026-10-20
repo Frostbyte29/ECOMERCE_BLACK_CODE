@@ -1,35 +1,33 @@
 @model IReadOnlyList<BlackCode.Web.Models.Product>
 @{
     ViewData["Title"] = "Inicio";
+    var collections = Model.GroupBy(p => p.Category).Take(4).ToList();
 }
 <section class="hero">
     <img src="/images/products/portada-blackcode.jpg" alt="Joyería masculina en tonos oscuros" />
     <div class="hero-shade"></div>
     <div class="hero-copy">
-        <p class="eyebrow">BLACK CODE</p>
-        <h1>Bienvenido<br />a tu próxima pieza.</h1>
-        <p class="hero-subtitle">NUEVAS PIEZAS, LA MISMA ACTITUD.</p>
-        <a class="button button-light" href="#productos">EXPLORAR LO NUEVO <span>→</span></a>
+        <p class="eyebrow">JOYERÍA PARA HOMBRES</p>
+        <h1>Tu actitud,<br />tu código.</h1>
+        <p class="hero-subtitle">DISEÑOS QUE HABLAN POR TI.</p>
+        <a class="button button-light" asp-controller="Productos" asp-action="Colecciones">EXPLORAR COLECCIONES <span>→</span></a>
     </div>
 </section>
 <section class="section products-section" id="productos">
-    <div class="section-heading"><div><h2>Recomendados para ti</h2><p>Piezas que hablan por sí solas.</p></div><span class="text-link">VER TODOS →</span></div>
+    <div class="section-heading"><div><h2>Lo nuevo</h2><p>Explora las piezas disponibles.</p></div><a class="text-link" asp-controller="Productos" asp-action="Index">VER TODOS →</a></div>
     <div class="product-grid">
-        @foreach (var product in Model)
+        @foreach (var product in Model.Take(4))
         {
-            <a class="product-card" asp-controller="Productos" asp-action="Detalle" asp-route-id="@product.Id">
-                <div class="product-image"><img src="@product.ImageUrl" alt="@product.Name" loading="lazy" /></div>
-                <h3>@product.Name</h3>
-                <p class="price">S/ @product.Price.ToString("0.00")</p>
-            </a>
+            <partial name="_ProductCard" model="product" />
         }
     </div>
 </section>
-<section class="section account-section" id="cuenta">
-    <div class="section-heading"><div><h2>Mi cuenta</h2><p>Gestiona tu cuenta de forma rápida y segura.</p></div></div>
-    <div class="account-grid">
-        <a class="account-tile" asp-controller="Pedidos" asp-action="Index"><span class="tile-icon">◇</span><h3>Mis pedidos</h3><p>Revisa el estado de tus pedidos y sigue su envío.</p><b>→</b></a>
-        <a class="account-tile" href="#favoritos"><span class="tile-icon">♡</span><h3>Favoritos</h3><p>Descubre nuevamente las piezas que te inspiran.</p><b>→</b></a>
-        <a class="account-tile" href="#direcciones"><span class="tile-icon">⌖</span><h3>Direcciones</h3><p>Administra tus direcciones de envío.</p><b>→</b></a>
+<section class="section home-collections" id="colecciones">
+    <div class="section-heading"><div><h2>Colecciones</h2></div><a class="text-link" asp-controller="Productos" asp-action="Colecciones">VER TODAS →</a></div>
+    <div class="home-collection-grid">
+        @foreach (var collection in collections)
+        {
+            <a asp-controller="Productos" asp-action="Index" asp-route-categoria="@collection.Key" class="home-collection-card"><img src="@collection.First().ImageUrl" alt="" /><span>@collection.Key.ToUpperInvariant() →</span></a>
+        }
     </div>
 </section>

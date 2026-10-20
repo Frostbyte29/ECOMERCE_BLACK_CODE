@@ -11,4 +11,7 @@ public class HomeController(BlackCodeContext context) : Controller
         var products = await context.Products.AsNoTracking().OrderBy(p => p.Id).ToListAsync();
         return View(products);
     }
+
+    [HttpGet("Nosotros")]
+    public IActionResult Nosotros() => View();
 }

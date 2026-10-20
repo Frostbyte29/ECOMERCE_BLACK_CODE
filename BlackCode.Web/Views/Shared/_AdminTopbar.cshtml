@@ -1,0 +1,17 @@
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
+@{
+    var adminUser = await UserManager.GetUserAsync(User);
+    var adminName = string.IsNullOrWhiteSpace(adminUser?.FullName) ? (adminUser?.Email ?? "Administrador") : adminUser.FullName;
+}
+<header class="admin-topbar">
+    <form asp-controller="AdminCatalogo" asp-action="Productos" method="get" class="admin-top-search">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.5" /><path d="m16 16 5 5" /></svg>
+        <label class="sr-only" for="admin-global-search">Buscar productos</label>
+        <input id="admin-global-search" name="search" type="search" placeholder="Buscar productos..." />
+    </form>
+    <details class="admin-user-menu">
+        <summary><span class="admin-avatar" aria-hidden="true">@adminName[..1].ToUpperInvariant()</span><span class="admin-user-copy"><strong>@adminName</strong><small>Administrador</small></span><span aria-hidden="true">⌄</span></summary>
+        <div class="admin-user-dropdown"><a asp-controller="MiCuenta" asp-action="Index">Mi cuenta</a><a asp-controller="Home" asp-action="Index">Ir a la tienda</a><form asp-controller="Cuenta" asp-action="Logout" method="post"><button type="submit">Cerrar sesión</button></form></div>
+    </details>
+</header>

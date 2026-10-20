@@ -1,0 +1,27 @@
+@model AdminProductFormViewModel
+@{
+    var editing = Model.Id > 0;
+    ViewData["Title"] = editing ? "Editar producto" : "Nuevo producto";
+}
+<div class="admin-shell">
+    <partial name="_AdminNav" />
+    <section class="admin-main">
+        <partial name="_AdminTopbar" />
+        <p class="eyebrow">CATÁLOGO</p><h1>@ViewData["Title"]</h1>
+        <p class="admin-intro">Usa una imagen que ya exista en la carpeta images/products de este proyecto.</p>
+        <form asp-action="@(editing ? "Editar" : "Nuevo")" asp-route-id="@(editing ? Model.Id : null)" method="post" class="form-card account-form admin-product-form">
+            <input asp-for="Id" type="hidden" />
+            <div asp-validation-summary="ModelOnly" class="form-errors"></div>
+            <div class="field"><label asp-for="Name">Nombre</label><input asp-for="Name" required maxlength="100" /><span asp-validation-for="Name"></span></div>
+            <div class="field"><label asp-for="Category">Categoría</label><input asp-for="Category" required maxlength="50" /><span asp-validation-for="Category"></span></div>
+            <div class="field"><label asp-for="Price">Precio en soles</label><input asp-for="Price" type="number" step="0.01" min="0.01" required /><span asp-validation-for="Price"></span></div>
+            <div class="field"><label asp-for="Description">Descripción</label><textarea asp-for="Description" rows="4" required maxlength="1200"></textarea><span asp-validation-for="Description"></span></div>
+            <div class="field"><label asp-for="Material">Material</label><input asp-for="Material" required maxlength="100" /><span asp-validation-for="Material"></span></div>
+            <div class="field"><label asp-for="Finish">Acabado</label><input asp-for="Finish" required maxlength="100" /><span asp-validation-for="Finish"></span></div>
+            <div class="field"><label asp-for="SizesCsv">Tallas separadas por coma</label><input asp-for="SizesCsv" required maxlength="100" placeholder="7,8,9 o Única" /><span asp-validation-for="SizesCsv"></span></div>
+            <div class="field"><label asp-for="ImageUrl">Ruta de imagen</label><input asp-for="ImageUrl" required maxlength="500" placeholder="/images/products/archivo.jpg" /><span asp-validation-for="ImageUrl"></span></div>
+            @if (!string.IsNullOrWhiteSpace(Model.ImageUrl)) { <img class="admin-product-preview" src="@Model.ImageUrl" alt="Vista previa del producto" /> }
+            <div class="account-form-actions"><button class="button button-dark" type="submit">GUARDAR PRODUCTO</button><a asp-action="Productos">Cancelar</a></div>
+        </form>
+    </section>
+</div>

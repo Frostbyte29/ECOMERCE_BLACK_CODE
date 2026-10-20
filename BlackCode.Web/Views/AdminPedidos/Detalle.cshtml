@@ -4,11 +4,19 @@
     var next = OrderService.AllowedTransitions(Model.Status);
 }
 <div class="breadcrumbs"><a asp-action="Index">Panel de pedidos</a> › @Model.Code</div>
+<div class="admin-shell">
+    <partial name="_AdminNav" />
+    <section class="admin-main">
+        <partial name="_AdminTopbar" />
 <section class="section admin">
     <div class="section-heading">
         <div><h2>Pedido @Model.Code</h2><p>@PeruTime.Format(Model.CreatedAt) · @Model.User?.FullName (@Model.User?.Email)</p></div>
         <partial name="_OrderStatusBadge" model="Model.Status" />
     </div>
+    @if (Model.Status == OrderStatus.PendientePago)
+    {
+        <div class="payment-deadline"><strong>Pago pendiente</strong><span>Plazo hasta el @PeruTime.Format(OrderService.PaymentDueAt(Model)) (hora de Perú). Después se cancela automáticamente.</span></div>
+    }
     <div class="checkout-layout">
         <div>
             <div class="info-box">
@@ -50,6 +58,8 @@
         <aside><partial name="_OrderItems" model="Model" /></aside>
     </div>
 </section>
+    </section>
+</div>
 @section Scripts {
     <script>
         // El número de seguimiento solo se pide al marcar el pedido como enviado.

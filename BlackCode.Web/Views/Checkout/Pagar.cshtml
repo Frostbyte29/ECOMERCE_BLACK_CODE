@@ -3,12 +3,17 @@
     ViewData["Title"] = "Pago";
     var order = Model.Order!;
 }
-<section class="section page-narrow">
+<section class="section checkout-page">
+    <nav class="checkout-breadcrumb" aria-label="Ruta de compra"><a asp-controller="Carrito" asp-action="Index">Carrito</a><span aria-hidden="true">›</span><a asp-action="Index">Finalizar compra</a><span aria-hidden="true">›</span><strong>Pago</strong></nav>
+    <div class="checkout-page-heading"><p class="eyebrow">BLACK CODE / COMPRA</p><h1>Finalizar compra</h1><p>Pedido @order.Code · Revisa el total y elige cómo registrar el pago.</p></div>
     <partial name="_Steps" model="2" />
     <div class="checkout-layout">
-        <form asp-action="Pagar" asp-route-id="@order.Id" method="post" class="form-card" autocomplete="off">
-            <h2>Elige cómo pagar</h2>
-            <p class="muted small">Pedido <b>@order.Code</b> · Total <b>S/ @order.Total.ToString("0.00")</b></p>
+        <form id="checkout-payment-form" asp-action="Pagar" asp-route-id="@order.Id" method="post" class="form-card checkout-payment-form" autocomplete="off">
+            <div class="checkout-section-heading"><span>1</span><div><h3>Dirección de entrega</h3><p>Datos registrados para este pedido.</p></div></div>
+            <div class="checkout-order-address"><strong>@order.ShippingName</strong><span>@order.ShippingAddress, @order.ShippingDistrict, @order.ShippingCity</span><span>@order.ShippingPhone</span></div>
+            <div class="checkout-section-heading"><span>2</span><div><h3>Método de envío</h3><p>Tarifa incluida en el total del pedido.</p></div></div>
+            <div class="checkout-delivery-row"><span class="checkout-delivery-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M2 6h12v10H2zM14 9h4l4 4v3h-8zM5 18a2 2 0 1 0 4 0 2 2 0 0 0-4 0Zm11 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0Z"/></svg></span><div><strong>Envío estándar</strong><small>Para este pedido</small></div><b>@(order.ShippingCost == 0 ? "Gratis" : "S/ " + order.ShippingCost.ToString("0.00"))</b></div>
+            <div class="checkout-section-heading"><span>3</span><div><h3>Método de pago</h3><p>Elige una opción de demostración.</p></div></div>
             <div asp-validation-summary="ModelOnly" class="form-errors"></div>
 
             <div class="pay-methods">
@@ -16,7 +21,31 @@
                 {
                     <label class="pay-method">
                         <input type="radio" name="Method" value="@method" checked="@(Model.Method == method)" />
-                        <span>@OrderService.DisplayName(method)</span>
+                        <span class="pay-method-option">
+                            <span class="pay-method-icon" aria-hidden="true">
+                                @if (method == PaymentMethod.Tarjeta)
+                                {
+                                    <svg viewBox="0 0 32 32"><rect x="3" y="7" width="26" height="18" rx="2"/><path d="M3 13h26M8 20h7"/></svg>
+                                }
+                                else if (method == PaymentMethod.YapePlin)
+                                {
+                                    <svg viewBox="0 0 32 32"><rect x="9" y="3" width="14" height="26" rx="2"/><path d="M13 6h6M15 25h2"/></svg>
+                                }
+                                else
+                                {
+                                    <svg viewBox="0 0 32 32"><path d="M12 4h12v11H12zM12 8h12M3 22h7l5-4h5a2 2 0 0 1 0 4h-4M3 27h8l11-4 6-5a2 2 0 0 0-3-3l-5 3M3 20v9"/></svg>
+                                }
+                            </span>
+                            <span class="pay-method-copy"><b>@OrderService.DisplayName(method)</b><small>@(method == PaymentMethod.Tarjeta ? "Tarjeta de prueba · sin cobro real" : method == PaymentMethod.YapePlin ? "Código de prueba · sin transferencia" : "Pago al recibir el pedido")</small></span>
+                            @if (method == PaymentMethod.Tarjeta)
+                            {
+                                <span class="pay-method-brands" aria-hidden="true"><span class="pay-brand-visa">VISA</span><span class="pay-brand-mastercard"><i></i><i></i></span></span>
+                            }
+                            else if (method == PaymentMethod.YapePlin)
+                            {
+                                <span class="pay-method-brands" aria-hidden="true"><img class="pay-brand-app" src="~/images/payment/yape.png" alt="" /><img class="pay-brand-app" src="~/images/payment/plin.png" alt="" /></span>
+                            }
+                        </span>
                     </label>
                 }
             </div>
@@ -32,19 +61,25 @@
             </div>
 
             <div class="pay-panel" data-method="YapePlin">
-                <p class="small">Yapea o plinea <b>S/ @order.Total.ToString("0.00")</b> al número <b>999 888 777</b> (BLACK CODE) e ingresa el número de operación.</p>
-                <div class="field"><label asp-for="OperationCode"></label><input asp-for="OperationCode" inputmode="numeric" placeholder="123456" /></div>
-                <p class="demo-note">Modo demostración: cualquier número de 6 a 10 dígitos se acepta.</p>
+                <p class="small">Simula el pago de <b>S/ @order.Total.ToString("0.00")</b> con Yape o Plin. En una compra real, Yape puede pedirte aprobarla desde su app o usar un código de aprobación.</p>
+                <div class="field"><label for="OperationCode">Código de prueba</label><input asp-for="OperationCode" inputmode="numeric" placeholder="123456" /></div>
+                <p class="demo-note">Esta tienda no está conectada a Yape ni Plin. Escribe 6 a 10 dígitos inventados. No ingreses un código real ni hagas una transferencia.</p>
             </div>
 
             <div class="pay-panel" data-method="ContraEntrega">
                 <p class="small">Pagas en efectivo o con tarjeta cuando recibes tu pedido. Prepararemos tu pedido de inmediato.</p>
             </div>
 
-            <button type="submit" class="button button-dark full-width">PAGAR S/ @order.Total.ToString("0.00")</button>
         </form>
-        <aside>
+        <aside class="checkout-order-summary">
+            <div class="checkout-summary-head"><h2>Resumen del pedido</h2><a asp-controller="Pedidos" asp-action="Detalle" asp-route-id="@order.Id">Ver pedido</a></div>
             <partial name="_OrderItems" model="order" />
+            <div class="payment-deadline"><strong>Tienes 3 días para pagar</strong><span>Hasta el @PeruTime.Format(OrderService.PaymentDueAt(order)) (hora de Perú). Después, el pedido se cancelará automáticamente.</span></div>
+            <button type="submit" form="checkout-payment-form" class="button button-dark full-width checkout-confirm-button">CONFIRMAR PEDIDO →</button>
+            <form asp-controller="Pedidos" asp-action="Cancelar" asp-route-id="@order.Id" method="post" class="checkout-cancel-form" onsubmit="return confirm('¿Quieres cancelar esta compra? Esta acción no se puede deshacer.');">
+                <button type="submit" class="button button-outline full-width">CANCELAR COMPRA</button>
+            </form>
+            <p class="checkout-demo-disclaimer">Esta compra es una demostración; no se realiza ningún cobro bancario real.</p>
         </aside>
     </div>
 </section>

@@ -50,6 +50,8 @@ builder.Services.AddSession(options =>
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<CartService>();
 builder.Services.AddScoped<OrderService>();
+builder.Services.AddHostedService<PendingOrderExpirationWorker>();
+builder.Services.AddScoped<FavoriteService>();
 
 var app = builder.Build();
 
@@ -80,6 +82,8 @@ using (var scope = app.Services.CreateScope())
         {
             await DbInitializer.SeedAsync(db);
             await DbInitializer.SeedRolesAndAdminAsync(scope.ServiceProvider, app.Configuration);
+            if (app.Environment.IsDevelopment())
+                await DbInitializer.SeedDemoAccountsAsync(scope.ServiceProvider, app.Configuration);
         }
     }
     catch (Exception ex)

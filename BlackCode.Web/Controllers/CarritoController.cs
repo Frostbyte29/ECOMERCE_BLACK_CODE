@@ -44,4 +44,12 @@ public class CarritoController(CartService cart, BlackCodeContext context) : Con
         cart.Remove(productId, size);
         return RedirectToAction(nameof(Index));
     }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public IActionResult Vaciar()
+    {
+        cart.Clear();
+        TempData["Message"] = "Tu carrito está vacío.";
+        return RedirectToAction(nameof(Index));
+    }
 }

@@ -35,6 +35,15 @@ public class CheckoutViewModel
     [BindNever, ValidateNever]
     public CartSummary Cart { get; set; } = new();
 
+    [BindNever, ValidateNever]
+    public List<SavedAddress> SavedAddresses { get; set; } = [];
+
+    public int? SelectedSavedAddressId { get; set; }
+    public bool SaveNewAddress { get; set; }
+
+    [StringLength(40, ErrorMessage = "Usa un nombre de máximo 40 caracteres.")]
+    public string? NewAddressLabel { get; set; }
+
     [Required(ErrorMessage = "Ingresa el nombre de quien recibe.")]
     [StringLength(120)]
     [Display(Name = "Nombre completo")]

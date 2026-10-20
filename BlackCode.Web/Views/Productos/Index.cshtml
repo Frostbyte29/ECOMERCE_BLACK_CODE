@@ -1,0 +1,96 @@
+@model BlackCode.Web.Controllers.CatalogoViewModel
+@{
+    ViewData["Title"] = Model.Category ?? (string.IsNullOrWhiteSpace(Model.Search) ? "Productos" : "Búsqueda");
+}
+<section class="catalog-page">
+    <div class="catalog-breadcrumb"><a asp-controller="Home" asp-action="Index">Inicio</a><span>›</span><span>@(Model.Category ?? "Productos")</span></div>
+    <div class="catalog-layout">
+        <aside class="catalog-sidebar">
+            <h2>Filtrar por</h2>
+            <form asp-controller="Productos" asp-action="Index" method="get" id="catalog-filters">
+                <input type="hidden" name="q" value="@Model.Search" />
+                <div class="filter-group">
+                    <label for="filter-category">Categoría</label>
+                    <select id="filter-category" name="categoria">
+                        <option value="">Todas</option>
+                        @foreach (var category in Model.Categories)
+                        {
+                            <option value="@category" selected="@(Model.Category == category)">@category</option>
+                        }
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filter-price">Precio máximo</label>
+                    <input id="filter-price" name="precioMax" type="number" min="0" step="0.01" value="@Model.MaxPrice" placeholder="S/ Sin límite" />
+                </div>
+                <div class="filter-group">
+                    <label for="filter-size">Talla</label>
+                    <select id="filter-size" name="talla">
+                        <option value="">Todas</option>
+                        @foreach (var size in Model.Sizes)
+                        {
+                            <option value="@size" selected="@(Model.Size == size)">@size</option>
+                        }
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filter-material">Material</label>
+                    <select id="filter-material" name="material">
+                        <option value="">Todos</option>
+                        @foreach (var material in Model.Materials)
+                        {
+                            <option value="@material" selected="@(Model.Material == material)">@material</option>
+                        }
+                    </select>
+                </div>
+                <input type="hidden" name="ordenar" value="@Model.Sort" />
+                <button class="button button-dark full-width" type="submit">APLICAR FILTROS</button>
+                <a class="filter-clear" asp-controller="Productos" asp-action="Index">Limpiar filtros</a>
+            </form>
+        </aside>
+        <div class="catalog-main">
+            <p class="eyebrow">JOYERÍA PARA TU CÓDIGO</p>
+            <div class="catalog-heading">
+                <div>
+                    <h1>@(Model.Category ?? (string.IsNullOrWhiteSpace(Model.Search) ? "Todas las piezas" : "Resultados de búsqueda"))</h1>
+                    <p>Explora las piezas disponibles en BLACK CODE.</p>
+                </div>
+                <form asp-controller="Productos" asp-action="Index" method="get" class="catalog-search">
+                    <label for="catalog-q" class="sr-only">Buscar productos</label>
+                    <input id="catalog-q" name="q" type="search" value="@Model.Search" placeholder="Buscar productos..." autocomplete="off" />
+                    <button type="submit" aria-label="Buscar">⌕</button>
+                </form>
+            </div>
+            <div class="catalog-toolbar">
+                <span>@Model.Products.Count producto@(Model.Products.Count == 1 ? "" : "s")</span>
+                <form asp-controller="Productos" asp-action="Index" method="get">
+                    <input type="hidden" name="q" value="@Model.Search" />
+                    <input type="hidden" name="categoria" value="@Model.Category" />
+                    <input type="hidden" name="material" value="@Model.Material" />
+                    <input type="hidden" name="talla" value="@Model.Size" />
+                    <input type="hidden" name="precioMax" value="@Model.MaxPrice" />
+                    <label for="catalog-sort">Ordenar por</label>
+                    <select id="catalog-sort" name="ordenar" onchange="this.form.submit()">
+                        <option value="relevancia" selected="@(Model.Sort == "relevancia")">Más relevantes</option>
+                        <option value="precio-asc" selected="@(Model.Sort == "precio-asc")">Menor precio</option>
+                        <option value="precio-desc" selected="@(Model.Sort == "precio-desc")">Mayor precio</option>
+                        <option value="nombre" selected="@(Model.Sort == "nombre")">Nombre</option>
+                    </select>
+                </form>
+            </div>
+            @if (Model.Products.Count == 0)
+            {
+                <div class="empty-state"><p>No encontramos piezas con esos filtros.</p><a class="button button-outline" asp-controller="Productos" asp-action="Index">VER TODOS LOS PRODUCTOS</a></div>
+            }
+            else
+            {
+                <div class="catalog-grid">
+                    @foreach (var product in Model.Products)
+                    {
+                        <partial name="_ProductCard" model="product" />
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</section>

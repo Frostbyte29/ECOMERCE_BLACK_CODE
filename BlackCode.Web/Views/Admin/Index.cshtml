@@ -1,0 +1,58 @@
+@model AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Administración";
+    var highest = Math.Max(1m, Model.MonthlySales.Max(m => m.Amount));
+    var chartPoints = Model.MonthlySales.Select((month, index) => new { Month = month, X = 35 + index * 60, Y = 206 - (int)Math.Round(month.Amount / highest * 165m) }).ToList();
+    var chartLine = string.Join(" ", chartPoints.Select(point => $"{point.X},{point.Y}"));
+    var chartArea = $"35,206 {chartLine} 695,206";
+}
+<div class="admin-shell">
+    <partial name="_AdminNav" />
+    <section class="admin-main">
+        <partial name="_AdminTopbar" />
+        <p class="eyebrow">A01. Dashboard</p><h1>Resumen</h1>
+        <p class="admin-intro">Una mirada completa a tu negocio.</p>
+        <div class="admin-metrics">
+            <a asp-controller="AdminPedidos" asp-action="Index"><span>VENTAS DEL MES</span><strong>S/ @Model.RevenueMonth.ToString("0.00")</strong><small>Pedidos pagados</small></a>
+            <a asp-controller="AdminPedidos" asp-action="Index"><span>PEDIDOS</span><strong>@Model.OrderCount</strong><small>Ver pedidos →</small></a>
+            <div><span>CUENTAS REGISTRADAS</span><strong>@Model.UserCount</strong><small>Todas las cuentas</small></div>
+            <a asp-action="Inventario"><span>PRODUCTOS</span><strong>@Model.ProductCount</strong><small>Ver inventario →</small></a>
+        </div>
+        <div class="admin-dashboard-grid">
+            <section class="admin-panel">
+                <h2>Ventas de los últimos 12 meses</h2>
+                <div class="admin-line-chart" role="img" aria-label="Ventas mensuales de los últimos 12 meses">
+                    <svg viewBox="0 0 730 242" preserveAspectRatio="none" aria-hidden="true">
+                        <path class="admin-chart-grid" d="M35 41H695 M35 82H695 M35 123H695 M35 164H695 M35 206H695" />
+                        @foreach (var point in chartPoints) { <path class="admin-chart-guide" d="M@(point.X) 20V206" /> }
+                        <polygon class="admin-chart-area" points="@chartArea" />
+                        <polyline class="admin-chart-line" points="@chartLine" />
+                        @foreach (var point in chartPoints) { <circle cx="@point.X" cy="@point.Y" r="3.5"><title>@point.Month.Label: S/ @point.Month.Amount.ToString("0.00")</title></circle> }
+                    </svg>
+                    <div class="admin-chart-labels">@foreach (var month in Model.MonthlySales) { <span>@month.Label</span> }</div>
+                </div>
+                <p class="admin-chart-note">Solo se cuentan pedidos pagados, en preparación, enviados o entregados.</p>
+            </section>
+            <section class="admin-panel">
+                <h2>Estado del inventario</h2>
+                <div class="admin-stock-summary"><strong>@Model.UndefinedStockCount</strong><span>producto(s) sin cantidad definida</span></div>
+                <div class="admin-stock-summary"><strong>@Model.LowStockCount</strong><span>producto(s) en el mínimo o por debajo</span></div>
+                <p>Las cantidades no limitan las compras por ahora.</p>
+                <a class="button button-dark" asp-action="Inventario">VER INVENTARIO →</a>
+            </section>
+        </div>
+        <section class="admin-panel admin-recent">
+            <div class="account-section-heading"><h2>Pedidos recientes</h2><a asp-controller="AdminPedidos" asp-action="Index">VER TODOS →</a></div>
+            @if (Model.RecentOrders.Count == 0) { <p>Aún no hay pedidos.</p> }
+            else
+            {
+                <div class="table-wrap"><table class="admin-table"><thead><tr><th>Pedido</th><th>Fecha</th><th>Cliente</th><th>Piezas</th><th>Total</th><th>Estado</th><th></th></tr></thead><tbody>
+                    @foreach (var order in Model.RecentOrders)
+                    {
+                        <tr><td>@order.Code</td><td>@PeruTime.Format(order.CreatedAt)</td><td>@order.ShippingName</td><td>@order.ItemCount</td><td>S/ @order.Total.ToString("0.00")</td><td><partial name="_OrderStatusBadge" model="order.Status" /></td><td><a asp-controller="AdminPedidos" asp-action="Detalle" asp-route-id="@order.Id">Ver →</a></td></tr>
+                    }
+                </tbody></table></div>
+            }
+        </section>
+    </section>
+</div>

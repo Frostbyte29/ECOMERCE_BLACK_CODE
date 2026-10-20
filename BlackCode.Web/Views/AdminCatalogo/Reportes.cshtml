@@ -1,0 +1,23 @@
+@model AdminReportsViewModel
+@{
+    ViewData["Title"] = "Reportes";
+}
+<div class="admin-shell">
+    <partial name="_AdminNav" />
+    <section class="admin-main">
+        <partial name="_AdminTopbar" />
+        <p class="eyebrow">ADMINISTRACIÓN</p><h1>Reportes</h1>
+        <p class="admin-intro">Datos actuales de la tienda. Las cantidades sin registrar se exportan como “Sin definir” en CSV y como nulo en JSON.</p>
+        <div class="admin-metrics">
+            <div><span>PRODUCTOS</span><strong>@Model.Products</strong></div>
+            <div><span>CUENTAS</span><strong>@Model.Customers</strong></div>
+            <div><span>PEDIDOS</span><strong>@Model.Orders</strong></div>
+            <div><span>SIN STOCK DEFINIDO</span><strong>@Model.ProductsWithoutStock</strong></div>
+        </div>
+        <section class="admin-panel">
+            <h2>Catálogo de productos</h2>
+            <p>Descarga los productos y sus cantidades registradas.</p>
+            <div class="admin-report-actions"><a class="button button-dark" asp-action="ProductosCsv">DESCARGAR CSV</a><a class="button button-dark" asp-action="ProductosJson">DESCARGAR JSON</a></div>
+        </section>
+    </section>
+</div>

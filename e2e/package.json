@@ -1,0 +1,12 @@
+{
+  "private": true,
+  "scripts": {
+    "test": "node guest-flow.cjs",
+    "test:account": "node account-flow.cjs",
+    "test:admin": "node admin-flow.cjs",
+    "test:checkout-address": "node checkout-address-flow.cjs"
+  },
+  "devDependencies": {
+    "playwright": "1.64.1"
+  }
+}

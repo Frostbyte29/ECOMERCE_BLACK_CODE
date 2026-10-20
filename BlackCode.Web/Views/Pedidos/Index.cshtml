@@ -2,14 +2,19 @@
 @{
     ViewData["Title"] = "Mis pedidos";
 }
-<section class="section page-narrow">
-    <div class="section-heading"><div><h2>Mis pedidos</h2><p>HISTORIAL DE COMPRAS</p></div></div>
+<div class="account-shell">
+    <partial name="_AccountNav" />
+    <section class="account-main">
+    <p class="eyebrow">HISTORIAL DE COMPRAS</p>
+    <h1>Mis pedidos</h1>
+    <p class="account-intro">Aquí puedes consultar el estado y los detalles de tus compras.</p>
 
     @if (Model.Count == 0)
     {
-        <div class="empty-state">
+        <div class="account-empty account-empty-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16l-1 13H5L4 8Z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg>
             <p>Todavía no tienes pedidos.</p>
-            <a class="button button-dark" asp-controller="Home" asp-action="Index" asp-fragment="productos">EXPLORAR PIEZAS</a>
+            <a class="button button-dark" asp-controller="Productos" asp-action="Index">EXPLORAR PIEZAS</a>
         </div>
     }
     else
@@ -27,6 +32,7 @@
                     <div class="order-card-info">
                         <b>@order.Code</b>
                         <small>@PeruTime.Format(order.CreatedAt) · @order.ItemCount pieza(s)</small>
+                        @if (order.Status == OrderStatus.PendientePago) { <small>Pago pendiente hasta el @PeruTime.Format(OrderService.PaymentDueAt(order))</small> }
                         <small>@string.Join(", ", order.Items.Select(i => i.ProductName))</small>
                     </div>
                     <div class="order-card-side">
@@ -37,4 +43,5 @@
             }
         </div>
     }
-</section>
+    </section>
+</div>

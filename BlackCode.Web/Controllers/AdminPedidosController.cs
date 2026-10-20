@@ -36,6 +36,7 @@ public class AdminPedidosController(OrderService orders, BlackCodeContext contex
     [HttpGet("")]
     public async Task<IActionResult> Index(OrderStatus? status, string? search, DateTime? from, DateTime? to, int page = 1)
     {
+        await orders.ExpirePendingOrdersAsync();
         var query = context.Orders.AsNoTracking().Include(o => o.User).Include(o => o.Items).AsQueryable();
 
         if (status is not null) query = query.Where(o => o.Status == status);
@@ -88,6 +89,7 @@ public class AdminPedidosController(OrderService orders, BlackCodeContext contex
     [HttpGet("{id:int}")]
     public async Task<IActionResult> Detalle(int id)
     {
+        await orders.ExpirePendingOrdersAsync(orderId: id);
         var order = await orders.QueryWithDetails().AsNoTracking().FirstOrDefaultAsync(o => o.Id == id);
         return order is null ? NotFound() : View(order);
     }

@@ -1,0 +1,33 @@
+@model Product
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
+@inject FavoriteService Favorites
+@{
+    var userId = UserManager.GetUserId(User);
+    var isFavorite = userId is not null && (await Favorites.GetProductIdsAsync(userId)).Contains(Model.Id);
+}
+<article class="product-tile">
+    <div class="product-tile-media">
+        <a asp-controller="Productos" asp-action="Detalle" asp-route-id="@Model.Id" aria-label="Ver @Model.Name">
+            <img src="@Model.ImageUrl" alt="@Model.Name" loading="lazy" />
+        </a>
+        @if (User.Identity?.IsAuthenticated != true)
+        {
+            <button type="button" class="tile-heart" data-favorite-open data-product-image="@Model.ImageUrl" aria-label="Guardar @Model.Name en favoritos" title="Guardar en favoritos">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.5c0 4.2-8.8 10.5-8.8 10.5S3.2 12.7 3.2 8.5a4.7 4.7 0 0 1 8.8-2.2 4.7 4.7 0 0 1 8.8 2.2Z"/></svg>
+            </button>
+        }
+        else
+        {
+            <button type="button" class="tile-heart @(isFavorite ? "is-favorite" : "")" data-favorite-toggle data-product-id="@Model.Id" aria-pressed="@(isFavorite ? "true" : "false")" aria-label="@(isFavorite ? "Quitar" : "Guardar") @Model.Name @(isFavorite ? "de" : "en") favoritos" title="@(isFavorite ? "Quitar de favoritos" : "Guardar en favoritos")">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.5c0 4.2-8.8 10.5-8.8 10.5S3.2 12.7 3.2 8.5a4.7 4.7 0 0 1 8.8-2.2 4.7 4.7 0 0 1 8.8 2.2Z"/></svg>
+            </button>
+        }
+    </div>
+    <div class="product-tile-copy">
+        <span>@Model.Category</span>
+        <h3><a asp-controller="Productos" asp-action="Detalle" asp-route-id="@Model.Id">@Model.Name</a></h3>
+        <p>S/ @Model.Price.ToString("0.00")</p>
+    </div>
+    <a class="product-tile-action" asp-controller="Productos" asp-action="Detalle" asp-route-id="@Model.Id">VER PRODUCTO →</a>
+</article>

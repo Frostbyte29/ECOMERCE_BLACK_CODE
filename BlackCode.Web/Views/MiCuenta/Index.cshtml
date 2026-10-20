@@ -1,0 +1,35 @@
+@model AccountDashboardViewModel
+@{
+    ViewData["Title"] = "Mi cuenta";
+}
+<div class="account-shell">
+    <partial name="_AccountNav" />
+    <section class="account-main">
+        <p class="eyebrow">RESUMEN</p>
+        <h1>Hola, @(string.IsNullOrWhiteSpace(Model.FullName) ? "bienvenido" : Model.FullName.Split(' ')[0])</h1>
+        <p class="account-intro">Aquí encuentras tus pedidos, favoritos y direcciones guardadas.</p>
+        <div class="account-stats">
+            <a asp-controller="Pedidos" asp-action="Index"><strong>@Model.OrderCount</strong><span>Pedidos</span><b>VER PEDIDOS →</b></a>
+            <a asp-controller="Favoritos" asp-action="Index"><strong>@Model.FavoriteCount</strong><span>Favoritos</span><b>VER FAVORITOS →</b></a>
+            <a asp-action="Direcciones"><strong>@Model.AddressCount</strong><span>Direcciones</span><b>VER DIRECCIONES →</b></a>
+        </div>
+        <div class="account-section-heading"><h2>Pedidos recientes</h2><a asp-controller="Pedidos" asp-action="Index">VER TODOS →</a></div>
+        @if (Model.RecentOrders.Count == 0)
+        {
+            <div class="account-empty"><p>Aún no tienes pedidos.</p><a class="button button-dark" asp-controller="Productos" asp-action="Index">EXPLORAR PRODUCTOS</a></div>
+        }
+        else
+        {
+            <div class="order-list">
+                @foreach (var order in Model.RecentOrders)
+                {
+                    <a class="order-card" asp-controller="Pedidos" asp-action="Detalle" asp-route-id="@order.Id">
+                        <div class="order-card-thumbs">@foreach (var item in order.Items.Take(2)) { <img src="@item.ImageUrl" alt="" /> }</div>
+                        <div class="order-card-info"><b>@order.Code</b><small>@PeruTime.Format(order.CreatedAt) · @order.ItemCount pieza(s)</small>@if (order.Status == OrderStatus.PendientePago) { <small>Pago pendiente hasta el @PeruTime.Format(OrderService.PaymentDueAt(order))</small> }</div>
+                        <div class="order-card-side"><partial name="_OrderStatusBadge" model="order.Status" /><b>S/ @order.Total.ToString("0.00")</b></div>
+                    </a>
+                }
+            </div>
+        }
+    </section>
+</div>

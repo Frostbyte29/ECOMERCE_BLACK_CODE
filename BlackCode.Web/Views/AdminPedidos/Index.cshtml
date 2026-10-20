@@ -12,6 +12,10 @@
         ["to"] = Model.To?.ToString("yyyy-MM-dd") ?? ""
     };
 }
+<div class="admin-shell">
+    <partial name="_AdminNav" />
+    <section class="admin-main">
+        <partial name="_AdminTopbar" />
 <section class="section admin">
     <div class="section-heading"><div><h2>Gestión de pedidos</h2><p>PANEL DE ADMINISTRACIÓN</p></div></div>
 
@@ -57,7 +61,7 @@
                             <td>@o.ShippingName<small>@o.User?.Email</small></td>
                             <td>@o.ItemCount</td>
                             <td>S/ @o.Total.ToString("0.00")</td>
-                            <td><partial name="_OrderStatusBadge" model="o.Status" /></td>
+                            <td><partial name="_OrderStatusBadge" model="o.Status" />@if (o.Status == OrderStatus.PendientePago) { <small>Hasta el @PeruTime.Format(OrderService.PaymentDueAt(o))</small> }</td>
                             <td><a class="text-link" asp-action="Detalle" asp-route-id="@o.Id">GESTIONAR →</a></td>
                         </tr>
                     }
@@ -71,3 +75,6 @@
         </div>
     }
 </section>
+
+    </section>
+</div>

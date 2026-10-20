@@ -2,14 +2,19 @@
 @{
     ViewData["Title"] = "Iniciar sesión";
 }
-<section class="section auth-page">
-    <form asp-action="Login" method="post" class="form-card">
+<section class="auth-shell">
+    <div class="auth-art auth-art-login"><img src="/images/auth/login-black-code.png" alt="" /><div><p class="eyebrow">BLACK CODE</p><h1>Tu código<br />te espera.</h1></div></div>
+    <form asp-action="Login" method="post" class="form-card auth-form">
+        <p class="eyebrow">BIENVENIDO DE NUEVO</p>
         <h2>Iniciar sesión</h2>
+        <p class="auth-intro">Entra para continuar con tu compra y ver tus pedidos.</p>
         <input type="hidden" asp-for="ReturnUrl" />
         <div asp-validation-summary="ModelOnly" class="form-errors"></div>
-        <div class="field"><label asp-for="Email"></label><input asp-for="Email" autocomplete="email" /><span asp-validation-for="Email"></span></div>
-        <div class="field"><label asp-for="Password"></label><input asp-for="Password" autocomplete="current-password" /><span asp-validation-for="Password"></span></div>
+        <div class="field"><label asp-for="Email"></label><input asp-for="Email" type="email" autocomplete="email" required /><span asp-validation-for="Email"></span></div>
+        <div class="field"><label asp-for="Password"></label><div class="password-field"><input asp-for="Password" autocomplete="current-password" minlength="6" required /><partial name="_PasswordEyeButton" model='"Password"' /></div><span asp-validation-for="Password"></span></div>
+        <label class="remember-field"><input asp-for="RememberMe" /> <span>Mantener sesión iniciada</span></label>
         <button type="submit" class="button button-dark full-width">ENTRAR</button>
-        <p class="small">¿No tienes cuenta? <a asp-action="Registro" asp-route-returnUrl="@Model.ReturnUrl"><b>Regístrate</b></a></p>
+        <p class="auth-switch">¿No tienes cuenta? <a asp-action="Registro" asp-route-returnUrl="@Model.ReturnUrl">Crear cuenta →</a></p>
     </form>
 </section>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

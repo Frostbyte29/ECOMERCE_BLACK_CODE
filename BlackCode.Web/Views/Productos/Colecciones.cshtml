@@ -1,0 +1,26 @@
+@model IReadOnlyList<BlackCode.Web.Controllers.ColeccionViewModel>
+@{
+    ViewData["Title"] = "Colecciones";
+}
+<section class="collections-page">
+    <div class="catalog-breadcrumb"><a asp-controller="Home" asp-action="Index">Inicio</a><span>›</span><span>Colecciones</span></div>
+    <p class="eyebrow">JOYERÍA PARA TU CÓDIGO</p>
+    <h1>Colecciones</h1>
+    <p class="collections-intro">Encuentra las piezas disponibles según tu estilo.</p>
+    @if (Model.Count == 0)
+    {
+        <div class="empty-state"><p>Aún no hay colecciones disponibles.</p><a class="button button-dark" asp-controller="Home" asp-action="Index">VOLVER AL INICIO</a></div>
+    }
+    else
+    {
+        <div class="collections-grid">
+            @foreach (var collection in Model)
+            {
+                <a class="collection-card" asp-controller="Productos" asp-action="Index" asp-route-categoria="@collection.Name">
+                    <img src="@collection.ImageUrl" alt="" loading="lazy" />
+                    <span><strong>@collection.Name</strong><small>@collection.ProductCount producto@(collection.ProductCount == 1 ? "" : "s")</small><b>EXPLORAR →</b></span>
+                </a>
+            }
+        </div>
+    }
+</section>

@@ -2,9 +2,13 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 @inject CartService Cart
+@inject FavoriteService Favorites
 @{
     var cartCount = Cart.Count();
     var currentUser = SignInManager.IsSignedIn(User) ? await UserManager.GetUserAsync(User) : null;
+    var favoriteCount = currentUser is null ? 0 : (await Favorites.GetProductIdsAsync(currentUser.Id)).Count;
+    var isAdminPage = new[] { "Admin", "AdminCatalogo", "AdminPedidos" }.Contains(ViewContext.RouteData.Values["controller"]?.ToString());
+    var isAboutPage = ViewContext.RouteData.Values["controller"]?.ToString() == "Home" && ViewContext.RouteData.Values["action"]?.ToString() == "Nosotros";
 }
 <!DOCTYPE html>
 <html lang="es">
@@ -12,54 +16,151 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - BLACK CODE</title>
+    <link rel="icon" type="image/x-icon" href="~/favicon.ico?v=2" />
+    <link rel="icon" type="image/png" media="(prefers-color-scheme: light)" href="~/favicon-light.png?v=2" />
+    <link rel="icon" type="image/png" media="(prefers-color-scheme: dark)" href="~/favicon-dark.png?v=2" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/pedidos.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/catalogo.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/guest.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/account.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/admin-theme.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/nosotros.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/checkout-theme.css" asp-append-version="true" />
 </head>
-<body>
-    <div class="announcement">ENVÍOS A TODO EL PERÚ <span>|</span> CAMBIOS FÁCILES <span>|</span> PAGA SEGURO</div>
+<body class="@(isAdminPage ? "admin-page" : isAboutPage ? "about-page" : null)">
+    @if (!isAdminPage)
+    {
+    <div class="announcement">BLACK CODE <span>|</span> JOYERÍA CON ACTITUD</div>
     <header class="site-header">
-        <a class="brand" asp-controller="Home" asp-action="Index">BLACK <span>CODE</span></a>
-        <nav class="main-nav">
+        <a class="brand" asp-controller="Home" asp-action="Index"><span class="brand-emblem"><img src="~/images/brand/monograma-oscuro.jpeg" alt="" /></span><span class="brand-wordmark">BLACK <span>CODE</span></span></a>
+        <nav class="main-nav" aria-label="Navegación principal">
             <a asp-controller="Home" asp-action="Index">Inicio</a>
-            <a href="/#colecciones">Colecciones⌄</a>
-            <a asp-controller="Home" asp-action="Index" asp-fragment="productos">Anillos</a>
-            <a href="/#productos">Cadenas</a>
-            <a href="/#productos">Pulseras</a>
-            <a href="/#nosotros">Nosotros</a>
+            <a asp-controller="Productos" asp-action="Colecciones">Colecciones</a>
+            <a asp-controller="Productos" asp-action="Index" asp-route-categoria="Anillos">Anillos</a>
+            <a asp-controller="Productos" asp-action="Index" asp-route-categoria="Cadenas">Cadenas</a>
+            <a asp-controller="Productos" asp-action="Index" asp-route-categoria="Pulseras">Pulseras</a>
+            <a asp-controller="Home" asp-action="Nosotros">Nosotros</a>
         </nav>
         <div class="header-actions">
-            <span class="search-icon">⌕</span>
+            <button type="button" class="icon-button" data-search-open aria-label="Buscar productos" title="Buscar productos"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.5"/><path d="m16 16 5 5"/></svg></button>
             @if (currentUser is not null)
             {
                 <div class="account-menu">
-                    <a href="/#cuenta">♙ <span class="hello">Hola, @(string.IsNullOrWhiteSpace(currentUser.FullName) ? currentUser.Email : currentUser.FullName.Split(' ')[0])</span></a>
+                    <a asp-controller="MiCuenta" asp-action="Index" aria-label="Mi cuenta"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7.5" r="3.5"/><path d="M4.5 21c0-4.2 3-6.5 7.5-6.5s7.5 2.3 7.5 6.5"/></svg><span class="hello">Hola, @(string.IsNullOrWhiteSpace(currentUser.FullName) ? currentUser.Email : currentUser.FullName.Split(' ')[0])</span></a>
                     <div class="account-dropdown">
+                        <a asp-controller="MiCuenta" asp-action="Index">Mi cuenta</a>
                         <a asp-controller="Pedidos" asp-action="Index">Mis pedidos</a>
+                        <a asp-controller="Favoritos" asp-action="Index">Favoritos</a>
+                        <a asp-controller="MiCuenta" asp-action="Direcciones">Direcciones</a>
                         @if (User.IsInRole(Roles.Admin))
                         {
+                            <a asp-controller="Admin" asp-action="Index">Administración</a>
                             <a asp-controller="AdminPedidos" asp-action="Index">Panel de pedidos</a>
                         }
                         <form asp-controller="Cuenta" asp-action="Logout" method="post"><button type="submit">Cerrar sesión</button></form>
                     </div>
                 </div>
+                <a class="icon-button header-favorite-link" asp-controller="Favoritos" asp-action="Index" aria-label="Favoritos" title="Favoritos"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.5c0 4.2-8.8 10.5-8.8 10.5S3.2 12.7 3.2 8.5a4.7 4.7 0 0 1 8.8-2.2 4.7 4.7 0 0 1 8.8 2.2Z"/></svg><span class="favorite-count" data-favorite-count>@favoriteCount</span></a>
             }
             else
             {
-                <a asp-controller="Cuenta" asp-action="Login">♙ <span class="hello">Iniciar sesión</span></a>
+                <a asp-controller="Cuenta" asp-action="Login" aria-label="Iniciar sesión" title="Iniciar sesión"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7.5" r="3.5"/><path d="M4.5 21c0-4.2 3-6.5 7.5-6.5s7.5 2.3 7.5 6.5"/></svg><span class="hello">Iniciar sesión</span></a>
+                <button type="button" class="icon-button" data-favorite-open aria-label="Guardar favoritos" title="Favoritos"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.5c0 4.2-8.8 10.5-8.8 10.5S3.2 12.7 3.2 8.5a4.7 4.7 0 0 1 8.8-2.2 4.7 4.7 0 0 1 8.8 2.2Z"/></svg></button>
             }
-            <a href="/#favoritos" aria-label="Favoritos">♡</a>
-            <a class="cart-link" asp-controller="Carrito" asp-action="Index" aria-label="Carrito">♧@if (cartCount > 0)
+            <a class="cart-link" asp-controller="Carrito" asp-action="Index" aria-label="Carrito" title="Carrito"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16l-1 13H5L4 8Z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg>@if (cartCount > 0)
                 {
                     <span class="cart-count">@cartCount</span>
                 }</a>
         </div>
     </header>
+    }
     <main>
         @if (TempData["Message"] is string message) { <div class="flash flash-ok">@message</div> }
         @if (TempData["Error"] is string error) { <div class="flash flash-error">@error</div> }
         @RenderBody()
     </main>
-    <footer class="footer"><a class="brand" asp-controller="Home" asp-action="Index">BLACK <span>CODE</span></a><p>Diseñado para marcar la diferencia.</p><small>© @DateTime.Now.Year BLACK CODE. Proyecto de demostración.</small></footer>
+    @if (!isAdminPage)
+    {
+    @if (isAboutPage)
+    {
+    <footer class="about-footer">
+        <div class="about-footer-grid">
+            <div class="about-footer-brand"><a class="brand brand-on-dark" asp-controller="Home" asp-action="Index"><span class="brand-emblem"><img src="~/images/brand/monograma-claro.jpeg" alt="" /></span><span class="brand-wordmark">BLACK <span>CODE</span></span></a><p>TU ACTITUD, TU CÓDIGO.</p></div>
+            <div><h2>COMPRAR</h2><a asp-controller="Productos" asp-action="Colecciones">Colecciones</a><a asp-controller="Productos" asp-action="Index" asp-route-categoria="Anillos">Anillos</a><a asp-controller="Productos" asp-action="Index" asp-route-categoria="Cadenas">Cadenas</a><a asp-controller="Productos" asp-action="Index" asp-route-categoria="Pulseras">Pulseras</a></div>
+            <div><h2>BLACK CODE</h2><a asp-controller="Home" asp-action="Nosotros">Nosotros</a><a asp-controller="Productos" asp-action="Index">Todos los productos</a></div>
+            <div><h2>TU CUENTA</h2><a asp-controller="MiCuenta" asp-action="Index">Mi cuenta</a><a asp-controller="Pedidos" asp-action="Index">Mis pedidos</a><a asp-controller="Favoritos" asp-action="Index">Favoritos</a></div>
+        </div>
+        <small class="footer-copyright">© @DateTime.Now.Year BLACK CODE. Todos los derechos reservados.</small>
+    </footer>
+    }
+    else
+    {
+    <footer class="footer"><a class="brand brand-on-dark" asp-controller="Home" asp-action="Index"><span class="brand-emblem"><img src="~/images/brand/monograma-claro.jpeg" alt="" /></span><span class="brand-wordmark">BLACK <span>CODE</span></span></a><p>Piezas con carácter para tu estilo.</p><a asp-controller="Productos" asp-action="Colecciones">Colecciones</a><span> · </span><a asp-controller="Productos" asp-action="Index">Todos los productos</a><span> · </span><a asp-controller="Home" asp-action="Nosotros">Nosotros</a><small class="footer-copyright">© @DateTime.Now.Year BLACK CODE. Todos los derechos reservados.</small></footer>
+    }
+    }
+    <div class="ui-overlay" id="search-overlay" hidden>
+        <div class="overlay-backdrop" data-overlay-close></div>
+        <section class="search-panel" role="dialog" aria-modal="true" aria-labelledby="search-title">
+            <div class="overlay-head"><span id="search-title">BUSCAR EN BLACK CODE</span><button type="button" class="close-button" data-overlay-close aria-label="Cerrar búsqueda">×</button></div>
+            <form asp-controller="Productos" asp-action="Index" method="get" class="search-panel-form">
+                <label class="sr-only" for="global-search">Buscar productos</label>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.5"/><path d="m16 16 5 5"/></svg>
+                <input id="global-search" name="q" type="search" autocomplete="off" placeholder="Busca por nombre o colección" />
+                <button type="submit" class="search-submit">BUSCAR →</button>
+            </form>
+            <div class="search-results" aria-live="polite"><p class="search-hint">Escribe para ver productos y colecciones disponibles.</p></div>
+            <a asp-controller="Productos" asp-action="Index" class="search-all">VER TODO EL CATÁLOGO →</a>
+        </section>
+    </div>
+    @if (currentUser is null)
+    {
+        <div class="ui-overlay" id="favorite-overlay" hidden>
+            <div class="overlay-backdrop" data-overlay-close></div>
+            <section class="favorite-panel" role="dialog" aria-modal="true" aria-labelledby="favorite-title">
+                <div class="favorite-photo"><img src="/images/products/anillo-obsidiana.jpg" alt="" data-favorite-image /></div>
+                <div class="favorite-copy">
+                    <button type="button" class="close-button" data-overlay-close aria-label="Cerrar">×</button>
+                    <p class="eyebrow">BLACK CODE</p>
+                    <h2 id="favorite-title">Guarda tus favoritos</h2>
+                    <p>Inicia sesión o crea una cuenta para guardar piezas y encontrarlas después.</p>
+                    <a asp-controller="Cuenta" asp-action="Login" class="button button-dark full-width" data-auth-link="login">INICIAR SESIÓN →</a>
+                    <a asp-controller="Cuenta" asp-action="Registro" class="button button-outline full-width" data-auth-link="register">CREAR CUENTA</a>
+                    <button type="button" class="link-button explore-button" data-overlay-close>Seguir explorando</button>
+                    <div class="favorite-footnote"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.5c0 4.2-8.8 10.5-8.8 10.5S3.2 12.7 3.2 8.5a4.7 4.7 0 0 1 8.8-2.2 4.7 4.7 0 0 1 8.8 2.2Z"/></svg><span>Tu lista estará disponible al iniciar sesión.</span></div>
+                </div>
+            </section>
+        </div>
+    }
+    else
+    {
+        <form id="favorite-token" method="post" hidden>@Html.AntiForgeryToken()</form>
+        <div class="ui-overlay" id="favorite-saved-overlay" hidden>
+            <div class="overlay-backdrop" data-overlay-close></div>
+            <section class="favorite-panel" role="dialog" aria-modal="true" aria-labelledby="favorite-saved-title">
+                <div class="favorite-photo"><img src="" alt="" data-saved-image /></div>
+                <div class="favorite-copy">
+                    <button type="button" class="close-button" data-overlay-close aria-label="Cerrar">×</button>
+                    <p class="eyebrow">GUARDADO EN TU CUENTA</p>
+                    <h2 id="favorite-saved-title">Añadido a favoritos</h2>
+                    <p data-saved-name></p>
+                    <a asp-controller="Favoritos" asp-action="Index" class="button button-dark full-width">VER MIS FAVORITOS →</a>
+                    <button type="button" class="link-button explore-button" data-overlay-close>Seguir explorando</button>
+                </div>
+            </section>
+        </div>
+    }
+    <div class="ui-overlay" id="gallery-overlay" hidden>
+        <div class="overlay-backdrop" data-overlay-close></div>
+        <section class="gallery-panel" role="dialog" aria-modal="true" aria-label="Imagen ampliada del producto">
+            <button type="button" class="close-button" data-overlay-close aria-label="Cerrar imagen">×</button>
+            <img src="" alt="" data-gallery-image />
+        </section>
+    </div>
+    <script src="~/js/guest.js" asp-append-version="true" defer></script>
+    @if (isAdminPage) { <script src="~/js/admin.js" asp-append-version="true" defer></script> }
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

@@ -2,12 +2,16 @@
 @{
     ViewData["Title"] = $"Pedido {Model.Code}";
 }
-<div class="breadcrumbs"><a asp-controller="Home" asp-action="Index">Inicio</a> › <a asp-action="Index">Mis pedidos</a> › @Model.Code</div>
-<section class="section page-narrow">
-    <div class="section-heading">
-        <div><h2>Pedido @Model.Code</h2><p>REALIZADO EL @PeruTime.Format(Model.CreatedAt)</p></div>
-        <partial name="_OrderStatusBadge" model="Model.Status" />
-    </div>
+<div class="account-shell">
+    <partial name="_AccountNav" />
+    <section class="account-main">
+    <a class="account-back-link" asp-action="Index">← VOLVER A MIS PEDIDOS</a>
+    <p class="eyebrow">REALIZADO EL @PeruTime.Format(Model.CreatedAt)</p>
+    <div class="account-section-heading"><h1>Pedido @Model.Code</h1><partial name="_OrderStatusBadge" model="Model.Status" /></div>
+    @if (Model.Status == OrderStatus.PendientePago)
+    {
+        <div class="payment-deadline"><strong>Tienes 3 días para completar el pago</strong><span>Plazo: hasta el @PeruTime.Format(OrderService.PaymentDueAt(Model)) (hora de Perú). Si no pagas, el pedido se cancelará automáticamente.</span></div>
+    }
     <div class="checkout-layout">
         <div><partial name="_OrderInfo" model="Model" /></div>
         <aside>
@@ -24,4 +28,5 @@
             }
         </aside>
     </div>
-</section>
+    </section>
+</div>
