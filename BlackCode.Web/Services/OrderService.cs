@@ -33,6 +33,10 @@ public class OrderService(BlackCodeContext context)
         .Include(o => o.Payments)
         .Include(o => o.History);
 
+    public Task<int?> FindCheckoutOrderAsync(string userId, string checkoutToken) => context.Orders.AsNoTracking()
+        .Where(o => o.UserId == userId && o.CheckoutToken == checkoutToken)
+        .Select(o => (int?)o.Id).FirstOrDefaultAsync();
+
     public async Task<Order> CreateOrderAsync(string userId, CheckoutViewModel checkout, CartSummary cart)
     {
         if (cart.IsEmpty) throw new InvalidOperationException("El carrito está vacío.");
@@ -40,6 +44,7 @@ public class OrderService(BlackCodeContext context)
         var order = new Order
         {
             Code = GenerateCode(),
+            CheckoutToken = checkout.CheckoutToken,
             UserId = userId,
             Status = OrderStatus.PendientePago,
             Subtotal = cart.Subtotal,

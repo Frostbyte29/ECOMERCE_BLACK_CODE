@@ -32,6 +32,9 @@ public class CartSummary
 
 public class CheckoutViewModel
 {
+    [Required, StringLength(32, MinimumLength = 32)]
+    public string CheckoutToken { get; set; } = "";
+
     [BindNever, ValidateNever]
     public CartSummary Cart { get; set; } = new();
 

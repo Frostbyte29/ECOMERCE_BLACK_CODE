@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BlackCode.Domain\BlackCode.Domain.csproj" />
+    <ProjectReference Include="..\BlackCode.Web\BlackCode.Web.csproj" />
   </ItemGroup>
 
   <ItemGroup>

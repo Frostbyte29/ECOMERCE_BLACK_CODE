@@ -8,6 +8,7 @@
     <partial name="_Steps" model="1" />
     <div class="checkout-layout">
         <form asp-action="Index" method="post" class="form-card checkout-shipping-form">
+            <input asp-for="CheckoutToken" type="hidden" />
             <p class="checkout-form-intro">Selecciona dónde quieres recibir tu pedido. Podrás revisar el total antes de continuar.</p>
             <div asp-validation-summary="ModelOnly" class="form-errors"></div>
 

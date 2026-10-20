@@ -1,0 +1,29 @@
+@model AdminCustomerFormViewModel
+@{
+    var editing = !string.IsNullOrWhiteSpace(Model.Id);
+}
+<form asp-action="@(editing ? "Editar" : "Nuevo")" asp-route-id="@(editing ? Model.Id : null)" method="post" class="form-card account-form admin-product-form">
+    <input asp-for="Id" type="hidden" />
+    <div asp-validation-summary="ModelOnly" class="form-errors"></div>
+    <div class="field"><label asp-for="Name">Nombre completo</label><input asp-for="Name" autocomplete="name" maxlength="120" required /><span asp-validation-for="Name"></span></div>
+    @if (editing)
+    {
+        <input asp-for="Email" type="hidden" />
+        <div class="field"><label>Correo</label><input value="@Model.Email" readonly /></div>
+    }
+    else
+    {
+        <div class="field"><label asp-for="Email">Correo</label><input asp-for="Email" type="email" autocomplete="email" required /><span asp-validation-for="Email"></span></div>
+    }
+    <div class="field"><label asp-for="Phone">Teléfono</label><input asp-for="Phone" type="tel" autocomplete="tel" placeholder="Opcional" /><span asp-validation-for="Phone"></span></div>
+    @if (editing)
+    {
+        <label class="account-check"><input asp-for="IsActive" /> Cuenta activa</label>
+        <p class="admin-intro">Si desactivas la cuenta, el cliente no podrá iniciar sesión y su sesión abierta se cerrará en la siguiente petición.</p>
+    }
+    else
+    {
+        <div class="field"><label asp-for="Password">Contraseña inicial</label><div class="password-field"><input asp-for="Password" type="password" autocomplete="new-password" minlength="6" required /><partial name="_PasswordEyeButton" model='"Password"' /></div><span asp-validation-for="Password"></span></div>
+    }
+    <div class="account-form-actions"><button class="button button-dark" type="submit">@(editing ? "GUARDAR CAMBIOS" : "CREAR CLIENTE")</button><a asp-action="Index">Cancelar</a></div>
+</form>

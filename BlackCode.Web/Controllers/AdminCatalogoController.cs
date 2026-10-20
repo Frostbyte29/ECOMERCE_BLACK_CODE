@@ -67,21 +67,6 @@ public class AdminCatalogoController(BlackCodeContext context, IWebHostEnvironme
         return RedirectToAction(nameof(Productos));
     }
 
-    [HttpGet("Clientes")]
-    public async Task<IActionResult> Clientes()
-    {
-        var users = await context.Users.AsNoTracking().OrderBy(u => u.FullName).ToListAsync();
-        var orderCounts = await context.Orders.AsNoTracking().GroupBy(o => o.UserId)
-            .Select(g => new { UserId = g.Key, Count = g.Count() }).ToDictionaryAsync(x => x.UserId, x => x.Count);
-        var favoriteCounts = await context.Favorites.AsNoTracking().GroupBy(f => f.UserId)
-            .Select(g => new { UserId = g.Key, Count = g.Count() }).ToDictionaryAsync(x => x.UserId, x => x.Count);
-        var addressCounts = await context.SavedAddresses.AsNoTracking().GroupBy(a => a.UserId)
-            .Select(g => new { UserId = g.Key, Count = g.Count() }).ToDictionaryAsync(x => x.UserId, x => x.Count);
-        var rows = users.Select(u => new AdminCustomerRow(u.FullName, u.Email ?? "", orderCounts.GetValueOrDefault(u.Id),
-            favoriteCounts.GetValueOrDefault(u.Id), addressCounts.GetValueOrDefault(u.Id))).ToList();
-        return View(rows);
-    }
-
     [HttpGet("Reportes")]
     public async Task<IActionResult> Reportes()
     {

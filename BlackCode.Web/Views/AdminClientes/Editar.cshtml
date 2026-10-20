@@ -1,0 +1,13 @@
+@model AdminCustomerFormViewModel
+@{
+    ViewData["Title"] = "Editar cliente";
+}
+<div class="admin-shell">
+    <partial name="_AdminNav" />
+    <section class="admin-main">
+        <partial name="_AdminTopbar" />
+        <p class="eyebrow">ADMINISTRACIÓN / CLIENTES</p><h1>Editar cliente</h1>
+        <p class="admin-intro">Puedes cambiar sus datos y activar o desactivar el acceso.</p>
+        <partial name="_Formulario" model="Model" />
+    </section>
+</div>

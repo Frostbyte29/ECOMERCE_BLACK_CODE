@@ -21,6 +21,9 @@ public class Order
     [Required, StringLength(30)]
     public string Code { get; set; } = "";
 
+    [StringLength(32)]
+    public string? CheckoutToken { get; set; }
+
     [Required]
     public string UserId { get; set; } = "";
     public ApplicationUser? User { get; set; }

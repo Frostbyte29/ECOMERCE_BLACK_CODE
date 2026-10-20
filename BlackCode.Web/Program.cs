@@ -38,6 +38,10 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.LogoutPath = "/Cuenta/Logout";
     options.AccessDeniedPath = "/Cuenta/AccesoDenegado";
 });
+// Comprueba en cada petición el sello de seguridad. Al desactivar una cuenta se renueva
+// ese sello y las sesiones abiertas quedan invalidadas en la siguiente petición.
+builder.Services.Configure<SecurityStampValidatorOptions>(options =>
+    options.ValidationInterval = TimeSpan.Zero);
 
 // Carrito en sesión.
 builder.Services.AddDistributedMemoryCache();

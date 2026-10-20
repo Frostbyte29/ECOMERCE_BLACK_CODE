@@ -33,6 +33,7 @@ public class CheckoutController(
 
         return View(new CheckoutViewModel
         {
+            CheckoutToken = Guid.NewGuid().ToString("N"),
             Cart = summary,
             SavedAddresses = addresses,
             SelectedSavedAddressId = saved?.Id,
@@ -48,10 +49,19 @@ public class CheckoutController(
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Index(CheckoutViewModel model)
     {
+        if (!Guid.TryParseExact(model.CheckoutToken, "N", out _))
+        {
+            TempData["Error"] = "Vuelve a abrir la compra para continuar.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        var userId = userManager.GetUserId(User)!;
+        var previousOrderId = await orders.FindCheckoutOrderAsync(userId, model.CheckoutToken);
+        if (previousOrderId.HasValue) return RedirectToAction(nameof(Pagar), new { id = previousOrderId.Value });
+
         var summary = await cart.GetSummaryAsync();
         if (summary.IsEmpty) return RedirectToAction("Index", "Carrito");
 
-        var userId = userManager.GetUserId(User)!;
         model.SavedAddresses = await context.SavedAddresses.AsNoTracking()
             .Where(a => a.UserId == userId)
             .OrderByDescending(a => a.IsDefault).ThenBy(a => a.CreatedAt).ToListAsync();
@@ -86,26 +96,37 @@ public class CheckoutController(
             return View(model);
         }
 
-        await using var transaction = await context.Database.BeginTransactionAsync();
-        if (model.SelectedSavedAddressId is null && model.SaveNewAddress)
+        try
         {
-            context.SavedAddresses.Add(new SavedAddress
+            await using var transaction = await context.Database.BeginTransactionAsync();
+            if (model.SelectedSavedAddressId is null && model.SaveNewAddress)
             {
-                UserId = userId,
-                Label = model.NewAddressLabel!.Trim(),
-                RecipientName = model.ShippingName.Trim(),
-                Phone = model.ShippingPhone.Trim(),
-                Street = model.ShippingAddress.Trim(),
-                District = model.ShippingDistrict.Trim(),
-                City = model.ShippingCity.Trim(),
-                Reference = string.IsNullOrWhiteSpace(model.ShippingReference) ? null : model.ShippingReference.Trim(),
-                IsDefault = model.SavedAddresses.Count == 0
-            });
+                context.SavedAddresses.Add(new SavedAddress
+                {
+                    UserId = userId,
+                    Label = model.NewAddressLabel!.Trim(),
+                    RecipientName = model.ShippingName.Trim(),
+                    Phone = model.ShippingPhone.Trim(),
+                    Street = model.ShippingAddress.Trim(),
+                    District = model.ShippingDistrict.Trim(),
+                    City = model.ShippingCity.Trim(),
+                    Reference = string.IsNullOrWhiteSpace(model.ShippingReference) ? null : model.ShippingReference.Trim(),
+                    IsDefault = model.SavedAddresses.Count == 0
+                });
+            }
+            var order = await orders.CreateOrderAsync(userId, model, summary);
+            await transaction.CommitAsync();
+            cart.Clear();
+            return RedirectToAction(nameof(Pagar), new { id = order.Id });
         }
-        var order = await orders.CreateOrderAsync(userId, model, summary);
-        await transaction.CommitAsync();
-        cart.Clear();
-        return RedirectToAction(nameof(Pagar), new { id = order.Id });
+        catch (DbUpdateException)
+        {
+            // El índice único permite que solo uno de dos envíos simultáneos cree el pedido.
+            context.ChangeTracker.Clear();
+            var existingId = await orders.FindCheckoutOrderAsync(userId, model.CheckoutToken);
+            if (existingId.HasValue) return RedirectToAction(nameof(Pagar), new { id = existingId.Value });
+            throw;
+        }
     }
 
     // Paso 2: pago (se puede reintentar si fue rechazado).

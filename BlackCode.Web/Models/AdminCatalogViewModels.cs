@@ -31,8 +31,6 @@ public class AdminProductFormViewModel
     public string ImageUrl { get; set; } = "";
 }
 
-public record AdminCustomerRow(string Name, string Email, int Orders, int Favorites, int Addresses);
-
 public class AdminReportsViewModel
 {
     public int Products { get; init; }

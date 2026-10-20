@@ -50,6 +50,7 @@ public class BlackCodeContext(DbContextOptions<BlackCodeContext> options) : Iden
         modelBuilder.Entity<Order>(order =>
         {
             order.HasIndex(o => o.Code).IsUnique();
+            order.HasIndex(o => o.CheckoutToken).IsUnique();
             order.HasIndex(o => o.Status);
             order.HasIndex(o => o.CreatedAt);
             // Los estados se guardan como texto para que sean legibles en MySQL.

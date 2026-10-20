@@ -9,6 +9,8 @@ public class ApplicationUser : IdentityUser
     [StringLength(120)]
     public string FullName { get; set; } = "";
 
+    public bool IsActive { get; set; } = true;
+
     public List<Order> Orders { get; set; } = [];
 }
 

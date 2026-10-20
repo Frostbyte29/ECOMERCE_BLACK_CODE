@@ -7,8 +7,10 @@
     var cartCount = Cart.Count();
     var currentUser = SignInManager.IsSignedIn(User) ? await UserManager.GetUserAsync(User) : null;
     var favoriteCount = currentUser is null ? 0 : (await Favorites.GetProductIdsAsync(currentUser.Id)).Count;
-    var isAdminPage = new[] { "Admin", "AdminCatalogo", "AdminPedidos" }.Contains(ViewContext.RouteData.Values["controller"]?.ToString());
+    var isAdminPage = new[] { "Admin", "AdminCatalogo", "AdminClientes", "AdminPedidos" }.Contains(ViewContext.RouteData.Values["controller"]?.ToString());
     var isAboutPage = ViewContext.RouteData.Values["controller"]?.ToString() == "Home" && ViewContext.RouteData.Values["action"]?.ToString() == "Nosotros";
+    var successMessage = TempData["Message"] as string;
+    var errorMessage = TempData["Error"] as string;
 }
 <!DOCTYPE html>
 <html lang="es">
@@ -76,9 +78,25 @@
         </div>
     </header>
     }
+    <div class="toast-region" id="toast-region" aria-label="Notificaciones">
+        @if (!string.IsNullOrWhiteSpace(successMessage))
+        {
+            <div class="toast toast-success" data-toast role="status">
+                <span class="toast-symbol" aria-hidden="true">✓</span>
+                <span class="toast-message">@successMessage</span>
+                <button class="toast-close" type="button" data-toast-close aria-label="Cerrar notificación">×</button>
+            </div>
+        }
+        @if (!string.IsNullOrWhiteSpace(errorMessage))
+        {
+            <div class="toast toast-error" data-toast role="alert">
+                <span class="toast-symbol" aria-hidden="true">!</span>
+                <span class="toast-message">@errorMessage</span>
+                <button class="toast-close" type="button" data-toast-close aria-label="Cerrar notificación">×</button>
+            </div>
+        }
+    </div>
     <main>
-        @if (TempData["Message"] is string message) { <div class="flash flash-ok">@message</div> }
-        @if (TempData["Error"] is string error) { <div class="flash flash-error">@error</div> }
         @RenderBody()
     </main>
     @if (!isAdminPage)
@@ -158,6 +176,7 @@
             <img src="" alt="" data-gallery-image />
         </section>
     </div>
+    <script src="~/js/toast.js" asp-append-version="true" defer></script>
     <script src="~/js/guest.js" asp-append-version="true" defer></script>
     <script src="~/js/catalogo.js" asp-append-version="true" defer></script>
     @if (isAdminPage) { <script src="~/js/admin.js" asp-append-version="true" defer></script> }

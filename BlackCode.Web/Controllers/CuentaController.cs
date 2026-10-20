@@ -60,7 +60,14 @@ public class CuentaController(
     {
         if (!ModelState.IsValid) return View(model);
 
-        var result = await signInManager.PasswordSignInAsync(model.Email.Trim(), model.Password, isPersistent: model.RememberMe, lockoutOnFailure: true);
+        var user = await userManager.FindByEmailAsync(model.Email.Trim());
+        if (user is null || !user.IsActive)
+        {
+            ModelState.AddModelError("", "Correo o contraseña incorrectos o cuenta desactivada.");
+            return View(model);
+        }
+
+        var result = await signInManager.PasswordSignInAsync(user, model.Password, isPersistent: model.RememberMe, lockoutOnFailure: true);
         if (!result.Succeeded)
         {
             ModelState.AddModelError("", result.IsLockedOut

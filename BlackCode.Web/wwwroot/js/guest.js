@@ -125,11 +125,7 @@
                 location.reload();
             }
         } catch {
-            const notice = document.createElement('div');
-            notice.className = 'flash flash-error';
-            notice.textContent = 'No pudimos actualizar tus favoritos. Inténtalo de nuevo.';
-            document.querySelector('main')?.prepend(notice);
-            setTimeout(() => notice.remove(), 5000);
+            window.BlackCodeToast?.show('error', 'No pudimos actualizar tus favoritos. Inténtalo de nuevo.');
         } finally {
             button.disabled = false;
         }

@@ -1,0 +1,61 @@
+@model AdminCustomersViewModel
+@{
+    ViewData["Title"] = "Clientes";
+}
+<div class="admin-shell">
+    <partial name="_AdminNav" />
+    <section class="admin-main">
+        <partial name="_AdminTopbar" />
+        <p class="eyebrow">ADMINISTRACIÓN</p>
+        <div class="admin-customers-heading">
+            <div><h1>Clientes</h1><p class="admin-intro">Consulta y administra las cuentas de clientes. Las cuentas de administración no aparecen aquí.</p></div>
+            <a class="button button-dark" asp-action="Nuevo">+ NUEVO CLIENTE</a>
+        </div>
+        <div class="admin-customer-counts">
+            <span><strong>@(Model.ActiveCount + Model.InactiveCount)</strong> clientes</span>
+            <span><strong>@Model.ActiveCount</strong> activos</span>
+            <span><strong>@Model.InactiveCount</strong> desactivados</span>
+        </div>
+        <form asp-action="Index" method="get" class="admin-customer-filters">
+            <label class="sr-only" for="customer-search">Buscar clientes</label>
+            <input id="customer-search" name="search" value="@Model.Search" type="search" placeholder="Buscar por nombre o correo" />
+            <label class="sr-only" for="customer-status">Estado</label>
+            <select id="customer-status" name="active">
+                <option value="">Todos los estados</option>
+                <option value="true" selected="@(Model.Active == true)">Activos</option>
+                <option value="false" selected="@(Model.Active == false)">Desactivados</option>
+            </select>
+            <button class="button button-dark" type="submit">BUSCAR</button>
+        </form>
+        @if (Model.Customers.Count == 0)
+        {
+            <div class="admin-customer-empty">No hay clientes para esta búsqueda.</div>
+        }
+        else
+        {
+            <div class="table-wrap"><table class="admin-table admin-customers-table">
+                <thead><tr><th>Cliente</th><th>Correo</th><th>Estado</th><th>Pedidos</th><th>Favoritos</th><th>Direcciones</th><th>Acción</th></tr></thead>
+                <tbody>
+                @foreach (var row in Model.Customers)
+                {
+                    <tr>
+                        <td><strong>@row.Name</strong>@if (!string.IsNullOrWhiteSpace(row.Phone)) { <small>@row.Phone</small> }</td>
+                        <td>@row.Email</td>
+                        <td><span class="admin-customer-status @(row.IsActive ? "is-active" : "is-inactive")">@(row.IsActive ? "Activo" : "Desactivado")</span></td>
+                        <td>@row.Orders</td><td>@row.Favorites</td><td>@row.Addresses</td>
+                        <td><a asp-action="Editar" asp-route-id="@row.Id">Editar</a></td>
+                    </tr>
+                }
+                </tbody>
+            </table></div>
+            @if (Model.TotalPages > 1)
+            {
+                <nav class="admin-customer-pages" aria-label="Páginas de clientes">
+                    @if (Model.Page > 1) { <a asp-action="Index" asp-route-search="@Model.Search" asp-route-active="@Model.Active" asp-route-page="@(Model.Page - 1)">← Anterior</a> }
+                    <span>Página @Model.Page de @Model.TotalPages</span>
+                    @if (Model.Page < Model.TotalPages) { <a asp-action="Index" asp-route-search="@Model.Search" asp-route-active="@Model.Active" asp-route-page="@(Model.Page + 1)">Siguiente →</a> }
+                </nav>
+            }
+        }
+    </section>
+</div>
