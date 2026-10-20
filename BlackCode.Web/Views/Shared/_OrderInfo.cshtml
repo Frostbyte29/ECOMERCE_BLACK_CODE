@@ -1,0 +1,43 @@
+@model Order
+@* Envío, pagos e historial de estados de un pedido. Lo usan el cliente y el administrador. *@
+<div class="info-box">
+    <h3>Envío</h3>
+    <p><b>@Model.ShippingName</b> · @Model.ShippingPhone</p>
+    <p>@Model.ShippingAddress, @Model.ShippingDistrict, @Model.ShippingCity</p>
+    @if (!string.IsNullOrWhiteSpace(Model.ShippingReference)) { <p class="muted">Ref.: @Model.ShippingReference</p> }
+    @if (!string.IsNullOrWhiteSpace(Model.Notes)) { <p class="muted">Notas: @Model.Notes</p> }
+    @if (!string.IsNullOrWhiteSpace(Model.TrackingNumber)) { <p>N.º de seguimiento: <b>@Model.TrackingNumber</b></p> }
+</div>
+
+<div class="info-box">
+    <h3>Pagos</h3>
+    @if (Model.Payments.Count == 0)
+    {
+        <p class="muted">Aún no se registró ningún pago.</p>
+    }
+    @foreach (var payment in Model.Payments.OrderByDescending(p => p.CreatedAt))
+    {
+        <div class="payment-row">
+            <div>
+                <b>@OrderService.DisplayName(payment.Method)</b>@(payment.CardLast4 is null ? "" : $" •••• {payment.CardLast4}")
+                <small>@PeruTime.Format(payment.CreatedAt)@(payment.TransactionId is null ? "" : $" · {payment.TransactionId}")</small>
+                @if (!string.IsNullOrWhiteSpace(payment.Message)) { <small>@payment.Message</small> }
+            </div>
+            <span class="payment-status payment-@payment.Status.ToString().ToLowerInvariant()">@OrderService.DisplayName(payment.Status)</span>
+        </div>
+    }
+</div>
+
+<div class="info-box">
+    <h3>Seguimiento</h3>
+    <ol class="timeline">
+        @foreach (var h in Model.History.OrderBy(h => h.ChangedAt))
+        {
+            <li>
+                <partial name="_OrderStatusBadge" model="h.Status" />
+                <small>@PeruTime.Format(h.ChangedAt)@(h.ChangedBy is null ? "" : $" · {h.ChangedBy}")</small>
+                @if (!string.IsNullOrWhiteSpace(h.Note)) { <p>@h.Note</p> }
+            </li>
+        }
+    </ol>
+</div>

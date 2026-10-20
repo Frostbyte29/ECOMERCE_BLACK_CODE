@@ -1,0 +1,65 @@
+@model Order
+@{
+    ViewData["Title"] = $"Pedido {Model.Code}";
+    var next = OrderService.AllowedTransitions(Model.Status);
+}
+<div class="breadcrumbs"><a asp-action="Index">Panel de pedidos</a> › @Model.Code</div>
+<section class="section admin">
+    <div class="section-heading">
+        <div><h2>Pedido @Model.Code</h2><p>@PeruTime.Format(Model.CreatedAt) · @Model.User?.FullName (@Model.User?.Email)</p></div>
+        <partial name="_OrderStatusBadge" model="Model.Status" />
+    </div>
+    <div class="checkout-layout">
+        <div>
+            <div class="info-box">
+                <h3>Cambiar estado</h3>
+                @if (next.Count == 0)
+                {
+                    <p class="muted">Este pedido está cerrado; no admite más cambios.</p>
+                }
+                else
+                {
+                    <form asp-action="CambiarEstado" asp-route-id="@Model.Id" method="post" class="status-form">
+                        <div class="field">
+                            <label for="newStatus">Nuevo estado</label>
+                            <select id="newStatus" name="newStatus">
+                                @foreach (var s in next)
+                                {
+                                    <option value="@s">@OrderService.DisplayName(s)</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="field" id="tracking-field">
+                            <label for="trackingNumber">N.º de seguimiento</label>
+                            <input id="trackingNumber" name="trackingNumber" placeholder="Ej. OLVA-123456" value="@Model.TrackingNumber" />
+                        </div>
+                        <div class="field field-wide">
+                            <label for="note">Nota (visible para el cliente)</label>
+                            <input id="note" name="note" maxlength="300" placeholder="Opcional" />
+                        </div>
+                        <button type="submit" class="button button-dark">ACTUALIZAR</button>
+                    </form>
+                    @if (next.Contains(OrderStatus.Cancelado) && Model.Payments.Any(p => p.Status == PaymentStatus.Aprobado))
+                    {
+                        <p class="demo-note">Si cancelas este pedido, los pagos aprobados se marcarán como reembolsados.</p>
+                    }
+                }
+            </div>
+            <partial name="_OrderInfo" model="Model" />
+        </div>
+        <aside><partial name="_OrderItems" model="Model" /></aside>
+    </div>
+</section>
+@section Scripts {
+    <script>
+        // El número de seguimiento solo se pide al marcar el pedido como enviado.
+        (function () {
+            const select = document.getElementById('newStatus');
+            const field = document.getElementById('tracking-field');
+            if (!select || !field) return;
+            const update = () => field.hidden = select.value !== 'Enviado';
+            select.addEventListener('change', update);
+            update();
+        })();
+    </script>
+}

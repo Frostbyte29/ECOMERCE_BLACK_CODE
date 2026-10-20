@@ -1,0 +1,65 @@
+@model PaymentViewModel
+@{
+    ViewData["Title"] = "Pago";
+    var order = Model.Order!;
+}
+<section class="section page-narrow">
+    <partial name="_Steps" model="2" />
+    <div class="checkout-layout">
+        <form asp-action="Pagar" asp-route-id="@order.Id" method="post" class="form-card" autocomplete="off">
+            <h2>Elige cómo pagar</h2>
+            <p class="muted small">Pedido <b>@order.Code</b> · Total <b>S/ @order.Total.ToString("0.00")</b></p>
+            <div asp-validation-summary="ModelOnly" class="form-errors"></div>
+
+            <div class="pay-methods">
+                @foreach (var method in Enum.GetValues<PaymentMethod>())
+                {
+                    <label class="pay-method">
+                        <input type="radio" name="Method" value="@method" checked="@(Model.Method == method)" />
+                        <span>@OrderService.DisplayName(method)</span>
+                    </label>
+                }
+            </div>
+
+            <div class="pay-panel" data-method="Tarjeta">
+                <div class="form-grid">
+                    <div class="field field-wide"><label asp-for="CardNumber"></label><input asp-for="CardNumber" inputmode="numeric" placeholder="4111 1111 1111 1111" /></div>
+                    <div class="field field-wide"><label asp-for="CardHolder"></label><input asp-for="CardHolder" /></div>
+                    <div class="field"><label asp-for="CardExpiry"></label><input asp-for="CardExpiry" placeholder="12/28" /></div>
+                    <div class="field"><label asp-for="CardCvv"></label><input asp-for="CardCvv" inputmode="numeric" maxlength="4" /></div>
+                </div>
+                <p class="demo-note">Modo demostración: no se realiza ningún cargo real. Usa 4111 1111 1111 1111 para un pago aprobado o 4000 0000 0000 0002 para simular un rechazo.</p>
+            </div>
+
+            <div class="pay-panel" data-method="YapePlin">
+                <p class="small">Yapea o plinea <b>S/ @order.Total.ToString("0.00")</b> al número <b>999 888 777</b> (BLACK CODE) e ingresa el número de operación.</p>
+                <div class="field"><label asp-for="OperationCode"></label><input asp-for="OperationCode" inputmode="numeric" placeholder="123456" /></div>
+                <p class="demo-note">Modo demostración: cualquier número de 6 a 10 dígitos se acepta.</p>
+            </div>
+
+            <div class="pay-panel" data-method="ContraEntrega">
+                <p class="small">Pagas en efectivo o con tarjeta cuando recibes tu pedido. Prepararemos tu pedido de inmediato.</p>
+            </div>
+
+            <button type="submit" class="button button-dark full-width">PAGAR S/ @order.Total.ToString("0.00")</button>
+        </form>
+        <aside>
+            <partial name="_OrderItems" model="order" />
+        </aside>
+    </div>
+</section>
+@section Scripts {
+    <script>
+        // Muestra solo el formulario del método de pago elegido.
+        (function () {
+            const radios = document.querySelectorAll('input[name="Method"]');
+            const panels = document.querySelectorAll('.pay-panel');
+            function update() {
+                const selected = document.querySelector('input[name="Method"]:checked')?.value;
+                panels.forEach(p => p.hidden = p.dataset.method !== selected);
+            }
+            radios.forEach(r => r.addEventListener('change', update));
+            update();
+        })();
+    </script>
+}

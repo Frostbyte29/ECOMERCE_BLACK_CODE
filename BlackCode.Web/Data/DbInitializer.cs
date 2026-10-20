@@ -1,4 +1,5 @@
 using BlackCode.Web.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace BlackCode.Web.Data;
@@ -18,5 +19,32 @@ public static class DbInitializer
         );
 
         await db.SaveChangesAsync();
+    }
+
+    // Crea los roles y un administrador de prueba (datos en appsettings.json → "SeedAdmin").
+    public static async Task SeedRolesAndAdminAsync(IServiceProvider services, IConfiguration configuration)
+    {
+        var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+        foreach (var role in new[] { Roles.Admin, Roles.Cliente })
+        {
+            if (!await roleManager.RoleExistsAsync(role))
+                await roleManager.CreateAsync(new IdentityRole(role));
+        }
+
+        var email = configuration["SeedAdmin:Email"];
+        var password = configuration["SeedAdmin:Password"];
+        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password)) return;
+
+        var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+        var admin = await userManager.FindByEmailAsync(email);
+        if (admin is null)
+        {
+            admin = new ApplicationUser { UserName = email, Email = email, FullName = "Administrador", EmailConfirmed = true };
+            var result = await userManager.CreateAsync(admin, password);
+            if (!result.Succeeded) return;
+        }
+
+        if (!await userManager.IsInRoleAsync(admin, Roles.Admin))
+            await userManager.AddToRoleAsync(admin, Roles.Admin);
     }
 }

@@ -1,0 +1,107 @@
+/* Estilos del módulo de carrito, checkout, pedidos y panel de administración. */
+[hidden]{display:none!important}
+.muted{color:var(--muted)}.small{font-size:11px;line-height:1.6}
+.page-narrow{max-width:1150px;margin:0 auto}
+
+/* Encabezado: menú de cuenta y contador del carrito */
+.account-menu{position:relative}.account-dropdown{display:none;position:absolute;right:0;top:100%;z-index:20;min-width:180px;background:#fff;border:1px solid var(--line);box-shadow:0 8px 24px rgba(0,0,0,.08);padding:6px 0}
+.account-menu:hover .account-dropdown,.account-menu:focus-within .account-dropdown{display:block}
+.account-dropdown a,.account-dropdown button{display:block;width:100%;text-align:left;padding:9px 16px;font-size:12px;background:none;border:0;cursor:pointer;font-family:inherit;color:inherit}
+.account-dropdown a:hover,.account-dropdown button:hover{background:var(--soft);opacity:1}
+.cart-link{position:relative}.cart-count{position:absolute;top:-6px;right:-10px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:#111;color:#fff;font-size:9px;display:flex;align-items:center;justify-content:center}
+
+/* Mensajes */
+.flash{padding:12px 5%;font-size:12px;letter-spacing:.5px}.flash-ok{background:#eef7f1;color:#1d6b3c}.flash-error{background:#fbeeee;color:#9b2c2c}
+.form-errors ul{margin:0 0 14px;padding:10px 14px 10px 28px;background:#fbeeee;color:#9b2c2c;font-size:12px}.form-errors.validation-summary-valid{display:none}
+.field-validation-error{color:#9b2c2c;font-size:10px}
+.demo-note{font-size:10px;line-height:1.6;color:#7a5b00;background:#fff8e1;padding:8px 10px;margin:10px 0}
+
+/* Estados vacíos */
+.empty-state{text-align:center;padding:60px 20px;background:var(--soft)}.empty-state p{font-family:Georgia,serif;font-size:18px;margin:0 0 18px}
+
+/* Layout de checkout: contenido + resumen */
+.checkout-layout{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:32px;align-items:start}
+.checkout-layout aside .button{margin-top:10px}
+.checkout-steps{display:flex;gap:0;list-style:none;padding:0;margin:0 0 24px;border-bottom:1px solid var(--line)}
+.checkout-steps li{flex:1;padding:10px 0;font-size:10px;letter-spacing:1.6px;color:#bbb;border-bottom:2px solid transparent;margin-bottom:-1px;text-transform:uppercase}
+.checkout-steps li.done{color:#111;border-color:#111}
+
+/* Carrito */
+.cart-line{display:grid;grid-template-columns:80px minmax(0,1fr) 70px 90px 24px;gap:16px;align-items:center;padding:16px 0;border-bottom:1px solid var(--line)}
+.cart-thumb{height:80px;background:#fafafa;display:block}.cart-thumb img{width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply}
+.cart-line-info{display:flex;flex-direction:column;gap:4px}.cart-line-info b{font-size:13px;font-weight:500}.cart-line-info small{font-size:10px;color:var(--muted)}
+.qty-form input{width:64px;height:36px;border:1px solid #ddd;padding:6px}.cart-line-total{text-align:right;font-size:13px}
+.link-button{background:none;border:0;cursor:pointer;font-size:14px;color:var(--muted)}.link-button:hover{color:#111}
+
+/* Resumen */
+.summary-box,.info-box,.form-card{border:1px solid var(--line);padding:22px;background:#fff}
+.summary-box h3,.info-box h3{font-size:10px;letter-spacing:2px;font-weight:500;color:var(--muted);text-transform:uppercase;margin:0 0 14px}
+.info-box{margin-bottom:16px}.info-box p{font-size:12px;margin:0 0 6px;line-height:1.6}
+.summary-line{display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:12px;align-items:center;padding:8px 0;font-size:12px}
+.summary-line img{width:48px;height:48px;object-fit:contain;background:#fafafa;mix-blend-mode:multiply}
+.summary-line-info{display:flex;flex-direction:column;gap:3px}.summary-line-info b{font-weight:500}.summary-line-info small{font-size:10px;color:var(--muted)}
+.summary-totals{border-top:1px solid var(--line);margin-top:12px;padding-top:12px;display:flex;flex-direction:column;gap:8px;font-size:12px}
+.summary-totals div{display:flex;justify-content:space-between}.summary-total{font-size:15px;font-weight:700;border-top:1px solid var(--line);padding-top:10px;margin-top:4px}
+
+/* Formularios */
+.form-card h2{font-family:Georgia,serif;font-weight:400;font-size:22px;margin:0 0 16px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 16px;margin-bottom:18px}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}.form-grid .field{margin-bottom:0}.field-wide{grid-column:1/-1}
+.field label{font-size:9px;letter-spacing:1.6px;color:var(--muted);text-transform:uppercase}
+.field input,.field textarea,.field select,.admin-filters input{height:40px;border:1px solid #ddd;padding:8px 10px;font:inherit;font-size:13px;background:#fff}
+.field textarea{height:auto}.field input:focus,.field textarea:focus,.field select:focus{outline:none;border-color:#111}
+.auth-page{max-width:420px;margin:0 auto;padding-top:50px;padding-bottom:60px}
+
+/* Métodos de pago */
+.pay-methods{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:16px 0}
+.pay-method input{position:absolute;opacity:0}
+.pay-method span{display:flex;align-items:center;justify-content:center;text-align:center;min-height:52px;padding:8px;border:1px solid #ddd;font-size:11px;cursor:pointer}
+.pay-method input:checked+span{border-color:#111;background:#111;color:#fff}
+.pay-method input:focus-visible+span{outline:2px solid #111;outline-offset:2px}
+.pay-panel{margin-bottom:12px}
+
+/* Confirmación */
+.confirm-hero{text-align:center;padding:10px 0 30px}.confirm-hero h2{font-family:Georgia,serif;font-weight:400;font-size:28px;margin:10px 0 6px}
+.confirm-icon{display:inline-flex;width:52px;height:52px;border-radius:50%;background:#111;color:#fff;align-items:center;justify-content:center;font-size:22px}
+
+/* Estados */
+.status-badge{display:inline-block;padding:4px 10px;font-size:9px;letter-spacing:1.4px;text-transform:uppercase;white-space:nowrap;border:1px solid currentColor}
+.status-pendientepago{color:#a06800}.status-pagado{color:#1d6b3c}.status-enpreparacion{color:#1f5fa8}.status-enviado{color:#6b3fa0}.status-entregado{color:#fff;background:#111;border-color:#111}.status-cancelado{color:#9b2c2c}
+.payment-row{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:12px}.payment-row:last-child{border-bottom:0}
+.payment-row div{display:flex;flex-direction:column;gap:3px}.payment-row small{font-size:10px;color:var(--muted)}
+.payment-status{font-size:9px;letter-spacing:1.2px;text-transform:uppercase;white-space:nowrap}.payment-aprobado{color:#1d6b3c}.payment-pendiente{color:#a06800}.payment-rechazado{color:#9b2c2c}.payment-reembolsado{color:#6b3fa0}
+.timeline{list-style:none;margin:0;padding:0 0 0 14px;border-left:1px solid var(--line)}
+.timeline li{position:relative;padding:0 0 14px 12px}.timeline li:before{content:"";position:absolute;left:-19px;top:5px;width:9px;height:9px;border-radius:50%;background:#111}
+.timeline small{display:block;font-size:10px;color:var(--muted);margin-top:4px}.timeline p{font-size:11px;margin:4px 0 0}
+
+/* Historial del cliente */
+.order-list{display:flex;flex-direction:column;gap:10px}
+.order-card{display:grid;grid-template-columns:150px minmax(0,1fr) auto;gap:18px;align-items:center;border:1px solid var(--line);padding:14px;transition:.2s}
+.order-card:hover{border-color:#111}
+.order-card-thumbs{display:flex;gap:4px}.order-card-thumbs img{width:46px;height:46px;object-fit:contain;background:#fafafa;mix-blend-mode:multiply}
+.order-card-info{display:flex;flex-direction:column;gap:4px;min-width:0}.order-card-info small{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.order-card-side{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+
+/* Panel admin */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.stat{background:#111;color:#fff;padding:18px}.stat span{display:block;font-size:9px;letter-spacing:1.6px;color:#aaa;text-transform:uppercase;margin-bottom:8px}.stat b{font-family:Georgia,serif;font-weight:400;font-size:24px}
+.status-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.chip{padding:7px 12px;border:1px solid #ddd;font-size:10px;letter-spacing:.8px}.chip.active{background:#111;color:#fff;border-color:#111}
+.admin-filters{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:16px;font-size:11px;color:var(--muted)}
+.admin-filters input[type=search]{flex:1;min-width:200px}.admin-filters label{display:flex;align-items:center;gap:6px}
+.table-wrap{overflow-x:auto;border:1px solid var(--line)}
+.admin-table{width:100%;border-collapse:collapse;font-size:12px}
+.admin-table th{text-align:left;font-size:9px;letter-spacing:1.4px;color:var(--muted);text-transform:uppercase;font-weight:500;padding:12px;border-bottom:1px solid var(--line);background:var(--soft)}
+.admin-table td{padding:12px;border-bottom:1px solid var(--line);vertical-align:middle}.admin-table td:first-child,.admin-table td:nth-child(2){white-space:nowrap}.admin-table td small{display:block;font-size:10px;color:var(--muted)}
+.admin-table tr:last-child td{border-bottom:0}.admin-table tbody tr:hover{background:#fcfcfb}
+.pager{display:flex;gap:18px;align-items:center;justify-content:flex-end;padding:14px 0;font-size:11px;color:var(--muted)}
+.status-form{display:grid;grid-template-columns:1fr 1fr;gap:0 16px;align-items:end}.status-form .button{grid-column:1/-1;justify-self:start}
+
+@media(max-width:900px){.checkout-layout{grid-template-columns:1fr}.stat-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:620px){
+    .cart-line{grid-template-columns:64px minmax(0,1fr) 24px;grid-template-areas:"img info del" "img qty total";gap:8px 12px}
+    .cart-thumb{grid-area:img;height:64px}.cart-line-info{grid-area:info}.qty-form{grid-area:qty}.cart-line-total{grid-area:total}.cart-line form:last-child{grid-area:del}
+    .form-grid,.status-form{grid-template-columns:1fr}.pay-methods{grid-template-columns:1fr}
+    .order-card{grid-template-columns:1fr;gap:10px}.order-card-side{flex-direction:row;justify-content:space-between;align-items:center}
+    .checkout-steps li{font-size:8px;letter-spacing:1px}
+}

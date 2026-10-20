@@ -1,0 +1,20 @@
+@model Order
+<div class="summary-box">
+    <h3>Productos (@Model.ItemCount)</h3>
+    @foreach (var item in Model.Items)
+    {
+        <div class="summary-line">
+            <img src="@item.ImageUrl" alt="@item.ProductName" />
+            <div class="summary-line-info">
+                <b>@item.ProductName</b>
+                <small>@(item.Size is null ? "" : $"Talla {item.Size} · ")@item.Quantity × S/ @item.UnitPrice.ToString("0.00")</small>
+            </div>
+            <span>S/ @item.LineTotal.ToString("0.00")</span>
+        </div>
+    }
+    <div class="summary-totals">
+        <div><span>Subtotal</span><span>S/ @Model.Subtotal.ToString("0.00")</span></div>
+        <div><span>Envío</span><span>@(Model.ShippingCost == 0 ? "Gratis" : "S/ " + Model.ShippingCost.ToString("0.00"))</span></div>
+        <div class="summary-total"><span>Total</span><span>S/ @Model.Total.ToString("0.00")</span></div>
+    </div>
+</div>

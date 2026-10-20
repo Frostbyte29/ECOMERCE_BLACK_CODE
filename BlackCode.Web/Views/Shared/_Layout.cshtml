@@ -1,3 +1,11 @@
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+@inject CartService Cart
+@{
+    var cartCount = Cart.Count();
+    var currentUser = SignInManager.IsSignedIn(User) ? await UserManager.GetUserAsync(User) : null;
+}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -5,6 +13,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - BLACK CODE</title>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/pedidos.css" asp-append-version="true" />
 </head>
 <body>
     <div class="announcement">ENVÍOS A TODO EL PERÚ <span>|</span> CAMBIOS FÁCILES <span>|</span> PAGA SEGURO</div>
@@ -18,9 +27,38 @@
             <a href="/#productos">Pulseras</a>
             <a href="/#nosotros">Nosotros</a>
         </nav>
-        <div class="header-actions"><span class="search-icon">⌕</span><a href="/#cuenta">♙ <span class="hello">Hola, Carlos</span></a><a href="/#favoritos" aria-label="Favoritos">♡</a><a href="/#carrito" aria-label="Carrito">♧</a></div>
+        <div class="header-actions">
+            <span class="search-icon">⌕</span>
+            @if (currentUser is not null)
+            {
+                <div class="account-menu">
+                    <a href="/#cuenta">♙ <span class="hello">Hola, @(string.IsNullOrWhiteSpace(currentUser.FullName) ? currentUser.Email : currentUser.FullName.Split(' ')[0])</span></a>
+                    <div class="account-dropdown">
+                        <a asp-controller="Pedidos" asp-action="Index">Mis pedidos</a>
+                        @if (User.IsInRole(Roles.Admin))
+                        {
+                            <a asp-controller="AdminPedidos" asp-action="Index">Panel de pedidos</a>
+                        }
+                        <form asp-controller="Cuenta" asp-action="Logout" method="post"><button type="submit">Cerrar sesión</button></form>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <a asp-controller="Cuenta" asp-action="Login">♙ <span class="hello">Iniciar sesión</span></a>
+            }
+            <a href="/#favoritos" aria-label="Favoritos">♡</a>
+            <a class="cart-link" asp-controller="Carrito" asp-action="Index" aria-label="Carrito">♧@if (cartCount > 0)
+                {
+                    <span class="cart-count">@cartCount</span>
+                }</a>
+        </div>
     </header>
-    <main>@RenderBody()</main>
+    <main>
+        @if (TempData["Message"] is string message) { <div class="flash flash-ok">@message</div> }
+        @if (TempData["Error"] is string error) { <div class="flash flash-error">@error</div> }
+        @RenderBody()
+    </main>
     <footer class="footer"><a class="brand" asp-controller="Home" asp-action="Index">BLACK <span>CODE</span></a><p>Diseñado para marcar la diferencia.</p><small>© @DateTime.Now.Year BLACK CODE. Proyecto de demostración.</small></footer>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

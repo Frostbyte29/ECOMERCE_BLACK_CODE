@@ -1,0 +1,40 @@
+@model CheckoutViewModel
+@{
+    ViewData["Title"] = "Datos de envío";
+}
+<section class="section page-narrow">
+    <partial name="_Steps" model="1" />
+    <div class="checkout-layout">
+        <form asp-action="Index" method="post" class="form-card">
+            <h2>¿A dónde enviamos tu pedido?</h2>
+            <div asp-validation-summary="ModelOnly" class="form-errors"></div>
+            <div class="form-grid">
+                <div class="field field-wide"><label asp-for="ShippingName"></label><input asp-for="ShippingName" autocomplete="name" /><span asp-validation-for="ShippingName"></span></div>
+                <div class="field"><label asp-for="ShippingPhone"></label><input asp-for="ShippingPhone" type="tel" autocomplete="tel" placeholder="987654321" /><span asp-validation-for="ShippingPhone"></span></div>
+                <div class="field"><label asp-for="ShippingCity"></label><input asp-for="ShippingCity" autocomplete="address-level1" /><span asp-validation-for="ShippingCity"></span></div>
+                <div class="field field-wide"><label asp-for="ShippingAddress"></label><input asp-for="ShippingAddress" autocomplete="street-address" placeholder="Av. / Calle, número, dpto." /><span asp-validation-for="ShippingAddress"></span></div>
+                <div class="field"><label asp-for="ShippingDistrict"></label><input asp-for="ShippingDistrict" autocomplete="address-level2" /><span asp-validation-for="ShippingDistrict"></span></div>
+                <div class="field"><label asp-for="ShippingReference"></label><input asp-for="ShippingReference" placeholder="Opcional" /></div>
+                <div class="field field-wide"><label asp-for="Notes"></label><textarea asp-for="Notes" rows="2" placeholder="Opcional"></textarea></div>
+            </div>
+            <button type="submit" class="button button-dark full-width">CONTINUAR AL PAGO →</button>
+        </form>
+        <aside class="summary-box">
+            <h3>Tu pedido (@Model.Cart.ItemCount)</h3>
+            @foreach (var line in Model.Cart.Lines)
+            {
+                <div class="summary-line">
+                    <img src="@line.Product.ImageUrl" alt="@line.Product.Name" />
+                    <div class="summary-line-info"><b>@line.Product.Name</b><small>@(line.Size is null ? "" : $"Talla {line.Size} · ")Cant. @line.Quantity</small></div>
+                    <span>S/ @line.LineTotal.ToString("0.00")</span>
+                </div>
+            }
+            <div class="summary-totals">
+                <div><span>Subtotal</span><span>S/ @Model.Cart.Subtotal.ToString("0.00")</span></div>
+                <div><span>Envío</span><span>@(Model.Cart.ShippingCost == 0 ? "Gratis" : "S/ " + Model.Cart.ShippingCost.ToString("0.00"))</span></div>
+                <div class="summary-total"><span>Total</span><span>S/ @Model.Cart.Total.ToString("0.00")</span></div>
+            </div>
+            <a class="text-link" asp-controller="Carrito" asp-action="Index">← EDITAR CARRITO</a>
+        </aside>
+    </div>
+</section>

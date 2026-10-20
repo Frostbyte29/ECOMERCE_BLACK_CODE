@@ -1,0 +1,15 @@
+@model BlackCode.Web.Controllers.LoginViewModel
+@{
+    ViewData["Title"] = "Iniciar sesión";
+}
+<section class="section auth-page">
+    <form asp-action="Login" method="post" class="form-card">
+        <h2>Iniciar sesión</h2>
+        <input type="hidden" asp-for="ReturnUrl" />
+        <div asp-validation-summary="ModelOnly" class="form-errors"></div>
+        <div class="field"><label asp-for="Email"></label><input asp-for="Email" autocomplete="email" /><span asp-validation-for="Email"></span></div>
+        <div class="field"><label asp-for="Password"></label><input asp-for="Password" autocomplete="current-password" /><span asp-validation-for="Password"></span></div>
+        <button type="submit" class="button button-dark full-width">ENTRAR</button>
+        <p class="small">¿No tienes cuenta? <a asp-action="Registro" asp-route-returnUrl="@Model.ReturnUrl"><b>Regístrate</b></a></p>
+    </form>
+</section>

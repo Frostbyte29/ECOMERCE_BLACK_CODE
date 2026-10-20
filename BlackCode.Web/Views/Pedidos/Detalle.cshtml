@@ -1,0 +1,27 @@
+@model Order
+@{
+    ViewData["Title"] = $"Pedido {Model.Code}";
+}
+<div class="breadcrumbs"><a asp-controller="Home" asp-action="Index">Inicio</a> › <a asp-action="Index">Mis pedidos</a> › @Model.Code</div>
+<section class="section page-narrow">
+    <div class="section-heading">
+        <div><h2>Pedido @Model.Code</h2><p>REALIZADO EL @PeruTime.Format(Model.CreatedAt)</p></div>
+        <partial name="_OrderStatusBadge" model="Model.Status" />
+    </div>
+    <div class="checkout-layout">
+        <div><partial name="_OrderInfo" model="Model" /></div>
+        <aside>
+            <partial name="_OrderItems" model="Model" />
+            @if (Model.Status == OrderStatus.PendientePago)
+            {
+                <a class="button button-dark full-width" asp-controller="Checkout" asp-action="Pagar" asp-route-id="@Model.Id">COMPLETAR PAGO</a>
+            }
+            @if (OrderService.CustomerCanCancel(Model))
+            {
+                <form asp-action="Cancelar" asp-route-id="@Model.Id" method="post" onsubmit="return confirm('¿Seguro que quieres cancelar este pedido?');">
+                    <button type="submit" class="button button-outline full-width">CANCELAR PEDIDO</button>
+                </form>
+            }
+        </aside>
+    </div>
+</section>
