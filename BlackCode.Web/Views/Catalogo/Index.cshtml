@@ -1,5 +1,6 @@
 @model CatalogoViewModel
 @{ViewData["Title"]="Catálogo";}
+@section Styles { <partial name="_EstilosCompras" /> }
 <section class="section catalog-page"><p class="breadcrumb"><a href="/">Inicio</a> / Colecciones</p><div class="section-heading"><div><p class="eyebrow">ELIGE TU CÓDIGO</p><h1>@(string.IsNullOrWhiteSpace(Model.Buscar)?"Todas las piezas":"Resultados de búsqueda")</h1><p class="muted">Anillos, cadenas y pulseras. Detalles que hacen la diferencia.</p></div><span>@Model.Productos.Count productos</span></div>
 <div class="catalog-layout">
 <form method="get" class="filters" aria-label="Filtros de productos"><h2>Filtrar <span>☷</span></h2>

@@ -1,6 +1,6 @@
 @model CarritoViewModel
 @{ViewData["Title"]="Mi carrito";}
-@section Styles{<link rel="stylesheet" href="~/css/carrito.css" asp-append-version="true"/>}
+@section Styles{<partial name="_EstilosCompras" /><link rel="stylesheet" href="~/css/carrito.css" asp-append-version="true"/>}
 <section class="section"><p class="breadcrumb"><a href="/">Inicio</a> / Carrito</p><div class="section-heading"><div><p class="eyebrow">YA CASI SON TUYOS</p><h1>Tu carrito</h1></div><a class="underlined" href="/Catalogo">Seguir explorando ↗</a></div>
 @if(Model.Lineas.Count==0){<div class="empty"><span>◇</span><h2>Tu carrito está esperando una buena pieza.</h2><p>Encuentra los detalles que van contigo.</p><a class="button" href="/Catalogo">Explorar colección →</a></div>}
 else{<div class="cart-layout"><div><div class="cart-column-heading">PRODUCTO <span>IMPORTE</span></div>@foreach(var l in Model.Lineas){<article class="cart-line"><a href="/Catalogo/Detalle/@l.ProductoId"><img src="@l.Imagen" alt="@l.Nombre"/></a><div><p class="eyebrow">BLACKCODE / ACERO</p><h2><a href="/Catalogo/Detalle/@l.ProductoId">@l.Nombre</a></h2><p>Talla @l.Talla · @Dinero(l.Precio)</p>
