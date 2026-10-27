@@ -20,10 +20,10 @@
 
     <nav class="main-nav" aria-label="Navegación principal">
         <a asp-controller="Home" asp-action="Index">Inicio</a>
-        <a href="#">Colecciones</a>
-        <a href="#">Anillos</a>
-        <a href="#">Cadenas</a>
-        <a href="#">Pulseras</a>
+        <a asp-controller="Catalogo" asp-action="Index">Colecciones</a>
+        <a href="/Catalogo?Buscar=anillo">Anillos</a>
+        <a href="/Catalogo?Buscar=cadena">Cadenas</a>
+        <a href="/Catalogo?Buscar=pulsera">Pulseras</a>
         <a href="#">Nosotros</a>
     </nav>
 
@@ -31,7 +31,7 @@
         <span class="search-icon" aria-hidden="true">⌕</span>
         @await Component.InvokeAsync("MenuCuenta")
         <a href="#" aria-label="Favoritos">♡</a>
-        <a href="#" aria-label="Carrito">♧</a>
+        <a asp-controller="Carrito" asp-action="Index" aria-label="Carrito">♧</a>
     </div>
 </header>
 
@@ -48,10 +48,10 @@
         <div class="footer__col">
             <h4>Comprar</h4>
             <ul>
-                <li><a href="#">Anillos</a></li>
-                <li><a href="#">Cadenas</a></li>
-                <li><a href="#">Pulseras</a></li>
-                <li><a href="#">Colecciones</a></li>
+                <li><a href="/Catalogo?Buscar=anillo">Anillos</a></li>
+                <li><a href="/Catalogo?Buscar=cadena">Cadenas</a></li>
+                <li><a href="/Catalogo?Buscar=pulsera">Pulseras</a></li>
+                <li><a asp-controller="Catalogo" asp-action="Index">Colecciones</a></li>
             </ul>
         </div>
         <div class="footer__col">
