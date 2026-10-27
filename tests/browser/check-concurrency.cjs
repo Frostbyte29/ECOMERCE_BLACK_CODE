@@ -1,0 +1,26 @@
+const {request}=require('playwright');
+const fs=require('node:fs');const path=require('node:path');const assert=require('node:assert/strict');const {execFileSync}=require('node:child_process');
+const s = {Bin:process.env.BLACKCODE_MYSQL_BIN, MySqlRootPassword:process.env.BLACKCODE_MYSQL_PASSWORD, AdminPassword:process.env.BLACKCODE_ADMIN_PASSWORD, ClientePassword:process.env.BLACKCODE_CLIENTE_PASSWORD};
+if(Object.values(s).some(v=>!v)) throw new Error('Completa las variables BLACKCODE indicadas en README.md.');
+const base='https://localhost:7262';const contexts=[];
+function sql(q){return execFileSync(path.join(s.Bin,'mysql.exe'),['--no-defaults','--host=127.0.0.1','--port=3307','--user='+(process.env.BLACKCODE_MYSQL_USER||'blackcode_proto'),'--batch','--skip-column-names','blackcode_prototipo','-e',q],{env:{...process.env,MYSQL_PWD:s.MySqlRootPassword},encoding:'utf8'}).trim();}
+async function ctx(){const c=await request.newContext({baseURL:base,ignoreHTTPSErrors:true});contexts.push(c);return c;}
+async function token(c,url){const html=await(await c.get(url)).text();const match=html.match(/name="__RequestVerificationToken"[^>]*value="([^"]+)"/);assert(match,'Formulario sin token');return match[1];}
+async function post(c,url,form){return c.post(url,{form:{...form,__RequestVerificationToken:await token(c,url)}});}
+async function cliente(){const c=await ctx();const email='qa-race-'+require('node:crypto').randomBytes(5).toString('hex')+'@example.test';const password='Prueba-'+require('node:crypto').randomBytes(10).toString('hex');await post(c,'/Cuenta/Registro',{Nombre:'Prueba de concurrencia',Correo:email,Contrasena:password,Confirmacion:password,AceptaTerminos:'true'});return {c,email};}
+async function agregar(c,variante){const t=await token(c,'/Catalogo/Detalle/'+Number(sql('SELECT producto_id FROM variantes_producto WHERE id='+variante)));return c.post('/Carrito/Agregar',{form:{varianteId:variante,cantidad:1,__RequestVerificationToken:t}});}
+async function checkoutForm(c){return {Nombre:'Prueba simultánea',Telefono:'999999999',Direccion:'Dirección de prueba',Distrito:'Lima',__RequestVerificationToken:await token(c,'/Pedidos/Checkout')};}
+(async()=>{try{
+const admin=await ctx();await post(admin,'/Cuenta/Login',{Correo:'admin@blackcode.pe',Contrasena:s.AdminPassword});
+const slug='prueba-concurrencia-'+Date.now();await post(admin,'/Admin/Producto',{Nombre:'Prueba concurrencia',Slug:slug,Descripcion:'Datos temporales de prueba',Precio:'50',CategoriaId:'1',ColorId:'1',MaterialId:'1',Publicado:'true',Imagen:'/img/productos/anillo-profano.svg','Variantes[0].Talla':'Única','Variantes[0].Stock':'1','Variantes[0].Activo':'true'});
+const product=Number(sql("SELECT id FROM productos WHERE slug='"+slug+"'"));assert(product>0);const variant=Number(sql('SELECT id FROM variantes_producto WHERE producto_id='+product));
+const a=await cliente(),b=await cliente();await agregar(a.c,variant);await agregar(b.c,variant);
+const [fa,fb]=await Promise.all([checkoutForm(a.c),checkoutForm(b.c)]);const results=await Promise.all([a.c.post('/Pedidos/Checkout',{form:fa}),b.c.post('/Pedidos/Checkout',{form:fb})]);assert(results.every(r=>r.status()<500));
+assert.equal(sql('SELECT stock FROM variantes_producto WHERE id='+variant),'0');assert.equal(sql('SELECT COUNT(*) FROM items_pedido WHERE variante_id='+variant),'1');const raceOrder=Number(sql('SELECT pedido_id FROM items_pedido WHERE variante_id='+variant));
+console.log('OK Dos compradores compiten por una unidad: solo una compra, stock cero, sin errores 500.');
+const stateToken=await token(admin,'/Admin/Pedidos');const canceled=await Promise.all([admin.post('/Admin/Estado',{form:{id:raceOrder,estado:'Cancelado',__RequestVerificationToken:stateToken}}),admin.post('/Admin/Estado',{form:{id:raceOrder,estado:'Cancelado',__RequestVerificationToken:stateToken}})]);assert(canceled.every(r=>r.status()<500));assert.equal(sql('SELECT stock FROM variantes_producto WHERE id='+variant),'1');console.log('OK Dos cancelaciones simultáneas reponen la unidad una sola vez.');
+const d=await cliente();await agregar(d.c,variant);const form=await checkoutForm(d.c);const duplicate=await Promise.all([d.c.post('/Pedidos/Checkout',{form}),d.c.post('/Pedidos/Checkout',{form})]);assert(duplicate.every(r=>r.status()<500));assert.equal(sql("SELECT COUNT(*) FROM pedidos p JOIN usuarios u ON p.usuario_id=u.id WHERE u.correo='"+d.email+"'"),'1');assert.equal(sql('SELECT stock FROM variantes_producto WHERE id='+variant),'0');console.log('OK Doble envío de compra: un pedido y un descuento de stock.');
+const newOrder=Number(sql("SELECT p.id FROM pedidos p JOIN usuarios u ON p.usuario_id=u.id WHERE u.correo='"+d.email+"'"));await admin.post('/Admin/Estado',{form:{id:newOrder,estado:'Cancelado',__RequestVerificationToken:await token(admin,'/Admin/Pedidos')}});
+await admin.post('/Admin/Eliminar',{form:{id:product,__RequestVerificationToken:await token(admin,'/Admin')}});assert.equal(sql('SELECT estado FROM productos WHERE id='+product),'1');console.log('OK Producto con pedidos se retira conservando el historial.');
+fs.writeFileSync(path.join(__dirname,'concurrency-results.json'),JSON.stringify({passed:true,checks:4},null,2));
+}finally{for(const c of contexts)await c.dispose();}})().catch(e=>{console.error(e.message);process.exitCode=1;});

@@ -1,4 +1,11 @@
-# BLACK CODE
+# BLACKCODE — PROTOTIPO INDEPENDIENTE
+
+> Copia privada en la cuenta AngeloE2003, basada en develop (8e868ce) del proyecto original. Se conserva su historial. Las funcionalidades del prototipo están en la rama angelo/prototipo y se entregan mediante Pull Request a develop.
+
+- [Abrir con F5 y conectar MySQL Workbench](docs/INICIO.md)
+- [Alcance, pantallas y proceso](docs/PROTOTIPO.md)
+- [Validaciones realizadas](docs/VALIDACION.md)
+
 
 Ecommerce de accesorios para hombre (anillos, cadenas y pulseras). Proyecto del curso Evolución de Software, UPN.
 
@@ -37,9 +44,9 @@ La explicación de cómo se aplica cada principio SOLID está en [`docs/SOLID.md
 ### 1. Clonar y cambiar de rama
 
 ```
-git clone https://github.com/Frostbyte29/ECOMERCE_BLACK_CODE.git
-cd ECOMERCE_BLACK_CODE
-git checkout develop
+git clone https://github.com/AngeloE2003/BlackCODE-Prototipo.git
+cd BlackCODE-Prototipo
+git checkout angelo/prototipo
 ```
 
 Abre la solución `BlackCode.slnx` con Visual Studio 2026 (carga de trabajo "Desarrollo de ASP.NET y web").
@@ -49,9 +56,9 @@ Abre la solución `BlackCode.slnx` con Visual Studio 2026 (carga de trabajo "Des
 Ejecuta esto una vez en MySQL Workbench o DBeaver (cambia `TU_CLAVE` por la que quieras):
 
 ```sql
-CREATE DATABASE IF NOT EXISTS blackcode CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
-CREATE USER IF NOT EXISTS 'blackcode'@'localhost' IDENTIFIED BY 'TU_CLAVE';
-GRANT ALL PRIVILEGES ON blackcode.* TO 'blackcode'@'localhost';
+CREATE DATABASE IF NOT EXISTS blackcode_prototipo CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+CREATE USER IF NOT EXISTS 'blackcode_proto'@'localhost' IDENTIFIED BY 'TU_CLAVE';
+GRANT ALL PRIVILEGES ON blackcode_prototipo.* TO 'blackcode_proto'@'localhost';
 FLUSH PRIVILEGES;
 ```
 
@@ -62,7 +69,7 @@ En el Explorador de soluciones: clic derecho en `BlackCode.Web` → **Administra
 ```json
 {
   "ConnectionStrings": {
-    "Default": "Server=localhost;Port=3306;Database=blackcode;Uid=blackcode;Pwd=TU_CLAVE;AllowPublicKeyRetrieval=True;"
+    "Default": "Server=localhost;Port=3306;Database=blackcode_prototipo;Uid=blackcode_proto;Pwd=TU_CLAVE;AllowPublicKeyRetrieval=True;"
   },
   "Seed": {
     "AdminPassword": "clave para admin@blackcode.pe",
@@ -75,7 +82,7 @@ Guarda con Ctrl+S. Este archivo vive en tu computadora, fuera del repositorio. *
 
 ### 4. Ejecutar
 
-Pulsa F5 con el perfil `BlackCode.Web`. En Desarrollo, la aplicación aplica las migraciones y carga los datos de demo (categorías, 6 anillos y los usuarios de prueba) al arrancar.
+Establece `BlackCode.Web` como proyecto de inicio y pulsa F5 con el perfil `https`. En Desarrollo, la aplicación aplica las migraciones y carga los datos de demo (categorías, 6 anillos, una cadena, una pulsera y los usuarios de prueba) al arrancar.
 
 ### 5. Cuentas de prueba
 

@@ -1,0 +1,15 @@
+@model CatalogoViewModel
+@{ViewData["Title"]="Catálogo";}
+<section class="section catalog-page"><p class="breadcrumb"><a href="/">Inicio</a> / Colecciones</p><div class="section-heading"><div><p class="eyebrow">ELIGE TU CÓDIGO</p><h1>@(string.IsNullOrWhiteSpace(Model.Buscar)?"Todas las piezas":"Resultados de búsqueda")</h1><p class="muted">Anillos, cadenas y pulseras. Detalles que hacen la diferencia.</p></div><span>@Model.Productos.Count productos</span></div>
+<div class="catalog-layout">
+<form method="get" class="filters" aria-label="Filtros de productos"><h2>Filtrar <span>☷</span></h2>
+<label asp-for="Buscar">Buscar</label><input asp-for="Buscar" placeholder="Nombre del producto" maxlength="100"/>
+<label asp-for="Categoria">Categoría</label><select asp-for="Categoria"><option value="">Todas</option>@foreach(var c in Model.Categorias){<option value="@c.Id">@c.Nombre</option>}</select>
+<label asp-for="Color">Color</label><select asp-for="Color"><option value="">Todos</option>@foreach(var c in Model.Colores){<option value="@c.Id">@c.Nombre</option>}</select>
+<label>Precio en soles</label><div class="price-range"><input asp-for="Minimo" type="number" min="0" step="0.01" placeholder="Desde" aria-label="Precio mínimo"/><input asp-for="Maximo" type="number" min="0" step="0.01" placeholder="Hasta" aria-label="Precio máximo"/></div>
+<label asp-for="Talla">Talla disponible</label><select asp-for="Talla"><option value="">Todas</option>@foreach(var t in new[]{"7","8","9","10","11","Única"}){<option>@t</option>}</select>
+<label asp-for="Orden">Ordenar por</label><select asp-for="Orden"><option value="relevancia">Más relevantes</option><option value="precio-asc">Menor precio</option><option value="precio-desc">Mayor precio</option><option value="nombre">Nombre</option></select>
+<button class="button full">Aplicar filtros →</button><a href="/Catalogo" class="reset">Limpiar filtros</a>
+</form>
+<div>@if(Model.Productos.Count==0){<div class="empty"><span>⌕</span><h2>No encontramos piezas con esos filtros.</h2><p>Prueba otro nombre o amplía el rango de precios.</p><a class="button" href="/Catalogo">Ver todo</a></div>}else{<div class="product-grid">@foreach(var p in Model.Productos){<partial name="_Producto" model="p"/>}</div>}</div>
+</div></section>

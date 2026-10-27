@@ -4,7 +4,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>50e106e2-3bcc-4c0f-bfa6-1df018ee50ad</UserSecretsId>
+    <UserSecretsId>blackcode-prototipo-angelo-2026</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

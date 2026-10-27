@@ -14,6 +14,7 @@ builder.Services.AddControllersWithViews(options =>
 
 // ---------- Raíz de composición (DIP): aquí se conectan las abstracciones con sus implementaciones ----------
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<CarritoIdentidad>();
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddScoped<IUsuarioActual, UsuarioActualHttp>();
 builder.Services.AddApplication();
@@ -24,7 +25,7 @@ builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.Cookie.Name = "bc_auth";
+        options.Cookie.Name = "bc_proto_auth";
         options.LoginPath = "/Cuenta/Login";
         options.LogoutPath = "/Cuenta/Logout";
         options.AccessDeniedPath = "/Cuenta/AccesoDenegado";

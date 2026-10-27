@@ -1,0 +1,3 @@
+@model IReadOnlyList<PedidoViewModel>
+@{ViewData["Title"]="Mis pedidos";}
+<section class="section"><p class="eyebrow">MI CUENTA</p><h1>Mis pedidos.</h1>@if(Model.Count==0){<div class="empty"><h2>Aún no tienes pedidos.</h2><a href="/Catalogo" class="button">Encuentra tu primera pieza →</a></div>}else{<div class="table-scroll"><table><thead><tr><th>Pedido</th><th>Fecha (UTC)</th><th>Estado</th><th>Total</th><th></th></tr></thead><tbody>@foreach(var p in Model){<tr><td>@p.Codigo</td><td>@p.Fecha.ToString("dd/MM/yyyy HH:mm")</td><td><span class="badge">@Estado(p.Estado)</span></td><td>@Dinero(p.Total)</td><td><a href="/Pedidos/Detalle/@p.Id" class="underlined">Ver detalle ↗</a></td></tr>}</tbody></table></div>}</section>
