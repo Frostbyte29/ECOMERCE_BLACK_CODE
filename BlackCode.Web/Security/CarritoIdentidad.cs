@@ -4,7 +4,7 @@ namespace BlackCode.Web.Security;
 
 public sealed class CarritoIdentidad(IHttpContextAccessor accessor, IUsuarioActual usuario)
 {
-    public const string Cookie = "bc_proto_carrito";
+    public const string Cookie = "bc_cart";
     public string? Token => accessor.HttpContext?.Request.Cookies[Cookie];
     public PropietarioCarrito Obtener()
     {

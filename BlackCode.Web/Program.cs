@@ -25,7 +25,7 @@ builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.Cookie.Name = "bc_proto_auth";
+        options.Cookie.Name = "bc_auth";
         options.LoginPath = "/Cuenta/Login";
         options.LogoutPath = "/Cuenta/Logout";
         options.AccessDeniedPath = "/Cuenta/AccesoDenegado";

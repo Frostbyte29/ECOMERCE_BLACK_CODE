@@ -10,10 +10,12 @@ public sealed class MenuPanelViewComponent : ViewComponent
 {
     private static readonly IReadOnlyList<ModuloPanel> Modulos =
     [
-        new("Clientes", "Clientes", "Admin"),
+        new("Clientes",  "Clientes", "Admin", "Index"),
+        new("Productos", "Admin",    "",      "Index"),
+        new("Pedidos",   "Admin",    "",      "Pedidos"),
     ];
 
     public IViewComponentResult Invoke() => View(Modulos);
 }
 
-public sealed record ModuloPanel(string Nombre, string Controlador, string Area);
+public sealed record ModuloPanel(string Nombre, string Controlador, string Area, string Accion = "Index");
