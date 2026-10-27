@@ -31,6 +31,7 @@ public class CheckoutViewModel
     [Required(ErrorMessage = "Escribe el distrito."), StringLength(80)] public string Distrito { get; set; } = "";
     [StringLength(200)] public string? Referencia { get; set; }
     public bool SimularRechazo { get; set; }
+    public bool EsDesarrollo { get; set; }
     [Required] public string MetodoPago { get; set; } = "tarjeta";
     public IReadOnlyList<MetodoPagoViewModel> Metodos { get; set; } = [];
     public CarritoViewModel Carrito { get; set; } = new([], new(0, 0, 0, 0));

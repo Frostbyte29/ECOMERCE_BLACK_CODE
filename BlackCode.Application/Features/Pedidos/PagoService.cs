@@ -25,14 +25,14 @@ public sealed class PagoService(IEnumerable<IMetodoPago> metodos) : IPagoService
 public sealed class PagoTarjetaSimulado : IMetodoPago
 {
     public string Codigo => "tarjeta";
-    public string Nombre => "Tarjeta — simulación";
+    public string Nombre => "Tarjeta";
     public Task<ResultadoPagoDto> ProcesarAsync(decimal monto, bool simularRechazo)
         => Task.FromResult(new ResultadoPagoDto(monto > 0 && !simularRechazo, "DEMO-TARJETA-" + Guid.NewGuid().ToString("N")[..12]));
 }
 public sealed class PagoTransferenciaSimulado : IMetodoPago
 {
     public string Codigo => "transferencia";
-    public string Nombre => "Transferencia — simulación";
+    public string Nombre => "Transferencia";
     public Task<ResultadoPagoDto> ProcesarAsync(decimal monto, bool simularRechazo)
         => Task.FromResult(new ResultadoPagoDto(monto > 0 && !simularRechazo, "DEMO-TRANSFERENCIA-" + Guid.NewGuid().ToString("N")[..12]));
 }
