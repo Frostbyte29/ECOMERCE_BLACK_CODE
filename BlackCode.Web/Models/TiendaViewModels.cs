@@ -71,4 +71,6 @@ public static class TiendaMapper
     public static ProductoEdicionViewModel Edicion(ProductoEdicionDto p) => new() { Id = p.Id, Nombre = p.Nombre, Slug = p.Slug, Descripcion = p.Descripcion, Precio = p.Precio, CategoriaId = p.CategoriaId, ColorId = p.ColorId, MaterialId = p.MaterialId, Publicado = p.Publicado, Destacado = p.Destacado, Imagen = p.Imagen, Variantes = p.Variantes.Select(v => new VarianteEdicionViewModel { Id = v.Id, Talla = v.Talla, Stock = v.Stock, Activo = v.Activo }).ToList() };
     public static string Estado(string valor) => valor switch { "PendientePago" => "Pendiente de pago", "EnPreparacion" => "En preparación", _ => valor };
     public static string Dinero(decimal valor) => "S/ " + valor.ToString("N2", System.Globalization.CultureInfo.GetCultureInfo("es-PE"));
+    private static readonly TimeSpan OffsetLima = TimeSpan.FromHours(-5); // Perú no tiene horario de verano
+    public static string Fecha(DateTime utc) => utc.Add(OffsetLima).ToString("dd/MM/yyyy HH:mm");
 }

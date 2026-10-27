@@ -17,7 +17,7 @@ public sealed class PedidosController(IPedidoService pedidos,ICarritoService car
     }
     [HttpPost] public async Task<IActionResult> Checkout(CheckoutViewModel model) {
         if(ModelState.IsValid) {
-            try { var id=await pedidos.ConfirmarAsync(new(model.Nombre,model.Telefono,model.Direccion,model.Distrito,model.Referencia),model.SimularRechazo,model.MetodoPago); var pedido=await pedidos.ObtenerAsync(id); TempData["Exito"]=notificaciones.Confirmacion(pedido!.Codigo); return RedirectToAction(nameof(Detalle),new { id }); }
+            try { var id=await pedidos.ConfirmarAsync(new(model.Nombre,model.Telefono,model.Direccion,model.Distrito,model.Referencia),model.SimularRechazo && env.IsDevelopment(),model.MetodoPago); var pedido=await pedidos.ObtenerAsync(id); TempData["Exito"]=notificaciones.Confirmacion(pedido!.Codigo); return RedirectToAction(nameof(Detalle),new { id }); }
             catch(DomainException ex) { ModelState.AddModelError("",ex.Message); }
         }
         model.Carrito=TiendaMapper.Carrito(await carrito.ObtenerAsync(identidad.Obtener()));
