@@ -53,7 +53,7 @@ public class ProductoEdicionViewModel
     [Required, StringLength(120)] public string Nombre { get; set; } = "";
     [Required, StringLength(140), RegularExpression("^[a-z0-9]+(?:-[a-z0-9]+)*$", ErrorMessage = "Usa minúsculas, números y guiones.")] public string Slug { get; set; } = "";
     [Required, StringLength(2000)] public string Descripcion { get; set; } = "";
-    [Range(typeof(decimal), "0.01", "99999999")] public decimal Precio { get; set; }
+    [Range(typeof(decimal), "0.01", "99999999", ParseLimitsInInvariantCulture = true)] public decimal Precio { get; set; }
     public int CategoriaId { get; set; }
     public int ColorId { get; set; }
     public int MaterialId { get; set; }
