@@ -13,7 +13,8 @@ public sealed class PedidosController(IPedidoService pedidos,ICarritoService car
     [HttpGet] public async Task<IActionResult> Checkout() {
         var c=TiendaMapper.Carrito(await carrito.ObtenerAsync(identidad.Obtener()));
         if(c.Lineas.Count==0) return RedirectToAction("Index","Carrito");
-        return View(new CheckoutViewModel { Nombre=User.Identity?.Name ?? "",Carrito=c,Metodos=Metodos(),EsDesarrollo=env.IsDevelopment() });
+        var ultimo=await pedidos.ObtenerUltimoEnvioAsync();
+        return View(new CheckoutViewModel { Nombre=!string.IsNullOrEmpty(ultimo?.Nombre)?ultimo.Nombre:User.Identity?.Name??"",Telefono=ultimo?.Telefono??"",Direccion=ultimo?.Direccion??"",Distrito=ultimo?.Distrito??"",Referencia=ultimo?.Referencia,Carrito=c,Metodos=Metodos(),EsDesarrollo=env.IsDevelopment() });
     }
     [HttpPost] public async Task<IActionResult> Checkout(CheckoutViewModel model) {
         if(ModelState.IsValid) {

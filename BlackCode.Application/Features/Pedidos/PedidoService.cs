@@ -67,6 +67,16 @@ public sealed class PedidoService(IAppDbContext db, IUsuarioActual usuario, ICar
             foreach (var item in pedido.Items.OrderBy(i => i.VarianteId)) await stock.RestituirAsync(item.VarianteId,item.Cantidad);
         await db.SaveChangesAsync(); await tx.CommitAsync();
     }
+    public async Task<EnvioDto?> ObtenerUltimoEnvioAsync() {
+        var uid=usuario.UsuarioId;
+        if(uid is null) return null;
+        var ultimo=await db.Pedidos.AsNoTracking().Where(p=>p.UsuarioId==uid.Value).OrderByDescending(p=>p.CreadoUtc)
+            .Select(p=>new EnvioDto(p.EnvioNombreCompleto,p.EnvioTelefono,p.EnvioDireccion,p.EnvioDistrito,p.EnvioReferencia))
+            .FirstOrDefaultAsync();
+        if(ultimo is not null) return ultimo;
+        var telefono=await db.Usuarios.AsNoTracking().Where(u=>u.Id==uid.Value).Select(u=>u.Telefono).FirstOrDefaultAsync();
+        return telefono is not null ? new EnvioDto("",telefono,"","",null) : null;
+    }
     private static PedidoDto Mapear(Pedido p) => new(p.Id,p.Codigo,p.EnvioNombreCompleto,"",p.Estado,p.Subtotal,p.CostoEnvio,p.Total,p.CreadoUtc,p.EnvioDireccion,p.EnvioDistrito,
         p.Items.Select(i => new LineaPedidoDto(i.NombreProductoCopia,i.TallaCopia,i.PrecioUnitario,i.Cantidad,i.TotalLinea)).ToList(),
         p.Historial.OrderBy(h => h.CambiadoUtc).Select(h => new HistorialDto(h.EstadoNuevo.ToString(),h.CambiadoUtc)).ToList());

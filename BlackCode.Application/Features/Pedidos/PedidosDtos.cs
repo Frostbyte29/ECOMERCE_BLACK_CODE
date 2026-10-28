@@ -11,4 +11,5 @@ public interface IPedidoService {
     Task<IReadOnlyList<PedidoDto>> ListarAsync(bool administracion = false);
     Task<PedidoDto?> ObtenerAsync(int id);
     Task CambiarEstadoAsync(int id, EstadoPedido estado);
+    Task<EnvioDto?> ObtenerUltimoEnvioAsync();
 }
