@@ -20,6 +20,8 @@
 | DIP | `BlackCode.Application/Features/Carrito/CarritoService.cs` | Depende de IAppDbContext e ICalculoCarritoService; no conoce MySQL ni AppDbContext | Angelo |
 | DIP | `BlackCode.Web/Controllers/CarritoController.cs` | Recibe ICarritoService por constructor y mapea el DTO a un ViewModel; no consulta tablas | Angelo |
 | SRP / DIP | `BlackCode.Application/Features/Pedidos/PedidoService.cs` | Coordina la compra con IStockGateway e IPagoService; el procesamiento del pago está separado | Angelo |
+| OCP | `BlackCode.Web/Program.cs` — `AddAuthorization` | La restricción se define como política declarativa en la raíz de composición; la lógica de las acciones y de los servicios no cambia; los controladores solo reciben el atributo | Carlos |
+| SRP | `BlackCode.Web/Models/TiendaViewModels.cs` — `CheckoutViewModel` | Una sola responsabilidad: ser el contrato de datos del formulario de checkout, con sus reglas de validación declaradas en DataAnnotations | Carlos |
 
 ## Cómo demostrar los tres principios en el carrito
 

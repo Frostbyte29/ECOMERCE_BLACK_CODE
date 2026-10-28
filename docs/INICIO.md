@@ -81,13 +81,16 @@ Todos los pagos son simulados; no introduzcas información real de tarjetas.
 
 1. Inicio: estilo blanco, negro y gris; menú desplegable y barra fija.
 2. Busca “anillo”: los filtros permanecen a la izquierda.
-3. Abre una pieza, selecciona talla y agrégala sin iniciar sesión.
+3. Abre una pieza, selecciona talla y agrégala sin iniciar sesión (invitado).
 4. Cambia la cantidad y prueba un valor mayor al stock.
-5. Continúa la compra, regístrate o inicia sesión; el carrito se conserva.
-6. Completa el envío y prueba **Simular un pago rechazado**: el stock y el carrito se mantienen.
-7. Desmarca esa opción y confirma. Se crea el pedido, se descuenta stock y se vacía el carrito.
-8. Desde el mismo login, entra como administrador. Modifica un producto y actualiza el estado del pedido.
-9. En Workbench, consulta las tablas para mostrar los registros persistidos.
+5. Continúa la compra; inicia sesión con `cliente@demo.pe`; el carrito se conserva.
+6. El formulario de checkout se precarga con el teléfono de la cuenta. Ingresa dirección y distrito.
+7. Prueba enviar con un teléfono de 8 dígitos: el campo muestra el error sin bloquear el botón.
+8. Completa los datos correctamente y confirma el pedido. Se descuenta stock y se vacía el carrito.
+   - _(Solo en Development)_ Con la casilla de pruebas, fuerza un rechazo de pago: el stock y el carrito se mantienen.
+9. Cierra sesión e ingresa con `admin@blackcode.pe`. El ícono del carrito no aparece; intentar ir a `/Carrito` redirige a `/Cuenta/AccesoDenegado`.
+10. En el panel, modifica un producto y actualiza el estado del pedido.
+11. En Workbench, consulta `pedidos`, `variantes_producto` e `historial_estado_pedido` para mostrar los registros persistidos.
 
 ## Alcance de la validación
 
