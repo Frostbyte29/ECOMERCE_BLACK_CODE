@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 namespace BlackCode.Web.Controllers;
 [Authorize]
+[Authorize(Policy = "NoEsAdministrador")]
 public sealed class PedidosController(IPedidoService pedidos,ICarritoService carrito,CarritoIdentidad identidad,IPagoService pagos,INotificacionPedidoService notificaciones,IWebHostEnvironment env) : Controller {
     public async Task<IActionResult> Index() => View((await pedidos.ListarAsync()).Select(TiendaMapper.Pedido).ToList());
     public async Task<IActionResult> Detalle(int id) { var dto=await pedidos.ObtenerAsync(id); return dto is null ? NotFound() : View(TiendaMapper.Pedido(dto)); }

@@ -2,8 +2,10 @@ using BlackCode.Application.Features.Carrito;
 using BlackCode.Domain.Common;
 using BlackCode.Web.Models;
 using BlackCode.Web.Security;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 namespace BlackCode.Web.Controllers;
+[Authorize(Policy = "NoEsAdministrador")]
 public sealed class CarritoController(ICarritoService carrito,CarritoIdentidad identidad) : Controller {
     public async Task<IActionResult> Index() => View(TiendaMapper.Carrito(await carrito.ObtenerAsync(identidad.Obtener())));
     [HttpPost] public async Task<IActionResult> Agregar(int varianteId,int cantidad=1) {

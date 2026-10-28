@@ -33,7 +33,10 @@
         else
         {
             <a class="menu-cuenta__item" asp-controller="Cuenta" asp-action="Index" role="menuitem">Mi cuenta</a>
-            <a class="menu-cuenta__item" asp-controller="Pedidos" asp-action="Index" role="menuitem">Mis pedidos</a>
+            @if (!esAdmin)
+            {
+                <a class="menu-cuenta__item" asp-controller="Pedidos" asp-action="Index" role="menuitem">Mis pedidos</a>
+            }
             @if (esAdmin)
             {
                 <a class="menu-cuenta__item" asp-area="Admin" asp-controller="Clientes" asp-action="Index" role="menuitem">Panel</a>
