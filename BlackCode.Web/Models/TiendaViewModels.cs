@@ -26,7 +26,7 @@ public record CarritoViewModel(IReadOnlyList<LineaCarritoViewModel> Lineas, Tota
 public class CheckoutViewModel
 {
     [Required(ErrorMessage = "Escribe el nombre de quien recibe."), StringLength(120)] public string Nombre { get; set; } = "";
-    [Required(ErrorMessage = "Escribe un teléfono."), StringLength(20)] public string Telefono { get; set; } = "";
+    [Required(ErrorMessage = "Escribe un teléfono."), StringLength(20), RegularExpression(@"^\d{9}$", ErrorMessage = "Ingresa un teléfono de 9 dígitos.")] public string Telefono { get; set; } = "";
     [Required(ErrorMessage = "Escribe la dirección."), StringLength(200)] public string Direccion { get; set; } = "";
     [Required(ErrorMessage = "Escribe el distrito."), StringLength(80)] public string Distrito { get; set; } = "";
     [StringLength(200)] public string? Referencia { get; set; }
