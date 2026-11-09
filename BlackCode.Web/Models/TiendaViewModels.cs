@@ -59,7 +59,8 @@ public class ProductoEdicionViewModel
     public int ColorId { get; set; }
     public int MaterialId { get; set; }
     public bool Publicado { get; set; } = true; public bool Destacado { get; set; }
-    [Required] public string Imagen { get; set; } = "/img/productos/anillo-profano.svg";
+    [Required] public string Imagen { get; set; } = "/img/productos/catalogo/anillo-carmesi.jpg";
+    [Display(Name = "Imagen del producto")] public IFormFile? ArchivoImagen { get; set; }
     public List<VarianteEdicionViewModel> Variantes { get; set; } = [new()];
     public IReadOnlyList<OpcionViewModel> Categorias { get; set; } = []; public IReadOnlyList<OpcionViewModel> Colores { get; set; } = []; public IReadOnlyList<OpcionViewModel> Materiales { get; set; } = [];
 }

@@ -4,6 +4,10 @@
 
 | Principio | Archivo | Qué demuestra | Autor |
 |---|---|---|---|
+| SRP | `Features/Administracion/ImagenProductoService.cs` + `EdicionProductoService.cs` + `Infrastructure/Storage/AlmacenImagenesProducto.cs` | Validar la carga, coordinar la edición y almacenar archivos tienen responsabilidades separadas | Angelo |
+| OCP | `Features/Administracion/FormatosImagenProducto.cs` | Los validadores de formato se registran como estrategias de IFormatoImagenProducto; el coordinador de carga no necesita condiciones por formato | Angelo |
+| DIP | `Application/Abstractions/IAlmacenImagenesProducto.cs` | Application depende del contrato de almacenamiento; Infrastructure implementa disco local. Web entrega un stream, sin escribir archivos ni consultar DbContext | Angelo |
+| SRP | `Infrastructure/Persistence/CatalogoFotograficoSeeder.cs` | Incorpora la colección una sola vez y conserva las modificaciones posteriores del administrador | Angelo |
 | DIP | `BlackCode.Application/Abstractions/IAppDbContext.cs` + `BlackCode.Infrastructure/Persistence/AppDbContext.cs` | Application depende de una interfaz; solo Infrastructure sabe que la base es MySQL | Equipo |
 | DIP | `BlackCode.Infrastructure/DependencyInjection.cs` + `BlackCode.Web/Program.cs` | Raíz de composición: el único lugar donde se conectan interfaces con implementaciones | Equipo |
 | SRP | `BlackCode.Infrastructure/Security/AspNetContrasenaService.cs` | Hashear contraseñas es una responsabilidad separada del login | Equipo |

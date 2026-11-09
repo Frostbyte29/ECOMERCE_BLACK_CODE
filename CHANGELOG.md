@@ -4,6 +4,12 @@ Formato: [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) · Versiona
 
 ## [Sin publicar]
 
+### Catálogo fotográfico y edición de imágenes
+- Colección de 19 anillos con fotografías propias, nombres y precios sugeridos, descripción, color, material y cinco tallas con stock de demostración. Se incorpora una sola vez en Development; los productos iniciales conservan sus referencias históricas como borradores.
+- Selección de JPG, PNG y WebP hasta 5 MB al crear o editar, con vista previa. Validación en servidor, almacenamiento detrás de una interfaz y limpieza de la carga nueva si el producto no se guarda.
+- Tarjetas de Inicio y Catálogo con imagen a todo el ancho, nombre y precio agrupados y precio destacado en soles, también en móvil.
+- Guía de fotografías y datos de demostración en `docs/CATALOGO-FOTOGRAFICO.md`. Sin cambios de esquema ni migraciones.
+
 ### RFC-2026-003 — Yape y Plin
 
 #### Agregado

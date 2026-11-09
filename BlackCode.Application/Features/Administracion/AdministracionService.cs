@@ -29,7 +29,9 @@ public sealed class AdministracionService(IAppDbContext db,IUsuarioActual usuari
         if (string.IsNullOrWhiteSpace(dto.Nombre) || dto.Nombre.Length > 120 || string.IsNullOrWhiteSpace(dto.Slug) || dto.Slug.Length > 140 || !System.Text.RegularExpressions.Regex.IsMatch(dto.Slug,"^[a-z0-9]+(?:-[a-z0-9]+)*$") ||
             string.IsNullOrWhiteSpace(dto.Descripcion) || dto.Descripcion.Length > 2000 || dto.Precio <= 0 || dto.Precio > 99999999m)
             throw new DomainException("Revisa los datos: nombre, descripción, precio positivo e identificador válido.");
-        if (!dto.Imagen.StartsWith("/img/productos/") || dto.Imagen.Contains("..") || dto.Imagen.Length > 300) throw new DomainException("Selecciona una imagen del catálogo local.");
+        if (string.IsNullOrWhiteSpace(dto.Imagen) || dto.Imagen.Length > 300 ||
+            !System.Text.RegularExpressions.Regex.IsMatch(dto.Imagen, @"\A/img/productos/(?:[a-z0-9-]+/)*[a-z0-9-]+\.(?:jpg|jpeg|png|webp|svg)\z"))
+            throw new DomainException("Selecciona una imagen del catálogo local.");
         if (await db.Productos.AnyAsync(p => p.Slug == dto.Slug && p.Id != dto.Id)) throw new DomainException("Ese identificador ya pertenece a otro producto.");
         if (!await db.Categorias.AnyAsync(c => c.Id == dto.CategoriaId) || !await db.Colores.AnyAsync(c => c.Id == dto.ColorId) || !await db.Materiales.AnyAsync(m => m.Id == dto.MaterialId)) throw new DomainException("Categoría, material o color inválido.");
         var p = dto.Id == 0 ? new Producto { CreadoUtc = reloj.GetUtcNow().UtcDateTime } :
