@@ -20,8 +20,9 @@ public sealed class ExtensibilidadTests
         await using var db = Db();
         var categoria = new Categoria { Nombre = "Anillos", Slug = "anillos", Activo = true };
         var color = new Color { Nombre = "Plateado", CodigoHex = "#cccccc" };
-        db.Productos.AddRange(new Producto { Nombre = "Económico", Precio = 39m, Estado = EstadoProducto.Publicado, Categoria = categoria, Color = color },
-            new Producto { Nombre = "Mayor precio", Precio = 89m, Estado = EstadoProducto.Publicado, Categoria = categoria, Color = color });
+        var material = new Material { Nombre = "Acero inoxidable" };
+        db.Productos.AddRange(new Producto { Nombre = "Económico", Precio = 39m, Estado = EstadoProducto.Publicado, Categoria = categoria, Color = color, Material = material },
+            new Producto { Nombre = "Mayor precio", Precio = 89m, Estado = EstadoProducto.Publicado, Categoria = categoria, Color = color, Material = material });
         await db.SaveChangesAsync();
         var catalogo = new CatalogoService(db, [new FiltroPrueba()]);
         Assert.Equal("Económico", Assert.Single((await catalogo.ConsultarAsync(new())).Productos).Nombre);

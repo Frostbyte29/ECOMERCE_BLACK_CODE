@@ -7,18 +7,19 @@ namespace BlackCode.Web.Models;
 
 public record OpcionViewModel(int Id, string Nombre);
 public record VarianteViewModel(int Id, string Talla, int Stock, bool Activo);
-public record ProductoViewModel(int Id, string Nombre, string Slug, string Descripcion, decimal Precio, string Categoria, string Color, string Imagen, bool Destacado, IReadOnlyList<VarianteViewModel> Variantes);
+public record ProductoViewModel(int Id, string Nombre, string Slug, string Descripcion, decimal Precio, string Categoria, string Color, string Material, string? MaterialDescripcion, string Imagen, bool Destacado, IReadOnlyList<VarianteViewModel> Variantes);
 public class CatalogoViewModel
 {
     public string? Buscar { get; set; }
     public int? Categoria { get; set; }
     public int? Color { get; set; }
+    public int? Material { get; set; }
     public decimal? Minimo { get; set; }
     public decimal? Maximo { get; set; }
     public string? Talla { get; set; }
     public string Orden { get; set; } = "relevancia";
     public IReadOnlyList<ProductoViewModel> Productos { get; set; } = [];
-    public IReadOnlyList<OpcionViewModel> Categorias { get; set; } = []; public IReadOnlyList<OpcionViewModel> Colores { get; set; } = [];
+    public IReadOnlyList<OpcionViewModel> Categorias { get; set; } = []; public IReadOnlyList<OpcionViewModel> Colores { get; set; } = []; public IReadOnlyList<OpcionViewModel> Materiales { get; set; } = [];
 }
 public record LineaCarritoViewModel(int VarianteId, int ProductoId, string Nombre, string Talla, string Imagen, decimal Precio, int Cantidad, int Stock, bool Disponible) { public decimal Total => Precio * Cantidad; }
 public record TotalesViewModel(decimal Subtotal, decimal Descuento, decimal Envio, decimal Total);
@@ -65,7 +66,7 @@ public class ProductoEdicionViewModel
 public record AdminViewModel(int Productos, int Pedidos, int Clientes, int CarritosInvitados, decimal Ventas, IReadOnlyList<ProductoEdicionViewModel> Lista);
 public static class TiendaMapper
 {
-    public static ProductoViewModel Producto(ProductoDto p) => new(p.Id, p.Nombre, p.Slug, p.Descripcion, p.Precio, p.Categoria, p.Color, p.Imagen, p.Destacado, p.Variantes.Select(v => new VarianteViewModel(v.Id, v.Talla, v.Stock, v.Activo)).ToList());
+    public static ProductoViewModel Producto(ProductoDto p) => new(p.Id, p.Nombre, p.Slug, p.Descripcion, p.Precio, p.Categoria, p.Color, p.Material, p.MaterialDescripcion, p.Imagen, p.Destacado, p.Variantes.Select(v => new VarianteViewModel(v.Id, v.Talla, v.Stock, v.Activo)).ToList());
     public static CarritoViewModel Carrito(CarritoDto c) => new(c.Lineas.Select(l => new LineaCarritoViewModel(l.VarianteId, l.ProductoId, l.Nombre, l.Talla, l.Imagen, l.Precio, l.Cantidad, l.Stock, l.Disponible)).ToList(), new(c.Totales.Subtotal, c.Totales.Descuento, c.Totales.Envio, c.Totales.Total));
     public static PedidoViewModel Pedido(PedidoDto p) => new(p.Id, p.Codigo, p.Cliente, p.Estado.ToString(), p.Subtotal, p.Envio, p.Total, p.Fecha, p.Direccion, p.Distrito, p.Lineas.Select(l => new LineaPedidoViewModel(l.Producto, l.Talla, l.Precio, l.Cantidad, l.Total)).ToList(), p.Historial.Select(h => new HistorialViewModel(h.Estado, h.Fecha)).ToList(), BlackCode.Domain.Pedidos.TransicionesPedido.SiguientesEstados(p.Estado).Select(e => e.ToString()).ToList());
     public static ProductoEdicionViewModel Edicion(ProductoEdicionDto p) => new() { Id = p.Id, Nombre = p.Nombre, Slug = p.Slug, Descripcion = p.Descripcion, Precio = p.Precio, CategoriaId = p.CategoriaId, ColorId = p.ColorId, MaterialId = p.MaterialId, Publicado = p.Publicado, Destacado = p.Destacado, Imagen = p.Imagen, Variantes = p.Variantes.Select(v => new VarianteEdicionViewModel { Id = v.Id, Talla = v.Talla, Stock = v.Stock, Activo = v.Activo }).ToList() };

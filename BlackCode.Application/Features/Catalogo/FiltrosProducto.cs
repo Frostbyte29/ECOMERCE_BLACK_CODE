@@ -39,3 +39,8 @@ public sealed class FiltroTalla : IFiltroProducto
         => string.IsNullOrWhiteSpace(entrada.Talla) ? productos :
             productos.Where(p => p.Variantes.Any(v => v.Talla == entrada.Talla && v.Activo && v.Stock > 0));
 }
+public sealed class FiltroMaterial : IFiltroProducto
+{
+    public IQueryable<Producto> Aplicar(IQueryable<Producto> productos, FiltroCatalogo entrada)
+        => entrada.Material.HasValue ? productos.Where(p => p.MaterialId == entrada.Material) : productos;
+}

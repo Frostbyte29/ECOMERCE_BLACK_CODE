@@ -32,6 +32,7 @@ public static class DependencyInjection
         services.AddSingleton<IFiltroProducto, FiltroColor>();
         services.AddSingleton<IFiltroProducto, FiltroPrecio>();
         services.AddSingleton<IFiltroProducto, FiltroTalla>();
+        services.AddSingleton<IFiltroProducto, FiltroMaterial>();
         services.AddScoped<ICarritoService, CarritoService>();
         services.AddScoped<ICalculoCarritoService, CalculoCarritoService>();
         services.AddSingleton<IReglaDescuento, SinDescuento>();

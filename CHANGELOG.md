@@ -7,6 +7,7 @@ Formato: [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) · Versiona
 ### Iteración 2 — flujo de compras
 
 #### Agregado
+- Filtro de material en el catálogo: acepta `material` por GET y se combina con categoría, color, talla, precio, búsqueda y orden sin modificar `CatalogoService` (OCP — `FiltroMaterial` como nueva clase independiente). El detalle del producto muestra el nombre y la descripción del material.
 - Flujo completo de compra: carrito para invitados y usuarios registrados, checkout con formulario de envío, selección de método de pago y confirmación con descuento de stock.
 - Precarga del formulario de checkout con los datos del último envío del usuario; si no hay pedidos previos usa el teléfono guardado en la cuenta.
 - Pruebas del servicio de pedidos: precarga del envío más reciente, selección del pedido más reciente por fecha y fallback al teléfono de la cuenta.

@@ -14,17 +14,19 @@ public sealed class CatalogoService(IAppDbContext db, IEnumerable<IFiltroProduct
             "nombre" => query.OrderBy(p => p.Nombre),
             _ => query.OrderByDescending(p => p.Destacado).ThenBy(p => p.Id)
         };
-        var productos = await query.Include(p => p.Categoria).Include(p => p.Color).Include(p => p.Imagenes).Include(p => p.Variantes).ToListAsync();
+        var productos = await query.Include(p => p.Categoria).Include(p => p.Color).Include(p => p.Material).Include(p => p.Imagenes).Include(p => p.Variantes).ToListAsync();
         return new(productos.Select(Mapear).ToList(),
             await db.Categorias.AsNoTracking().Where(c => c.Activo).OrderBy(c => c.Orden).Select(c => new OpcionDto(c.Id,c.Nombre)).ToListAsync(),
-            await db.Colores.AsNoTracking().Select(c => new OpcionDto(c.Id,c.Nombre)).ToListAsync());
+            await db.Colores.AsNoTracking().Select(c => new OpcionDto(c.Id,c.Nombre)).ToListAsync(),
+            await db.Materiales.AsNoTracking().OrderBy(m => m.Nombre).Select(m => new OpcionDto(m.Id,m.Nombre)).ToListAsync());
     }
     public async Task<ProductoDto?> ObtenerAsync(int id) {
-        var p = await db.Productos.AsNoTracking().Include(p => p.Categoria).Include(p => p.Color).Include(p => p.Imagenes).Include(p => p.Variantes)
+        var p = await db.Productos.AsNoTracking().Include(p => p.Categoria).Include(p => p.Color).Include(p => p.Material).Include(p => p.Imagenes).Include(p => p.Variantes)
             .SingleOrDefaultAsync(p => p.Id == id && p.Estado == EstadoProducto.Publicado);
         return p is null ? null : Mapear(p);
     }
     private static ProductoDto Mapear(Producto p) => new(p.Id,p.Nombre,p.Slug,p.Descripcion,p.Precio,p.Categoria.Nombre,p.Color.Nombre,
+        p.Material?.Nombre ?? "",p.Material?.Descripcion,
         p.Imagenes.OrderBy(i => i.Orden).FirstOrDefault()?.Url ?? "/img/productos/anillo-profano.svg", p.Destacado,
         p.Variantes.OrderBy(v => v.Id).Select(v => new VarianteDto(v.Id,v.Talla,v.Stock,v.Activo)).ToList());
 }
