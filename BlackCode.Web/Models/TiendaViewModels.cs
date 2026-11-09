@@ -38,7 +38,7 @@ public class CheckoutViewModel
     public CarritoViewModel Carrito { get; set; } = new([], new(0, 0, 0, 0));
 }
 public record LineaPedidoViewModel(string Producto, string Talla, decimal Precio, int Cantidad, decimal Total);
-public record MetodoPagoViewModel(string Codigo, string Nombre);
+public record MetodoPagoViewModel(string Codigo, string Nombre, string? ImagenQr = null, bool QrDisponible = false);
 public record HistorialViewModel(string Estado, DateTime Fecha);
 public record PedidoViewModel(int Id, string Codigo, string Cliente, string Estado, decimal Subtotal, decimal Envio, decimal Total, DateTime Fecha, string Direccion, string Distrito, IReadOnlyList<LineaPedidoViewModel> Lineas, IReadOnlyList<HistorialViewModel> Historial, IReadOnlyList<string> Siguientes);
 public class VarianteEdicionViewModel

@@ -27,5 +27,15 @@ public sealed class PedidosController(IPedidoService pedidos,ICarritoService car
         model.EsDesarrollo=env.IsDevelopment();
         return View(model);
     }
-    private IReadOnlyList<MetodoPagoViewModel> Metodos() => pagos.Metodos().Select(m=>new MetodoPagoViewModel(m.Codigo,m.Nombre)).ToList();
+    private static readonly IReadOnlyDictionary<string, string> ImagenesQr = new Dictionary<string, string>
+    {
+        ["yape"] = "img/pagos/yape-qr.png",
+        ["plin"] = "img/pagos/plin-qr.png"
+    };
+    private IReadOnlyList<MetodoPagoViewModel> Metodos() => pagos.Metodos().Select(m =>
+    {
+        var imagen = ImagenesQr.GetValueOrDefault(m.Codigo);
+        var disponible = imagen is not null && env.WebRootFileProvider.GetFileInfo(imagen).Exists;
+        return new MetodoPagoViewModel(m.Codigo, m.Nombre, imagen is null ? null : "~/" + imagen, disponible);
+    }).ToList();
 }

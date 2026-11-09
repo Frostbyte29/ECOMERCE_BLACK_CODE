@@ -4,6 +4,17 @@ Formato: [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) · Versiona
 
 ## [Sin publicar]
 
+### RFC-2026-003 — Yape y Plin
+
+#### Agregado
+- Yape y Plin como implementaciones independientes de `IMetodoPago`, registradas mediante inyección de dependencias y disponibles en el selector del checkout.
+- QR de cada billetera en el checkout, con archivos públicos `wwwroot/img/pagos/yape-qr.png` y `plin-qr.png`. Si falta una imagen, se muestra un aviso. Los pagos continúan siendo simulados.
+- Pruebas de resolución de los cuatro métodos, rechazo, códigos inválidos, persistencia del método elegido, reversión transaccional y lectura de pedidos históricos. SQLite se usa únicamente como base temporal de pruebas; la tienda conserva MySQL.
+
+#### Corregido
+- Cada pago nuevo guarda el método seleccionado: Tarjeta = 2, Transferencia = 3, Yape = 4 y Plin = 5. `Simulado = 1` conserva el significado de los registros anteriores.
+- Ajuste común del contrato: `IMetodoPago.Metodo` identifica la estrategia y `PagoService` lo transporta en `ResultadoPagoDto`. `PedidoService` deja de guardar un valor fijo. No se añaden condiciones por billetera al coordinador ni migraciones.
+
 ### Iteración 2 — flujo de compras
 
 #### Agregado
@@ -25,7 +36,7 @@ Formato: [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) · Versiona
 
 ### Pendiente para la iteración 2
 - Pedido pendiente de pago con expiración automática.
-- Pago contra entrega; Yape y Plin como nuevos métodos de pago.
+- Pago contra entrega.
 - Número de seguimiento del pedido.
 - Libreta de direcciones guardadas.
 - Historial de stock.

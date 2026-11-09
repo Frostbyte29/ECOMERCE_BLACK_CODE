@@ -38,6 +38,8 @@ public static class DependencyInjection
         services.AddSingleton<IReglaDescuento, SinDescuento>();
         services.AddSingleton<IMetodoPago, PagoTarjetaSimulado>();
         services.AddSingleton<IMetodoPago, PagoTransferenciaSimulado>();
+        services.AddSingleton<IMetodoPago, PagoYapeSimulado>();
+        services.AddSingleton<IMetodoPago, PagoPlinSimulado>();
         services.AddScoped<IPagoService, PagoService>();
         services.AddSingleton<INotificacionPedidoService, NotificacionPedidoService>();
         services.AddScoped<IPedidoService, PedidoService>();

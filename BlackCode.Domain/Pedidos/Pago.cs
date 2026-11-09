@@ -2,7 +2,11 @@ namespace BlackCode.Domain.Pedidos;
 
 public enum MetodoPago
 {
-    Simulado = 1   // el día que entre una pasarela real, se agrega aquí (ej. MercadoPago)
+    Simulado = 1, // Conserva el valor de los pagos históricos.
+    Tarjeta = 2,
+    Transferencia = 3,
+    Yape = 4,
+    Plin = 5
 }
 
 public enum EstadoPago

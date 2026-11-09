@@ -48,7 +48,7 @@ el enum y el diccionario. La extensión por IReglaDescuento es el ejemplo princi
 | Autenticación | AutenticacionService autentica (PortalAcceso.Tienda / Panel); GestionClientesService administra clientes. CookieSesion arma la cookie. IContrasenaService hashea. | Sin punto de extensión propio: hay un solo método de acceso por portal. | AutenticacionService recibe IAppDbContext, IContrasenaService y TimeProvider |
 | Catálogo | CatalogoService consulta; CatalogoController mapea; las vistas presentan ViewModels | IFiltroProducto tiene implementaciones de texto, categoría, color, material, precio y talla. Cada criterio nuevo es una clase independiente; CatalogoService no cambia | CatalogoService recibe IAppDbContext e IEnumerable<IFiltroProducto>; el controlador recibe ICatalogoService |
 | Carrito | CarritoService modifica artículos y fusiona; CalculoCarritoService calcula importes | IReglaDescuento permite SinDescuento y DescuentoPorCantidad sin cambiar la calculadora | CarritoService recibe IAppDbContext e ICalculoCarritoService; la calculadora recibe reglas mediante interfaz |
-| Pedidos y pagos | PedidoService coordina la compra; PagoService procesa mediante estrategias; NotificacionPedidoService prepara la confirmación en pantalla | IMetodoPago permite PagoTarjetaSimulado y PagoTransferenciaSimulado. La selección usa el código de la implementación, sin condicionales por método | PedidoService depende de IAppDbContext, ICarritoService, IStockGateway, IPagoService e IUsuarioActual |
+| Pedidos y pagos | PedidoService coordina la compra; PagoService procesa mediante estrategias; NotificacionPedidoService prepara la confirmación en pantalla | IMetodoPago permite PagoTarjetaSimulado, PagoTransferenciaSimulado, PagoYapeSimulado y PagoPlinSimulado. La selección usa el código de la implementación, sin condicionales por método | PedidoService depende de IAppDbContext, ICarritoService, IStockGateway, IPagoService e IUsuarioActual |
 | Administración | AdministracionService gestiona productos; InventarioService modifica variantes y stock; PedidoService gestiona pedidos; ReporteService prepara exportaciones | IExportadorReporte permite ExportadorCsv y ExportadorJson; una prueba incorpora un exportador nuevo sin cambiar ReporteService | Los servicios reciben IAppDbContext, IUsuarioActual, IInventarioService e interfaces de exportación; AdminController recibe servicios |
 
 ### Ubicación de los ejemplos
@@ -70,7 +70,7 @@ introducido repositorios duplicados ni controladores que accedan directamente al
   aislamiento de invitados, fusión y límites de cantidad.
 
 En autenticación solo se ofrece correo/contraseña en la interfaz actual.
-Las dos opciones de pago son simuladas. Las notificaciones son mensajes en la pantalla.
+Las cuatro opciones de pago son simuladas. Las notificaciones son mensajes en la pantalla.
 
 ### Presentación de la marca
 
@@ -80,3 +80,29 @@ Las dos opciones de pago son simuladas. Las notificaciones son mensajes en la pa
 
 La incorporación de fotografías y logos no cambia servicios, contratos ni persistencia.
 OCP y DIP conservan las implementaciones y pruebas descritas en las secciones anteriores.
+
+### RFC-2026-003 — Yape y Plin
+
+| Principio | Archivo | Qué demuestra | Autor |
+|---|---|---|---|
+| SRP | `Features/Pedidos/PagoYapeSimulado.cs` y `PagoPlinSimulado.cs` en Application | Cada clase simula únicamente el pago de su billetera. La presentación del QR pertenece al checkout de Web. | Angelo |
+| OCP | `IMetodoPago`, `PagoYapeSimulado`, `PagoPlinSimulado` y `Application/DependencyInjection.cs` | Los métodos nuevos se agregan como clases registradas. La selección genérica de `PagoService` no incorpora casos para Yape ni Plin. | Angelo |
+| DIP | `PedidoService` y `PagoService` | El pedido recibe `IPagoService` y el coordinador recibe `IEnumerable<IMetodoPago>`. El valor persistido procede de la estrategia seleccionada. | Angelo |
+
+El ajuste común para guardar el método introduce `IMetodoPago.Metodo` y transporta
+ese valor en `ResultadoPagoDto`. Por eso cambia una vez `PagoService`: agrega el
+valor al resultado de cualquier estrategia, sin reconocer billeteras concretas.
+Agregar las dos clases y sus registros no requiere otra modificación del coordinador.
+
+El checkout conserva su lista dinámica desde `IPagoService.Metodos()`. Web asocia
+las imágenes a los códigos registrados y envía esa información mediante
+`MetodoPagoViewModel`, sin pasar entidades a la vista.
+
+`pagos.metodo` permanece como `int`. El valor 1 conserva los pagos históricos y
+los valores 2 a 5 identifican los métodos nuevos. No se modifica el esquema.
+La prueba `Modelo_mysql_conserva_el_esquema_de_las_migraciones` verifica el modelo
+contra el snapshot sin conectarse a una base de datos.
+
+Pruebas: `BlackCode.Tests/Pedidos/PagoServiceTests.cs` y `CheckoutPagoTests.cs`.
+Las compras completas usan SQLite temporal y un adaptador de stock de prueba.
+Esto comprueba la coordinación y persistencia del checkout, no el SQL específico de MySQL.
