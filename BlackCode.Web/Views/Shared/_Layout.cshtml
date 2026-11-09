@@ -1,6 +1,6 @@
 @using BlackCode.Domain.Usuarios
 @{
-    var _buscar = Context.Request.Query["Buscar"].ToString().ToLowerInvariant();
+    var _catId = Context.Request.Query["Categoria"].ToString();
     bool _enCatalogo = (Context.Request.Path.Value ?? "").StartsWith("/Catalogo");
 }
 <!DOCTYPE html>
@@ -26,9 +26,9 @@
     <nav class="main-nav" aria-label="Navegación principal">
         <a asp-controller="Home" asp-action="Index">Inicio</a>
         <a asp-controller="Catalogo" asp-action="Index">Colecciones</a>
-        <a href="/Catalogo?Buscar=anillo" class="@(_enCatalogo&&_buscar=="anillo"?"active":null)" aria-current="@(_enCatalogo&&_buscar=="anillo"?"page":null)">Anillos</a>
-        <a href="/Catalogo?Buscar=cadena" class="@(_enCatalogo&&_buscar=="cadena"?"active":null)" aria-current="@(_enCatalogo&&_buscar=="cadena"?"page":null)">Cadenas</a>
-        <a href="/Catalogo?Buscar=pulsera" class="@(_enCatalogo&&_buscar=="pulsera"?"active":null)" aria-current="@(_enCatalogo&&_buscar=="pulsera"?"page":null)">Pulseras</a>
+        <a href="/Catalogo?Categoria=1" class="@(_enCatalogo&&_catId=="1"?"active":null)" aria-current="@(_enCatalogo&&_catId=="1"?"page":null)">Anillos</a>
+        <a href="/Catalogo?Categoria=2" class="@(_enCatalogo&&_catId=="2"?"active":null)" aria-current="@(_enCatalogo&&_catId=="2"?"page":null)">Cadenas</a>
+        <a href="/Catalogo?Categoria=3" class="@(_enCatalogo&&_catId=="3"?"active":null)" aria-current="@(_enCatalogo&&_catId=="3"?"page":null)">Pulseras</a>
         <a href="#">Nosotros</a>
     </nav>
 
