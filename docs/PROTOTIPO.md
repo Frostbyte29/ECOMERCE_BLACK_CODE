@@ -1,7 +1,7 @@
 # BlackCODE: alcance y proceso
 
 Empresa ficticia de accesorios para hombre: anillos, cadenas y pulseras.
-El prototipo automatiza el registro de compras, cálculo de importes, control de stock,
+El sistema automatiza el registro de compras, cálculo de importes, control de stock,
 seguimiento de pedidos y mantenimiento del catálogo.
 
 ## Referencias de diseño
@@ -10,7 +10,7 @@ seguimiento de pedidos y mantenimiento del catálogo.
 - Zaro: inicio con bloque principal, accesos a colecciones y productos destacados.
 - RKS: navegación con submenús al pasar el cursor y barra visible al desplazarse.
 - Interfaz en español y paleta blanco, negro y gris.
-- Se usan ilustraciones propias del prototipo, sin copiar fotografías de las tiendas.
+- Se usan ilustraciones propias del proyecto, sin copiar fotografías de las tiendas.
 
 ## Módulos
 
@@ -46,7 +46,7 @@ flowchart TD
 Las operaciones críticas de compra se ejecutan dentro de una transacción.
 Las cancelaciones permitidas restauran el stock. Un pedido enviado ya no puede cancelarse según las reglas originales.
 
-## Archivos para sustentar el carrito de Angelo
+## Archivos del módulo Carrito
 
 - `Application/Features/Carrito/CarritoService.cs`: gestión de artículos y fusión.
 - `Application/Features/Carrito/CalculoCarritoService.cs`: importes, envío y reglas de descuento.

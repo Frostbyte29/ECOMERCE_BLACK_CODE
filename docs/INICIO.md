@@ -1,31 +1,19 @@
-# Abrir el prototipo con Visual Studio y MySQL
+# Abrir el proyecto con Visual Studio y MySQL
 
-Este proyecto es una copia independiente de Frostbyte29/ECOMERCE_BLACK_CODE.
-Conserva su historial y parte del commit de integración 8e868ce.
-El desarrollo del prototipo está en la rama **angelo/prototipo**, propuesto hacia **develop** mediante Pull Request.
+Proyecto principal del equipo: ecommerce de accesorios para hombre (anillos, cadenas y pulseras). Repositorio: **Frostbyte29/ECOMERCE_BLACK_CODE**.
 
 ## En esta computadora
 
 1. Abre **BlackCode.slnx** con **Visual Studio 2026**.
 2. En el Explorador de soluciones, clic derecho en **BlackCode.Web → Establecer como proyecto de inicio**.
 3. Selecciona el perfil **https** en la barra superior.
-4. Comprueba que la instancia local de MySQL está encendida. Tras reiniciar Windows, ejecuta desde la carpeta del proyecto:
-
-   ```powershell
-   powershell -NoProfile -File tools/Start-LocalDatabase.ps1
-   ```
-
-5. Pulsa **F5**. La dirección del prototipo es **https://localhost:7262**.
+4. Comprueba que MySQL 8.4 está corriendo.
+5. Pulsa **F5**. La dirección del proyecto es **https://localhost:7062**.
 6. Si aparece un aviso de certificado, ejecuta `dotnet dev-certs https --trust` y acepta el certificado de desarrollo de localhost.
 
 La configuración preparada utiliza .NET SDK 10.0.402 y MySQL Community 8.4.11.
-El servidor de demostración está aislado en el puerto 3307. No reemplaza el MySQL 8.0 instalado.
-Los archivos de servidor y datos están fuera del repositorio; su ubicación se registra en el archivo local ignorado `.local/database.json`.
-Conserva esas carpetas si quieres seguir utilizando esta instancia. El servidor no está registrado como servicio de inicio automático.
 
 La cadena de conexión y las contraseñas se guardan únicamente en los **secretos de usuario de BlackCode.Web**.
-Este prototipo tiene su propio identificador de secretos: `blackcode-prototipo-angelo-2026`.
-No comparte las cookies ni los puertos HTTP/HTTPS del repositorio original.
 
 ## Cuentas de demostración
 
@@ -45,12 +33,12 @@ Crea una conexión nueva de tipo **Standard (TCP/IP)**:
 
 | Campo | Valor local |
 |---|---|
-| Connection Name | BlackCODE Prototipo |
-| Hostname | 127.0.0.1 |
-| Port | 3307 |
-| Username | blackcode_proto |
-| Password | Valor de Pwd en ConnectionStrings:Default, dentro de los secretos de usuario |
-| Default Schema | blackcode_prototipo |
+| Connection Name | BLACK CODE |
+| Hostname | localhost |
+| Port | 3306 |
+| Username | el usuario de tu ConnectionStrings:Default |
+| Password | el valor de Pwd en ConnectionStrings:Default |
+| Default Schema | el nombre de base de tu ConnectionStrings:Default |
 
 Pulsa **Test Connection**, conecta y actualiza **Schemas**.
 Puedes consultar el avance con:
@@ -71,11 +59,11 @@ Todos los pagos son simulados; no introduzcas información real de tarjetas.
 ## En otra computadora
 
 1. Instala Visual Studio 2026 con la carga **Desarrollo de ASP.NET y web**, SDK .NET 10 y MySQL 8.4.
-2. Clona **AngeloE2003/BlackCODE-Prototipo** y selecciona `angelo/prototipo` mientras el PR no esté integrado.
-3. Crea una base y usuario exclusivos del prototipo. Usa `blackcode_prototipo` como nombre de base para distinguirlo del proyecto del equipo.
+2. Clona **Frostbyte29/ECOMERCE_BLACK_CODE**.
+3. Crea una base de datos y un usuario exclusivos. Elige un nombre de base y úsalos también en el paso siguiente.
 4. En secretos de usuario, configura `ConnectionStrings:Default`, `Seed:AdminPassword` y `Seed:ClientePassword`, como se describe en el README.
-5. Ajusta host, puerto, base y usuario a tu instalación. El puerto 3307 corresponde únicamente a la instalación local preparada aquí.
-6. Ejecuta con el perfil https. En Development, el arranque aplica la migración existente y carga ocho productos iniciales.
+5. Ajusta host, puerto (3306 por defecto), base y usuario a tu instalación.
+6. Ejecuta con el perfil https. En Development, el arranque aplica las migraciones existentes y carga los datos de demo.
 
 ## Recorrido para la exposición
 
@@ -95,5 +83,5 @@ Todos los pagos son simulados; no introduzcas información real de tarjetas.
 ## Alcance de la validación
 
 Se compiló con .NET 10 y se ejecutó con el mismo perfil https definido para Visual Studio.
-Las pruebas automatizadas y de navegador se documentan en **VALIDACION.md**.
+Las pruebas automatizadas se documentan en **VALIDACION.md**.
 No se automatizó la pulsación de F5 ni la interfaz de Visual Studio; la selección del proyecto de inicio es el paso manual indicado arriba.

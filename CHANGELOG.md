@@ -33,6 +33,8 @@ Formato: [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) · Versiona
 - Panel de administración con inicio y dashboard.
 - Páginas Nosotros, Colecciones y Favoritos.
 - Filtros y cantidades del carrito sin botones intermedios.
+- Buscador con sugerencias de texto (autocompletado).
+- Conteos de resultados junto a cada opción de filtro.
 - Gestión de categorías, materiales y colores desde el panel.
 - Imagen del producto por subida de archivo en lugar de la lista fija.
 - Mensajes de éxito y error visibles, botón que se deshabilita al enviar e identificador URL generado desde el nombre en el formulario de producto.
