@@ -2,13 +2,24 @@
 @model IReadOnlyList<ModuloPanel>
 @{
     var controladorActual = ViewContext.RouteData.Values["controller"]?.ToString();
+    var accionActual      = ViewContext.RouteData.Values["action"]?.ToString();
+
+    bool EsActivo(ModuloPanel m)
+    {
+        if (!string.Equals(controladorActual, m.Controlador, StringComparison.OrdinalIgnoreCase))
+            return false;
+        if (!string.IsNullOrEmpty(m.Area)) return true; // área → basta el controlador (cubre Nuevo, Editar)
+        // AdminController sin área: Pedidos activo en Pedidos/Estado; Productos en el resto
+        var esPedidos = string.Equals(accionActual, "Pedidos", StringComparison.OrdinalIgnoreCase)
+                     || string.Equals(accionActual, "Estado",  StringComparison.OrdinalIgnoreCase);
+        return m.Accion == "Pedidos" ? esPedidos : !esPedidos;
+    }
 }
 
 @foreach (var modulo in Model)
 {
-    var esActivo = string.Equals(controladorActual, modulo.Controlador, StringComparison.OrdinalIgnoreCase);
-    <a asp-area="@modulo.Area" asp-controller="@modulo.Controlador" asp-action="Index"
-       class="panel__menu-item @(esActivo ? "panel__menu-item--activo" : null)">
+    <a asp-area="@modulo.Area" asp-controller="@modulo.Controlador" asp-action="@modulo.Accion"
+       class="panel__menu-item @(EsActivo(modulo) ? "panel__menu-item--activo" : null)">
         <svg class="panel__menu-icono" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
             <circle cx="9" cy="7" r="4"/>

@@ -2,6 +2,9 @@
 
 Ecommerce de accesorios para hombre (anillos, cadenas y pulseras). Proyecto del curso Evolución de Software, UPN.
 
+- [Abrir con F5 y conectar MySQL Workbench](docs/INICIO.md)
+- [Principios SOLID aplicados](docs/SOLID.md)
+
 ## Tecnología
 
 - ASP.NET Core MVC con .NET 10, en Visual Studio 2026
@@ -19,7 +22,7 @@ Cuatro capas más un proyecto de pruebas. Las flechas indican quién referencia 
 | `BlackCode.Application`    | Servicios, casos de uso y contratos (interfaces)      | Domain                      |
 | `BlackCode.Infrastructure` | EF Core, MySQL, hash de contraseñas, datos de demo    | Application                 |
 | `BlackCode.Web`            | Controladores, vistas Razor, ViewModels, `Program.cs` | Application, Infrastructure |
-| `BlackCode.Tests`          | Pruebas unitarias                                     | Domain                      |
+| `BlackCode.Tests`          | Pruebas unitarias y de integración                    | Domain, Application         |
 
 Reglas que se respetan siempre:
 
@@ -34,35 +37,38 @@ La explicación de cómo se aplica cada principio SOLID está en [`docs/SOLID.md
 
 ## Primeros pasos
 
-### 1. Clonar y cambiar de rama
+### 1. Clonar
 
 ```
 git clone https://github.com/Frostbyte29/ECOMERCE_BLACK_CODE.git
-cd ECOMERCE_BLACK_CODE
-git checkout develop
+cd ECOMERCE_BLACK_CODE/BlackCode
 ```
 
 Abre la solución `BlackCode.slnx` con Visual Studio 2026 (carga de trabajo "Desarrollo de ASP.NET y web").
 
 ### 2. Crear la base de datos en MySQL
 
-Ejecuta esto una vez en MySQL Workbench o DBeaver (cambia `TU_CLAVE` por la que quieras):
+Ejecuta esto una vez en MySQL Workbench o DBeaver. Elige un nombre de base y usuario propios y úsalos también en el paso 3.
+
+> Los valores concretos (`[NOMBRE_BASE]`, `[USUARIO]`, `[CLAVE]`) no están en el repositorio: los define cada integrante en sus secretos de usuario.
 
 ```sql
-CREATE DATABASE IF NOT EXISTS blackcode CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
-CREATE USER IF NOT EXISTS 'blackcode'@'localhost' IDENTIFIED BY 'TU_CLAVE';
-GRANT ALL PRIVILEGES ON blackcode.* TO 'blackcode'@'localhost';
+CREATE DATABASE IF NOT EXISTS [NOMBRE_BASE] CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+CREATE USER IF NOT EXISTS '[USUARIO]'@'localhost' IDENTIFIED BY '[CLAVE]';
+GRANT ALL PRIVILEGES ON [NOMBRE_BASE].* TO '[USUARIO]'@'localhost';
 FLUSH PRIVILEGES;
 ```
 
 ### 3. Configurar los secretos de usuario
 
-En el Explorador de soluciones: clic derecho en `BlackCode.Web` → **Administrar secretos de usuario**. Pega esto con tus propios valores:
+En el Explorador de soluciones: clic derecho en `BlackCode.Web` → **Administrar secretos de usuario**. Pega esto con los valores elegidos en el paso 2:
+
+> Fuente de los valores: user-secrets de cada integrante, no commitados. Los valores entre corchetes deben coincidir con lo que creaste en el paso anterior.
 
 ```json
 {
   "ConnectionStrings": {
-    "Default": "Server=localhost;Port=3306;Database=blackcode;Uid=blackcode;Pwd=TU_CLAVE;AllowPublicKeyRetrieval=True;"
+    "Default": "Server=localhost;Port=3306;Database=[NOMBRE_BASE];Uid=[USUARIO];Pwd=[CLAVE];AllowPublicKeyRetrieval=True;"
   },
   "Seed": {
     "AdminPassword": "clave para admin@blackcode.pe",
@@ -75,18 +81,18 @@ Guarda con Ctrl+S. Este archivo vive en tu computadora, fuera del repositorio. *
 
 ### 4. Ejecutar
 
-Pulsa F5 con el perfil `BlackCode.Web`. En Desarrollo, la aplicación aplica las migraciones y carga los datos de demo (categorías, 6 anillos y los usuarios de prueba) al arrancar.
+Establece `BlackCode.Web` como proyecto de inicio y pulsa F5 con el perfil `https`. En Desarrollo, la aplicación aplica las migraciones y carga los datos de demo (categorías, productos, usuarios) al arrancar.
 
 ### 5. Cuentas de prueba
 
-| Pantalla | Ruta | Usuario |
-| -------- | ---- | ------- |
-| Tienda (cliente) | `/Cuenta/Login` | `cliente@demo.pe` con la clave de `Seed:ClientePassword` |
-| Panel (administrador) | `/Admin/Login` | `admin@blackcode.pe` con la clave de `Seed:AdminPassword` |
+| Cuenta | Rol | Acceso |
+| ------ | --- | ------ |
+| `cliente@demo.pe` | Cliente | Tienda: catálogo, carrito, checkout, mis pedidos |
+| `admin@blackcode.pe` | Administrador | Panel: productos, variantes, pedidos, clientes, reportes |
 
 - Registro de clientes en `/Cuenta/Registro`. El rol siempre es Cliente; nunca viene del formulario.
-- A los 5 intentos fallidos la cuenta se bloquea 15 minutos. Un administrador puede desbloquearla en **Panel → Usuarios**.
-- El login del panel rechaza a los clientes aunque la clave sea correcta, con el mismo mensaje genérico.
+- Un administrador puede activar o desactivar cuentas de clientes desde **Panel → Clientes → Editar**.
+- El administrador no puede usar la tienda: carrito y checkout están restringidos a clientes.
 - Si un administrador desactiva a un usuario, su sesión abierta se cierra en la siguiente petición.
 
 ### 6. Pruebas
@@ -103,12 +109,10 @@ Menú **Prueba → Explorador de pruebas → Ejecutar todas**, o `dotnet test` e
   ```
 - Commits pequeños y frecuentes, con mensajes en español (`feat:`, `fix:`, `docs:`, `refactor:`, `test:`).
 - Si estás bloqueado más de 30 minutos, avisa en el grupo.
-- **Migraciones de base de datos.** Cualquiera del equipo puede crearlas, siguiendo estas reglas para evitar conflictos:
-  1. Antes de `Add-Migration`, haz `git pull origin develop` y compila.
-  2. Una sola migración por Pull Request, con nombre descriptivo (por ejemplo `AgregarEstadoEnvio`).
-  3. Nunca edites ni borres una migración que ya esté en `develop`.
-  4. Avisa en el grupo antes de generarla.
-  5. Si el merge choca en `AppDbContextModelSnapshot.cs`, ejecuta `Remove-Migration`, actualiza desde `develop` y vuelve a generarla.
+- **Migraciones de base de datos.** Si un cambio necesita una columna o tabla nueva: (1) modifica la entidad y su configuración en `Infrastructure/Persistence/Configurations`; (2) avisa al líder del equipo, que corre `Add-Migration` y abre el Pull Request con la migración. Reglas que se respetan siempre:
+  1. Una sola migración por Pull Request, con nombre descriptivo (por ejemplo `AgregarEstadoEnvio`).
+  2. Nunca edites ni borres una migración que ya esté en `develop`.
+  3. Si el merge choca en `AppDbContextModelSnapshot.cs`, ejecuta `Remove-Migration`, actualiza desde `develop` y vuelve a generarla.
 
 ## Cómo agregar una funcionalidad
 

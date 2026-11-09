@@ -67,14 +67,13 @@ public static class DbSeeder
         var dorado = new Color { Nombre = "Dorado", CodigoHex = "#C9A24A" };
         db.Colores.AddRange(plateado, negro, dorado);
 
-        var anillos = new Categoria { Nombre = "Anillos", Slug = "anillos", Orden = 1, UrlImagen = "/img/colecciones/anillos.jpg" };
-        var cadenas = new Categoria { Nombre = "Cadenas", Slug = "cadenas", Orden = 2, UrlImagen = "/img/colecciones/cadenas.jpg" };
-        var pulseras = new Categoria { Nombre = "Pulseras", Slug = "pulseras", Orden = 3, UrlImagen = "/img/colecciones/pulseras.jpg" };
+        var anillos = new Categoria { Nombre = "Anillos", Slug = "anillos", Orden = 1, UrlImagen = "/img/productos/anillo-profano.svg" };
+        var cadenas = new Categoria { Nombre = "Cadenas", Slug = "cadenas", Orden = 2, UrlImagen = "/img/productos/cadena-eslabones.svg" };
+        var pulseras = new Categoria { Nombre = "Pulseras", Slug = "pulseras", Orden = 3, UrlImagen = "/img/productos/pulsera-eslabones.svg" };
         db.Categorias.AddRange(anillos, cadenas, pulseras);
 
-        // ---------- Anillos del Figma (nombres y precios tomados del diseño) ----------
-        // imageCount: cuántas fotos tiene en wwwroot/img/productos ({slug}-1.jpg, {slug}-2.jpg...)
-        Producto Ring(string nombre, string slug, decimal precio, Color color, bool destacado, string descripcion, int imageCount = 1) => new()
+        // Nombres y precios del proyecto base; ilustraciones SVG locales para este prototipo.
+        Producto Ring(string nombre, string slug, decimal precio, Color color, bool destacado, string descripcion) => new()
         {
             Nombre = nombre,
             Slug = slug,
@@ -89,22 +88,31 @@ public static class DbSeeder
             Variantes = RingSizes
                 .Select(talla => new VarianteProducto { Talla = talla, Sku = $"{slug.ToUpperInvariant()}-{talla}", Stock = 10 })
                 .ToList(),
-            Imagenes = Enumerable.Range(1, imageCount)
-                .Select(i => new ImagenProducto { Url = $"/img/productos/{slug}-{i}.jpg", Orden = i })
-                .ToList()
+            Imagenes = [new ImagenProducto { Url = $"/img/productos/{slug}.svg", Orden = 1 }]
         };
 
         const string genericRing = "Anillo de acero inoxidable 316L.";
 
         db.Productos.AddRange(
             Ring("Anillo Profano", "anillo-profano", 39.00m, plateado, true,
-                "Diseño sólido y atemporal que refleja carácter. Anillo Profano combina líneas geométricas y un acabado envejecido que resalta su esencia rebelde y única.",
-                imageCount: 4),   // el Figma tiene 4 fotos del Profano
+                "Diseño sólido y atemporal que refleja carácter. Anillo Profano combina líneas geométricas y un acabado envejecido que resalta su esencia rebelde y única."),
             Ring("Anillo Aureo", "anillo-aureo", 55.00m, negro, true, genericRing),
             Ring("Anillo Bruma", "anillo-bruma", 49.00m, negro, true, genericRing),
             Ring("Anillo Tizzo", "anillo-tizzo", 45.00m, plateado, true, genericRing),
             Ring("Anillo Vértice", "anillo-vertice", 59.00m, negro, false, genericRing),
             Ring("Anillo Eslabón", "anillo-eslabon", 52.00m, plateado, false, genericRing));
+
+        Producto Accesorio(string nombre, string slug, Categoria categoria, decimal precio) => new()
+        {
+            Nombre = nombre, Slug = slug, Precio = precio, Categoria = categoria,
+            Material = acero, Color = plateado, Destacado = false,
+            Descripcion = "Eslabones de acero inoxidable. Una pieza versátil para expresar tu identidad.",
+            Estado = EstadoProducto.Publicado, CreadoUtc = now,
+            Variantes = [new VarianteProducto { Talla = "Única", Sku = slug.ToUpperInvariant(), Stock = 10 }],
+            Imagenes = [new ImagenProducto { Url = $"/img/productos/{slug}.svg", Orden = 1 }]
+        };
+        db.Productos.AddRange(Accesorio("Cadena Eslabones", "cadena-eslabones", cadenas, 89m),
+            Accesorio("Pulsera Eslabones", "pulsera-eslabones", pulseras, 69m));
 
         // ---------- Configuración de la tienda ----------
         db.ConfiguracionesTienda.AddRange(

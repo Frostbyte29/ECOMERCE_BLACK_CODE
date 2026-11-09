@@ -1,0 +1,9 @@
+{
+  "name": "blackcode-pruebas-navegador",
+  "private": true,
+  "scripts": {
+    "test": "node check-browser.cjs",
+    "test:concurrencia": "node check-concurrency.cjs"
+  },
+  "devDependencies": { "playwright": "1.64.1" }
+}

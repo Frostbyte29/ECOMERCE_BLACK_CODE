@@ -12,10 +12,13 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageReference Include="xunit" Version="2.9.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.9" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\BlackCode.Domain\BlackCode.Domain.csproj" />
+    <ProjectReference Include="..\BlackCode.Application\BlackCode.Application.csproj" />
+    <ProjectReference Include="..\BlackCode.Infrastructure\BlackCode.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -33,8 +33,9 @@ public class RegistroViewModel
     [Display(Name = "Confirmar contraseña")]
     public string ConfirmarContrasena { get; set; } = string.Empty;
 
-    // Se valida en el servidor: el navegador no valida un Range sobre bool.
-    [Range(typeof(bool), "true", "true", ErrorMessage = "Debes aceptar los términos y la política de privacidad.")]
+    // MustBeTrue valida solo en el servidor y no genera data-val-range,
+    // por lo que jQuery Validate no interfiere con el submit del formulario.
+    [MustBeTrue(ErrorMessage = "Debes aceptar los términos y la política de privacidad.")]
     [Display(Name = "Acepto los Términos y Condiciones y la Política de Privacidad")]
     public bool AceptoTerminos { get; set; }
 

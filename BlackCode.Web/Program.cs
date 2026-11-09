@@ -1,5 +1,6 @@
 using BlackCode.Application;
 using BlackCode.Application.Abstractions;
+using BlackCode.Domain.Usuarios;
 using BlackCode.Infrastructure;
 using BlackCode.Infrastructure.Persistence;
 using BlackCode.Web.Security;
@@ -14,6 +15,7 @@ builder.Services.AddControllersWithViews(options =>
 
 // ---------- Raíz de composición (DIP): aquí se conectan las abstracciones con sus implementaciones ----------
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<CarritoIdentidad>();
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddScoped<IUsuarioActual, UsuarioActualHttp>();
 builder.Services.AddApplication();
@@ -36,7 +38,10 @@ builder.Services
         options.Events.OnRedirectToLogin = EventosCookie.RedirigirAlLogin;
         options.Events.OnValidatePrincipal = EventosCookie.ValidarSesion;
     });
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+    options.AddPolicy("NoEsAdministrador", policy =>
+        policy.RequireAssertion(ctx =>
+            !ctx.User.IsInRole(nameof(RolUsuario.Admin)))));
 
 var app = builder.Build();
 

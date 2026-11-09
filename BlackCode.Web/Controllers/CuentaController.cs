@@ -1,5 +1,6 @@
 using BlackCode.Application.Abstractions;
 using BlackCode.Application.Features.Autenticacion;
+using BlackCode.Application.Features.Carrito;
 using BlackCode.Application.Features.Cuenta;
 using BlackCode.Web.Security;
 using BlackCode.Web.ViewModels;
@@ -18,7 +19,9 @@ public class CuentaController(
     IAutenticacionService autenticacion,
     ICuentaService cuenta,
     IUsuarioActual usuarioActual,
-    TimeProvider reloj) : Controller
+    TimeProvider reloj,
+    ICarritoService carrito,
+    CarritoIdentidad identidad) : Controller
 {
     [HttpGet]
     public IActionResult Login(string? returnUrl = null)
@@ -39,9 +42,11 @@ public class CuentaController(
             return View(modelo);
         }
 
+        var tokenAnonimo = identidad.Obtener().TokenAnonimo;
         await CookieSesion.IniciarAsync(HttpContext, resultado.Sesion!, modelo.MantenerSesion, reloj.GetUtcNow());
+        if (tokenAnonimo is not null)
+            await carrito.FusionarAsync(tokenAnonimo, resultado.Sesion!.Id);
 
-        // Pendiente (issue #7): fusionar aquí el carrito del invitado (cookie bc_cart) con el del usuario.
         return RedirigirLocal(modelo.ReturnUrl);
     }
 
@@ -65,10 +70,12 @@ public class CuentaController(
             return View(modelo);
         }
 
+        var tokenAnonimo = identidad.Obtener().TokenAnonimo;
         // Quien se registra queda con la sesión iniciada: la compra sigue sin pasar por otro login.
         await CookieSesion.IniciarAsync(HttpContext, resultado.Sesion!, persistente: false, reloj.GetUtcNow());
+        if (tokenAnonimo is not null)
+            await carrito.FusionarAsync(tokenAnonimo, resultado.Sesion!.Id);
 
-        // Pendiente (issue #7): igual que en Login, fusionar el carrito del invitado.
         return RedirigirLocal(modelo.ReturnUrl);
     }
 

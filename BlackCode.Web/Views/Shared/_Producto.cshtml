@@ -1,0 +1,10 @@
+@model ProductoViewModel
+<article class="product-card">
+<a class="product-image" asp-controller="Catalogo" asp-action="Detalle" asp-route-id="@Model.Id">
+<img src="@Model.Imagen" alt="@Model.Nombre, @Model.Color" loading="lazy" />
+@if(Model.Destacado){<span class="product-tag">SELECCIÓN BLACKCODE</span>}
+<span class="product-arrow" aria-hidden="true">↗</span>
+</a>
+<div class="product-caption"><div><p class="eyebrow">@Model.Categoria · @Model.Color</p><h3><a asp-controller="Catalogo" asp-action="Detalle" asp-route-id="@Model.Id">@Model.Nombre</a></h3></div><span>@Dinero(Model.Precio)</span></div>
+@if(!Model.Variantes.Any(v=>v.Activo && v.Stock>0)){<small class="muted">Agotado temporalmente</small>}
+</article>

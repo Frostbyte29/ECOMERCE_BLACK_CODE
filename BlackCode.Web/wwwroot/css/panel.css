@@ -1,5 +1,8 @@
 /* Panel de administración: Bootstrap para tablas y formularios. */
 
+/* Login admin: Layout = null no carga blackcode.css, el navegador aplica margin 8px por defecto. */
+body { margin: 0; }
+
 /* ── Estructura base ──────────────────────────────────────────── */
 
 .panel {
@@ -578,6 +581,12 @@
 .modal-panel__caja .franja-identidad  { padding: 12px 20px; }
 .modal-panel__caja .pie-form          { padding: 14px 20px; }
 .modal-panel__caja .banda-panel       { padding: 14px 20px; border-radius: 14px 14px 0 0; }
+
+/* ── Badge en contexto del panel ─────────────────────────────── */
+
+/* site.css define .badge con fondo gris claro (#eee); dentro del panel ese fondo
+   se pierde contra el fondo claro. Se sobreescribe con la paleta del panel. */
+.panel .badge { background: #111; color: #fff; }
 
 /* ── Responsive adicional (tarjetas de panel) ────────────────── */
 
