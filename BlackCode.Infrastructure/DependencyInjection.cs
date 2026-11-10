@@ -24,6 +24,7 @@ public static class DependencyInjection
 
         services.AddScoped<IStockGateway, MySqlStockGateway>();
         services.AddSingleton<IContrasenaService, AspNetContrasenaService>();
+        services.AddScoped<IAlmacenImagenesProducto, Storage.AlmacenImagenesProducto>();
 
         return services;
     }

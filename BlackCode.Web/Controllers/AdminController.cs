@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 namespace BlackCode.Web.Controllers;
 [Authorize(Roles="Admin")]
-public sealed class AdminController(IAdministracionService admin,IPedidoService pedidos,IReporteService reportes) : Controller {
+public sealed class AdminController(IAdministracionService admin,IPedidoService pedidos,IReporteService reportes,IEdicionProductoService edicion) : Controller {
     public async Task<IActionResult> Index() { var d=await admin.ConsultarAsync(); return View(new AdminViewModel(d.Productos,d.Pedidos,d.Clientes,d.CarritosInvitados,d.Ventas,d.Lista.Select(TiendaMapper.Edicion).ToList())); }
     [HttpGet] public async Task<IActionResult> Producto(int id=0) {
         var datos=await admin.ConsultarAsync();
@@ -15,9 +15,16 @@ public sealed class AdminController(IAdministracionService admin,IPedidoService 
         if(id!=0 && dto is null) return NotFound();
         var model=dto is null ? new ProductoEdicionViewModel() : TiendaMapper.Edicion(dto); Opciones(model,datos); return View(model);
     }
-    [HttpPost] public async Task<IActionResult> Producto(ProductoEdicionViewModel model) {
+    [HttpPost, RequestSizeLimit(6 * 1024 * 1024)] public async Task<IActionResult> Producto(ProductoEdicionViewModel model) {
+        if (model.Id == 0 && model.ArchivoImagen is null)
+            ModelState.AddModelError(nameof(model.ArchivoImagen), "Selecciona la fotografía del nuevo producto.");
         if(ModelState.IsValid) {
-            try { await admin.GuardarAsync(new(model.Id,model.Nombre,model.Slug,model.Descripcion,model.Precio,model.CategoriaId,model.ColorId,model.MaterialId,model.Publicado,model.Destacado,model.Imagen,model.Variantes.Select(v => new VarianteEdicionDto(v.Id,v.Talla,v.Stock,v.Activo)).ToList())); TempData["Exito"]="Producto guardado."; return RedirectToAction(nameof(Index)); }
+            try {
+                using var contenido = model.ArchivoImagen?.OpenReadStream();
+                var archivo = contenido is null ? null : new ArchivoImagenDto(contenido, model.ArchivoImagen!.FileName);
+                await edicion.GuardarAsync(new(model.Id,model.Nombre,model.Slug,model.Descripcion,model.Precio,model.CategoriaId,model.ColorId,model.MaterialId,model.Publicado,model.Destacado,model.Imagen,model.Variantes.Select(v => new VarianteEdicionDto(v.Id,v.Talla,v.Stock,v.Activo)).ToList()), archivo);
+                TempData["Exito"]="Producto guardado."; return RedirectToAction(nameof(Index));
+            }
             catch(DomainException ex) { ModelState.AddModelError("",ex.Message); }
         }
         Opciones(model,await admin.ConsultarAsync()); return View(model);

@@ -6,6 +6,7 @@ using BlackCode.Application.Features.Cuenta;
 using BlackCode.Application.Features.Pedidos;
 using BlackCode.Domain.Catalogo;
 using BlackCode.Domain.Common;
+using BlackCode.Domain.Pedidos;
 using BlackCode.Domain.Usuarios;
 using BlackCode.Infrastructure.Persistence;
 using BlackCode.Infrastructure.Security;
@@ -85,6 +86,7 @@ public sealed class ExtensibilidadTests
     {
         public string Codigo => "prueba";
         public string Nombre => "Solo pruebas";
+        public MetodoPago Metodo => MetodoPago.Simulado;
         public Task<ResultadoPagoDto> ProcesarAsync(decimal monto, bool simularRechazo) => Task.FromResult(new ResultadoPagoDto(true, "REFERENCIA-PRUEBA"));
     }
     private sealed class ExportadorPrueba : IExportadorReporte

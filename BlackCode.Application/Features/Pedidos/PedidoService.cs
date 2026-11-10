@@ -36,7 +36,7 @@ public sealed class PedidoService(IAppDbContext db, IUsuarioActual usuario, ICar
             EnvioDistrito = envio.Distrito.Trim(), EnvioReferencia = envio.Referencia?.Trim(), CreadoUtc = now,
             Items = compra.Lineas.Select(l => new ItemPedido { VarianteId = l.VarianteId, NombreProductoCopia = l.Nombre, TallaCopia = l.Talla,
                 PrecioUnitario = l.Precio, Cantidad = l.Cantidad, TotalLinea = l.Total }).ToList(),
-            Pago = new Pago { Metodo = MetodoPago.Simulado, Estado = EstadoPago.Aprobado, Monto = compra.Totales.Total, Referencia = resultado.Referencia, CreadoUtc = now }
+            Pago = new Pago { Metodo = resultado.Metodo, Estado = EstadoPago.Aprobado, Monto = compra.Totales.Total, Referencia = resultado.Referencia, CreadoUtc = now }
         };
         pedido.CambiarEstado(EstadoPedido.Pagado,uid,now,"Pago simulado aprobado");
         db.Pedidos.Add(pedido); await db.SaveChangesAsync(); await tx.CommitAsync(); return pedido.Id;

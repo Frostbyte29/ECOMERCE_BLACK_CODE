@@ -1,0 +1,28 @@
+.pago-qr {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid #dedede;
+}
+
+.pago-qr[hidden] {
+    display: none;
+}
+
+.pago-qr h4 {
+    margin: 0 0 16px;
+    font-size: 18px;
+}
+
+.pago-qr__imagen {
+    display: block;
+    width: 240px;
+    max-width: 100%;
+    height: auto;
+    padding: 12px;
+    background: #fff;
+    box-sizing: border-box;
+}
+
+.pago-qr__importe {
+    margin-top: 16px;
+}

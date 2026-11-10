@@ -432,3 +432,6 @@ FodyWeavers.xsd
 tests/browser/*-results.json
 tests/browser/browser-failure.png
 
+# Cargas del administrador en ejecución (se respaldan junto con la base de datos)
+BlackCode.Web/wwwroot/img/productos/cargas/
+

@@ -38,10 +38,17 @@ public static class DependencyInjection
         services.AddSingleton<IReglaDescuento, SinDescuento>();
         services.AddSingleton<IMetodoPago, PagoTarjetaSimulado>();
         services.AddSingleton<IMetodoPago, PagoTransferenciaSimulado>();
+        services.AddSingleton<IMetodoPago, PagoYapeSimulado>();
+        services.AddSingleton<IMetodoPago, PagoPlinSimulado>();
         services.AddScoped<IPagoService, PagoService>();
         services.AddSingleton<INotificacionPedidoService, NotificacionPedidoService>();
         services.AddScoped<IPedidoService, PedidoService>();
         services.AddScoped<IAdministracionService, AdministracionService>();
+        services.AddScoped<IImagenProductoService, ImagenProductoService>();
+        services.AddSingleton<IFormatoImagenProducto, FormatoImagenJpeg>();
+        services.AddSingleton<IFormatoImagenProducto, FormatoImagenPng>();
+        services.AddSingleton<IFormatoImagenProducto, FormatoImagenWebp>();
+        services.AddScoped<IEdicionProductoService, EdicionProductoService>();
         services.AddScoped<IInventarioService, InventarioService>();
         services.AddScoped<IReporteService, ReporteService>();
         services.AddSingleton<IExportadorReporte, ExportadorCsv>();

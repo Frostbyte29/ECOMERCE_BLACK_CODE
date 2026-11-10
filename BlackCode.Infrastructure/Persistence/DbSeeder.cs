@@ -22,7 +22,11 @@ public static class DbSeeder
         var db = services.GetRequiredService<AppDbContext>();
         await db.Database.MigrateAsync(ct);
 
-        if (await db.Usuarios.AnyAsync(ct)) return;
+        if (await db.Usuarios.AnyAsync(ct))
+        {
+            await CatalogoFotograficoSeeder.AplicarAsync(db, services.GetRequiredService<TimeProvider>(), ct);
+            return;
+        }
 
         var passwords = services.GetRequiredService<IContrasenaService>();
         var config = services.GetRequiredService<IConfiguration>();
@@ -120,5 +124,6 @@ public static class DbSeeder
             new ConfiguracionTienda { Clave = "Shipping:FlatCost", Valor = "15.00" });
 
         await db.SaveChangesAsync(ct);
+        await CatalogoFotograficoSeeder.AplicarAsync(db, services.GetRequiredService<TimeProvider>(), ct);
     }
 }

@@ -5,7 +5,7 @@ public record LineaPedidoDto(string Producto, string Talla, decimal Precio, int 
 public record HistorialDto(string Estado, DateTime Fecha);
 public record PedidoDto(int Id,string Codigo,string Cliente,string Correo,EstadoPedido Estado,decimal Subtotal,decimal Envio,decimal Total,
     DateTime Fecha,string Direccion,string Distrito,IReadOnlyList<LineaPedidoDto> Lineas,IReadOnlyList<HistorialDto> Historial);
-public record ResultadoPagoDto(bool Aprobado, string Referencia);
+public record ResultadoPagoDto(bool Aprobado, string Referencia, MetodoPago Metodo = MetodoPago.Simulado);
 public interface IPedidoService {
     Task<int> ConfirmarAsync(EnvioDto envio, bool simularRechazo, string metodo = "tarjeta");
     Task<IReadOnlyList<PedidoDto>> ListarAsync(bool administracion = false);

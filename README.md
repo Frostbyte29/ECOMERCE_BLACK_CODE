@@ -83,6 +83,10 @@ Guarda con Ctrl+S. Este archivo vive en tu computadora, fuera del repositorio. *
 
 Establece `BlackCode.Web` como proyecto de inicio y pulsa F5 con el perfil `https`. En Desarrollo, la aplicación aplica las migraciones y carga los datos de demo (categorías, productos, usuarios) al arrancar.
 
+> Las imágenes de productos cargadas desde el panel se guardan en `BlackCode.Web/wwwroot/img/productos/cargas/`. Esta carpeta está excluida del repositorio (`.gitignore`) y se crea automáticamente al subir la primera imagen; no es necesario crearla a mano.
+
+> Los códigos QR de Yape y Plin están incluidos en el repositorio como `BlackCode.Web/wwwroot/img/pagos/yape-qr.png` y `plin-qr.png`. El checkout los muestra al seleccionar el método correspondiente.
+
 ### 5. Cuentas de prueba
 
 | Cuenta | Rol | Acceso |

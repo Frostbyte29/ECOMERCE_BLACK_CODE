@@ -6,5 +6,12 @@
 </section>
 <div class="brand-strip">INDEPENDIENTE POR NATURALEZA <span>✳</span> ACERO QUE PERDURA <span>✳</span> ESTILO SIN REGLAS <span>✳</span></div>
 <section class="section"><div class="section-heading"><div><p class="eyebrow">PIEZAS QUE DEJAN HUELLA</p><h2>Lo nuevo</h2></div><a class="underlined" href="/Catalogo">Ver todos los productos ↗</a></div><div class="product-grid home-grid">@foreach(var p in Model.Productos.Where(p=>p.Destacado).Take(4)){<partial name="_Producto" model="p"/>}</div></section>
-<section class="section collections-section"><div class="section-heading"><h2>Explora las colecciones</h2></div><div class="collection-grid"><a href="/Catalogo?Buscar=anillo"><img src="/img/productos/anillo-profano.svg" alt="" loading="lazy"/><h3>ANILLOS ↗</h3></a><a href="/Catalogo?Buscar=cadena"><img src="/img/productos/cadena-eslabones.svg" alt="" loading="lazy"/><h3>CADENAS ↗</h3></a><a href="/Catalogo?Buscar=pulsera"><img src="/img/productos/pulsera-eslabones.svg" alt="" loading="lazy"/><h3>PULSERAS ↗</h3></a></div></section>
+<section class="section collections-section"><div class="section-heading"><h2>Explora las colecciones</h2></div><div class="collection-grid">
+@foreach(var categoria in Model.Categorias) {
+    var portada = Model.Productos.FirstOrDefault(p => p.Categoria == categoria.Nombre);
+    if(portada is not null) {
+        <a asp-controller="Catalogo" asp-action="Index" asp-route-Categoria="@categoria.Id"><img src="@portada.Imagen" alt="@categoria.Nombre" loading="lazy"/><h3>@categoria.Nombre.ToUpperInvariant() ↗</h3></a>
+    }
+}
+</div></section>
 <section id="nosotros" class="about about-editorial"><img class="about-photo" src="/img/marca/editorial-accesorios.jpg" alt="Detalle de anillo y pulsera en un conjunto negro" width="641" height="602" loading="lazy" /><div class="about-copy"><a class="logo brand brand-on-dark" href="/" aria-label="BlackCODE, inicio"><partial name="_Marca" /></a><p class="eyebrow">NUESTRA ESENCIA</p><h2>Menos ruido.<br>Más <em>identidad.</em></h2><p>BlackCODE nace de una idea: los detalles dicen quién eres. Creamos una selección de anillos, cadenas y pulseras para quienes eligen su propio camino.</p><p>Formas contundentes. Acero inoxidable. Piezas que se sienten tuyas desde el primer día.</p><a class="button light" href="/Catalogo">Encuentra tu pieza ↗</a></div></section>
