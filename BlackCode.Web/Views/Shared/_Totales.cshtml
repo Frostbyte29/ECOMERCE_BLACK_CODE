@@ -1,0 +1,2 @@
+@model TotalesViewModel
+<dl class="totals"><div><dt>Subtotal</dt><dd>@Dinero(Model.Subtotal)</dd></div>@if(Model.Descuento>0){<div><dt>Descuento</dt><dd>− @Dinero(Model.Descuento)</dd></div>}<div><dt>Envío</dt><dd>@(Model.Envio==0?"Gratis":Dinero(Model.Envio))</dd></div><div class="grand-total"><dt>Total</dt><dd>@Dinero(Model.Total)</dd></div></dl>

@@ -1,0 +1,38 @@
+@{
+    ViewData["Title"] = "Política de Privacidad";
+}
+<link rel="stylesheet" href="~/css/legal.css" asp-append-version="true" />
+
+<article class="legal">
+    <a href="/" class="legal__volver" aria-label="Volver al inicio">← Inicio</a>
+
+    <header class="legal__encabezado">
+        <h1 class="legal__titulo">Política de Privacidad</h1>
+        <p class="legal__fecha">Vigencia: noviembre de 2026</p>
+    </header>
+
+    <h2>1. Proyecto académico y demostración</h2>
+    <p>BLACK CODE es una tienda de demostración del curso Evolución de Software (UPN). No es una empresa real ni realiza operaciones comerciales. Los datos ingresados se usan exclusivamente para simular el flujo de compra dentro de esta aplicación.</p>
+
+    <h2>2. Datos que recopilamos</h2>
+    <p>Al registrarte recopilamos los siguientes datos:</p>
+    <ul>
+        <li>Nombre completo.</li>
+        <li>Correo electrónico.</li>
+        <li>Número de teléfono.</li>
+        <li>Dirección de envío (al realizar un pedido de demostración).</li>
+    </ul>
+    <p>Estos datos se utilizan para crear tu cuenta y procesar los pedidos simulados. No se transmiten a terceros.</p>
+
+    <h2>3. Contraseñas</h2>
+    <p>Las contraseñas se almacenan usando PBKDF2 con sal aleatoria por cuenta (PasswordHasher de ASP.NET Core). El texto original no se guarda ni puede recuperarse. Por ser un entorno de demostración, no se recomienda usar contraseñas que uses en otros servicios.</p>
+
+    <h2>4. Sesión</h2>
+    <p>La autenticación se mantiene mediante una cookie de sesión. No se utilizan cookies de seguimiento de terceros.</p>
+
+    <h2>5. Terceros</h2>
+    <p>Esta aplicación no comparte datos con terceros ni integra servicios externos de pago, analítica ni publicidad. Los pagos son completamente simulados dentro del sistema.</p>
+
+    <h2>6. Contacto</h2>
+    <p>Consultas sobre los datos: dirigirse al equipo del proyecto o al docente a cargo del curso Evolución de Software, UPN.</p>
+</article>

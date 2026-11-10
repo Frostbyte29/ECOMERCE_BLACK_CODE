@@ -1,0 +1,89 @@
+@model NuevoClienteViewModel
+@{
+    ViewData["Title"] = "Nuevo cliente";
+}
+
+<div aria-hidden="true" inert>
+    @if (Model.Lista != null)
+    {
+        <partial name="_ListaClientes" model="Model.Lista" />
+    }
+</div>
+
+<div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modal-titulo-nuevo">
+    <a asp-action="Index" class="modal-panel__fondo" aria-label="Cerrar"></a>
+    <div class="modal-panel__caja">
+
+        <div class="banda-panel">
+            <div>
+                <h1 class="banda-panel__titulo" id="modal-titulo-nuevo">Nuevo cliente</h1>
+                <p class="banda-panel__subtitulo">Registra un nuevo cliente en el sistema</p>
+            </div>
+            <a asp-action="Index" class="banda-panel__cerrar" aria-label="Cerrar">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </a>
+        </div>
+
+        <form asp-action="Nuevo" method="post" novalidate>
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger mx-3 mt-3" role="alert"></div>
+
+            <div class="seccion-form">
+                <h2 class="seccion-form__titulo">Datos personales</h2>
+
+                <div class="mb-2">
+                    <label asp-for="NombreCompleto" class="form-label"></label>
+                    <input asp-for="NombreCompleto" class="form-control form-control-sm"
+                           placeholder="Nombre completo" autocomplete="name" autofocus />
+                    <span asp-validation-for="NombreCompleto" class="text-danger small"></span>
+                </div>
+
+                <div class="row g-2">
+                    <div class="col-md-6">
+                        <label asp-for="Correo" class="form-label"></label>
+                        <input asp-for="Correo" class="form-control form-control-sm"
+                               placeholder="correo@ejemplo.com" autocomplete="email" />
+                        <span asp-validation-for="Correo" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Telefono" class="form-label"></label>
+                        <input asp-for="Telefono" class="form-control form-control-sm"
+                               placeholder="9XXXXXXXX" inputmode="numeric" maxlength="9" autocomplete="tel" />
+                        <span asp-validation-for="Telefono" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="seccion-form">
+                <h2 class="seccion-form__titulo">Contraseña</h2>
+
+                <div class="row g-2">
+                    <div class="col-md-6">
+                        <label asp-for="Contrasena" class="form-label"></label>
+                        <input asp-for="Contrasena" class="form-control form-control-sm"
+                               placeholder="Mínimo 8 caracteres" autocomplete="new-password" />
+                        <span asp-validation-for="Contrasena" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="ConfirmarContrasena" class="form-label"></label>
+                        <input asp-for="ConfirmarContrasena" class="form-control form-control-sm"
+                               placeholder="Repetir contraseña" autocomplete="new-password" />
+                        <span asp-validation-for="ConfirmarContrasena" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pie-form">
+                <a asp-action="Index" class="btn btn-outline-dark btn-sm">Cancelar</a>
+                <button type="submit" class="btn btn-dark btn-sm">Crear cliente</button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/modal-panel.js" asp-append-version="true"></script>
+}

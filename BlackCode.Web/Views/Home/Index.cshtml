@@ -1,35 +1,17 @@
-@model IReadOnlyList<BlackCode.Web.Models.Product>
-@{
-    ViewData["Title"] = "Inicio";
-}
+@model CatalogoViewModel
+@{ViewData["Title"]="Accesorios con identidad";}
+@section Styles { <partial name="_EstilosCompras" /> }
 <section class="hero">
-    <img src="/images/products/portada-blackcode.jpg" alt="Joyería masculina en tonos oscuros" />
-    <div class="hero-shade"></div>
-    <div class="hero-copy">
-        <p class="eyebrow">BLACK CODE</p>
-        <h1>Bienvenido<br />a tu próxima pieza.</h1>
-        <p class="hero-subtitle">NUEVAS PIEZAS, LA MISMA ACTITUD.</p>
-        <a class="button button-light" href="#productos">EXPLORAR LO NUEVO <span>→</span></a>
-    </div>
+<div class="hero-main hero-editorial"><div class="hero-art"><img src="/img/marca/editorial-anillo-pulsera.jpg" alt="Anillo y pulsera de acero combinados con ropa negra" width="657" height="535" fetchpriority="high" /></div><div class="hero-copy"><p class="eyebrow">BLACKCODE / COLECCIÓN 01</p><h1>MÁS QUE ACCESORIOS,<br>ES TU IDENTIDAD.</h1><p>Encuentra la pieza que define tu estilo.</p><a class="button light" href="/Catalogo">DESCUBRIR COLECCIÓN <span>↗</span></a></div><span class="hero-foot">DISEÑADO PARA SER TÚ — EST. 2026</span></div>
 </section>
-<section class="section products-section" id="productos">
-    <div class="section-heading"><div><h2>Recomendados para ti</h2><p>Piezas que hablan por sí solas.</p></div><span class="text-link">VER TODOS →</span></div>
-    <div class="product-grid">
-        @foreach (var product in Model)
-        {
-            <a class="product-card" asp-controller="Productos" asp-action="Detalle" asp-route-id="@product.Id">
-                <div class="product-image"><img src="@product.ImageUrl" alt="@product.Name" loading="lazy" /></div>
-                <h3>@product.Name</h3>
-                <p class="price">S/ @product.Price.ToString("0.00")</p>
-            </a>
-        }
-    </div>
-</section>
-<section class="section account-section" id="cuenta">
-    <div class="section-heading"><div><h2>Mi cuenta</h2><p>Gestiona tu cuenta de forma rápida y segura.</p></div></div>
-    <div class="account-grid">
-        <a class="account-tile" href="#pedidos"><span class="tile-icon">◇</span><h3>Mis pedidos</h3><p>Revisa el estado de tus pedidos y sigue su envío.</p><b>→</b></a>
-        <a class="account-tile" href="#favoritos"><span class="tile-icon">♡</span><h3>Favoritos</h3><p>Descubre nuevamente las piezas que te inspiran.</p><b>→</b></a>
-        <a class="account-tile" href="#direcciones"><span class="tile-icon">⌖</span><h3>Direcciones</h3><p>Administra tus direcciones de envío.</p><b>→</b></a>
-    </div>
-</section>
+<div class="brand-strip">INDEPENDIENTE POR NATURALEZA <span>✳</span> ACERO QUE PERDURA <span>✳</span> ESTILO SIN REGLAS <span>✳</span></div>
+<section class="section"><div class="section-heading"><div><p class="eyebrow">PIEZAS QUE DEJAN HUELLA</p><h2>Lo nuevo</h2></div><a class="underlined" href="/Catalogo">Ver todos los productos ↗</a></div><div class="product-grid home-grid">@foreach(var p in Model.Productos.Where(p=>p.Destacado).Take(4)){<partial name="_Producto" model="p"/>}</div></section>
+<section class="section collections-section"><div class="section-heading"><h2>Explora las colecciones</h2></div><div class="collection-grid">
+@foreach(var categoria in Model.Categorias) {
+    var portada = Model.Productos.FirstOrDefault(p => p.Categoria == categoria.Nombre);
+    if(portada is not null) {
+        <a asp-controller="Catalogo" asp-action="Index" asp-route-Categoria="@categoria.Id"><img src="@portada.Imagen" alt="@categoria.Nombre" loading="lazy"/><h3>@categoria.Nombre.ToUpperInvariant() ↗</h3></a>
+    }
+}
+</div></section>
+<section id="nosotros" class="about about-editorial"><img class="about-photo" src="/img/marca/editorial-accesorios.jpg" alt="Detalle de anillo y pulsera en un conjunto negro" width="641" height="602" loading="lazy" /><div class="about-copy"><a class="logo brand brand-on-dark" href="/" aria-label="BlackCODE, inicio"><partial name="_Marca" /></a><p class="eyebrow">NUESTRA ESENCIA</p><h2>Menos ruido.<br>Más <em>identidad.</em></h2><p>BlackCODE nace de una idea: los detalles dicen quién eres. Creamos una selección de anillos, cadenas y pulseras para quienes eligen su propio camino.</p><p>Formas contundentes. Acero inoxidable. Piezas que se sienten tuyas desde el primer día.</p><a class="button light" href="/Catalogo">Encuentra tu pieza ↗</a></div></section>

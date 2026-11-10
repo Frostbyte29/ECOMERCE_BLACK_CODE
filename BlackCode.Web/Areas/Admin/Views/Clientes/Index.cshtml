@@ -1,0 +1,19 @@
+@using BlackCode.Web.ViewModels
+@model ClientesListaViewModel
+@{
+    ViewData["Title"] = "Clientes";
+}
+
+@if (TempData["Ok"] is string ok)
+{
+    <div class="alerta-ok mb-3" role="status">
+        <span>@ok</span>
+        <button type="button" class="btn-close btn-close-sm" onclick="this.parentElement.remove()" aria-label="Cerrar"></button>
+    </div>
+}
+@if (TempData["Error"] is string error)
+{
+    <div class="alert alert-danger" role="alert">@error</div>
+}
+
+<partial name="_ListaClientes" model="Model" />

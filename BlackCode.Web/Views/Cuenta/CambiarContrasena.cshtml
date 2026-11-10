@@ -1,0 +1,75 @@
+@model CambiarContrasenaViewModel
+@{
+    ViewData["Title"] = "Cambiar contraseña";
+}
+<link rel="stylesheet" href="~/css/cuenta.css" asp-append-version="true" />
+
+<section class="cuenta">
+    <div class="cuenta__panel">
+        <div class="cuenta__contenido">
+            <nav class="cuenta__migas" aria-label="Ruta">
+                <a asp-controller="Cuenta" asp-action="Index">Mi cuenta</a> &rsaquo; <span>Cambiar contraseña</span>
+            </nav>
+            <h1 class="cuenta__titulo">Cambiar contraseña</h1>
+            <p class="cuenta__subtitulo">Ingresa tu contraseña actual y la nueva que quieres usar.</p>
+
+            <form asp-controller="Cuenta" asp-action="CambiarContrasena" method="post" class="cuenta__form" novalidate>
+                <div asp-validation-summary="ModelOnly" class="cuenta__error" role="alert"></div>
+
+                <div>
+                    <label asp-for="ContrasenaActual" class="cuenta__label"></label>
+                    <div class="cuenta__campo">
+                        <span class="cuenta__icono" aria-hidden="true">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="10" width="14" height="11" rx="1"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+                        </span>
+                        <input asp-for="ContrasenaActual" placeholder="Contraseña actual" autocomplete="current-password" />
+                        <button type="button" class="cuenta__ojo" data-mostrar-contrasena="ContrasenaActual" aria-pressed="false" aria-label="Mostrar contraseña">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
+                    </div>
+                    <span asp-validation-for="ContrasenaActual" class="cuenta__campo-error"></span>
+                </div>
+
+                <div>
+                    <label asp-for="NuevaContrasena" class="cuenta__label"></label>
+                    <div class="cuenta__campo">
+                        <span class="cuenta__icono" aria-hidden="true">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="10" width="14" height="11" rx="1"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+                        </span>
+                        <input asp-for="NuevaContrasena" placeholder="Nueva contraseña (mín. 8 caracteres)" autocomplete="new-password" />
+                        <button type="button" class="cuenta__ojo" data-mostrar-contrasena="NuevaContrasena" aria-pressed="false" aria-label="Mostrar contraseña">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
+                    </div>
+                    <span asp-validation-for="NuevaContrasena" class="cuenta__campo-error"></span>
+                </div>
+
+                <div>
+                    <label asp-for="ConfirmarContrasena" class="cuenta__label"></label>
+                    <div class="cuenta__campo">
+                        <span class="cuenta__icono" aria-hidden="true">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="10" width="14" height="11" rx="1"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+                        </span>
+                        <input asp-for="ConfirmarContrasena" placeholder="Confirmar nueva contraseña" autocomplete="new-password" />
+                        <button type="button" class="cuenta__ojo" data-mostrar-contrasena="ConfirmarContrasena" aria-pressed="false" aria-label="Mostrar contraseña">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
+                    </div>
+                    <span asp-validation-for="ConfirmarContrasena" class="cuenta__campo-error"></span>
+                </div>
+
+                <button type="submit" class="cuenta__boton cuenta__boton--oscuro cuenta__boton--espaciado">Guardar cambios <span aria-hidden="true">→</span></button>
+
+                <p class="cuenta__pie">
+                    <a asp-controller="Cuenta" asp-action="Index" class="cuenta__link">← Volver a mi cuenta</a>
+                </p>
+            </form>
+        </div>
+    </div>
+    <div class="cuenta__foto cuenta__foto--login" role="img" aria-label="Anillo de acero sobre superficie oscura"></div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/cuenta.js" asp-append-version="true"></script>
+}

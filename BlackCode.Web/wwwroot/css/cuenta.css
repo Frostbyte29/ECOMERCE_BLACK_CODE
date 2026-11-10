@@ -1,0 +1,266 @@
+/* Pantallas de cuenta: Iniciar sesión, Crear cuenta y Acceso administrador. */
+
+:root {
+    --cuenta-tinta: #111;
+    --cuenta-gris: #6b6b6b;
+    --cuenta-linea: #dcdcdc;
+    --cuenta-error: #a12622;
+}
+
+.cuenta {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    min-height: 640px;
+    color: var(--cuenta-tinta);
+    background: #fff;
+}
+
+.cuenta--registro {
+    grid-template-columns: minmax(0, 0.87fr) minmax(0, 1fr);
+}
+
+.cuenta__panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 56px clamp(24px, 7vw, 104px);
+}
+
+.cuenta__contenido {
+    width: 100%;
+    max-width: 440px;
+}
+
+.cuenta__foto {
+    background: #0c0c0c center / cover no-repeat;
+    min-height: 100%;
+}
+
+.cuenta__foto--login { background-image: url("../img/cuenta/login.jpg"); }
+.cuenta__foto--registro { background-image: url("../img/cuenta/registro.jpg"); }
+
+.cuenta__migas {
+    font-size: 12px;
+    color: var(--cuenta-gris);
+    margin-bottom: 24px;
+}
+
+.cuenta__migas a { color: var(--cuenta-gris); text-decoration: none; }
+.cuenta__migas span { color: var(--cuenta-tinta); }
+
+.cuenta__etiqueta {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin: 0 0 14px;
+}
+
+.cuenta__titulo {
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 400;
+    font-size: clamp(32px, 3.2vw, 42px);
+    line-height: 1.1;
+    margin: 0 0 14px;
+}
+
+.cuenta__subtitulo {
+    font-size: 15px;
+    line-height: 1.5;
+    letter-spacing: .3px;
+    color: var(--cuenta-gris);
+    margin: 0 0 32px;
+}
+
+.cuenta__form { display: grid; gap: 18px; }
+
+.cuenta__label {
+    display: block;
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+.cuenta__campo {
+    position: relative;
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--cuenta-linea);
+    background: #fff;
+    transition: border-color .15s;
+}
+
+.cuenta__campo:focus-within { border-color: var(--cuenta-tinta); }
+
+.cuenta__campo input {
+    flex: 1;
+    min-width: 0;
+    height: 46px;
+    border: 0;
+    padding: 0 14px;
+    font: inherit;
+    font-size: 14px;
+    background: transparent;
+    outline: none;
+}
+
+.cuenta__campo input::placeholder { color: #9a9a9a; }
+
+.cuenta__icono {
+    display: inline-flex;
+    padding-left: 14px;
+    color: #555;
+}
+
+.cuenta__icono + input { padding-left: 10px; }
+
+.cuenta__ojo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    background: transparent;
+    color: #555;
+    cursor: pointer;
+}
+
+.cuenta__ojo[aria-pressed="true"] { color: var(--cuenta-tinta); }
+
+.cuenta__error,
+.cuenta__campo-error {
+    font-size: 12px;
+    color: var(--cuenta-error);
+}
+
+.cuenta__campo-error { display: block; margin-top: 6px; }
+.cuenta__campo-error:empty { display: none; }
+
+.cuenta__error ul {
+    margin: 0;
+    padding: 12px 14px;
+    list-style: none;
+    border: 1px solid #e8c5c3;
+    background: #fbf1f0;
+}
+
+.cuenta__error.validation-summary-valid { display: none; }
+
+.cuenta__fila {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    font-size: 13px;
+}
+
+.cuenta__check {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 13px;
+    line-height: 1.5;
+    cursor: pointer;
+}
+
+.cuenta__check input {
+    width: 18px;
+    height: 18px;
+    margin: 1px 0 0;
+    accent-color: var(--cuenta-tinta);
+    flex: none;
+}
+
+.cuenta__check a,
+.cuenta__link {
+    color: var(--cuenta-tinta);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.cuenta__ayuda {
+    font-size: 13px;
+    color: var(--cuenta-gris);
+    margin: -6px 0 0;
+}
+
+.cuenta__ayuda[hidden] { display: none; }
+
+.cuenta__boton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    height: 50px;
+    border: 1px solid var(--cuenta-tinta);
+    font: inherit;
+    font-size: 14px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: opacity .15s;
+}
+
+.cuenta__boton:hover { opacity: .82; }
+.cuenta__boton--oscuro { background: var(--cuenta-tinta); color: #fff; }
+.cuenta__boton--claro { background: #fff; color: var(--cuenta-tinta); }
+.cuenta__boton--espaciado { font-size: 12px; letter-spacing: 3px; text-transform: uppercase; }
+
+.cuenta__separador {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    color: var(--cuenta-gris);
+    font-size: 13px;
+    margin: 6px 0;
+}
+
+.cuenta__separador::before,
+.cuenta__separador::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--cuenta-linea);
+}
+
+.cuenta__pie {
+    text-align: center;
+    font-size: 14px;
+    margin: 6px 0 0;
+}
+
+.cuenta__solo-lector {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+/* Acceso administrador: tarjeta centrada y sobria, sin foto. */
+.acceso-admin {
+    display: flex;
+    justify-content: center;
+    padding: 72px 16px;
+}
+
+.acceso-admin__tarjeta {
+    width: 100%;
+    max-width: 400px;
+    padding: 40px 36px;
+    border: 1px solid var(--cuenta-linea);
+    background: #fff;
+}
+
+@media (max-width: 860px) {
+    .cuenta,
+    .cuenta--registro { grid-template-columns: 1fr; }
+    .cuenta__foto { display: none; }
+    .cuenta__panel { padding: 40px 16px; }
+}
+
+/* Las variables --cuenta-* se definen en :root; .acceso-admin hereda sin redeclaración. */
+.acceso-admin {
+    color: var(--cuenta-tinta);
+}

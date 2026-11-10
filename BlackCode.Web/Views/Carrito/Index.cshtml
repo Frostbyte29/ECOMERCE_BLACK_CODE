@@ -1,0 +1,13 @@
+@model CarritoViewModel
+@{ViewData["Title"]="Mi carrito";}
+@section Styles{<partial name="_EstilosCompras" /><link rel="stylesheet" href="~/css/carrito.css" asp-append-version="true"/>}
+<section class="section"><p class="breadcrumb"><a href="/">Inicio</a> / Carrito</p><div class="section-heading"><div><p class="eyebrow">YA CASI SON TUYOS</p><h1>Tu carrito</h1></div><a class="underlined" href="/Catalogo">Seguir explorando ↗</a></div>
+@if(Model.Lineas.Count==0){<div class="empty"><span>◇</span><h2>Tu carrito está esperando una buena pieza.</h2><p>Encuentra los detalles que van contigo.</p><a class="button" href="/Catalogo">Explorar colección →</a></div>}
+else{<div class="cart-layout"><div><div class="cart-column-heading">PRODUCTO <span>IMPORTE</span></div>@foreach(var l in Model.Lineas){<article class="cart-line"><a href="/Catalogo/Detalle/@l.ProductoId"><img src="@l.Imagen" alt="@l.Nombre"/></a><div><p class="eyebrow">BLACKCODE / ACERO</p><h2><a href="/Catalogo/Detalle/@l.ProductoId">@l.Nombre</a></h2><p>Talla @l.Talla · @Dinero(l.Precio)</p>
+<form asp-action="Actualizar" method="post" class="quantity-form"><input type="hidden" name="varianteId" value="@l.VarianteId"/><label class="sr-only" for="cantidad-@l.VarianteId">Cantidad de @l.Nombre</label><input id="cantidad-@l.VarianteId" name="cantidad" type="number" min="1" max="99" value="@l.Cantidad"/></form>
+<form asp-action="Actualizar" method="post"><input type="hidden" name="varianteId" value="@l.VarianteId"/><input type="hidden" name="cantidad" value="0"/><button class="remove-button">Eliminar</button></form>
+@if(!l.Disponible || l.Cantidad>l.Stock){<p class="field-validation-error">Disponibilidad actual: @l.Stock. Ajusta o elimina este artículo.</p>}</div><strong>@Dinero(l.Total)</strong></article>}
+<p class="cart-note">Tus piezas permanecen en el carrito cuando inicias sesión. Añadirlas no reserva stock.</p></div>
+<aside class="order-summary"><p class="eyebrow">TU COMPRA, AL DETALLE</p><h2>Resumen del pedido</h2><partial name="_Totales" model="Model.Totales"/><a class="button full" href="/Pedidos/Checkout">Continuar con la compra →</a>@if(User.Identity?.IsAuthenticated!=true){<p class="small muted">En el siguiente paso te pediremos iniciar sesión o crear una cuenta para registrar el pedido.</p>}</aside></div>}
+</section>
+@section Scripts{<script>document.querySelectorAll('.quantity-form input[type=number]').forEach(function(inp){inp.addEventListener('change',function(){inp.closest('form').submit();});});</script>}

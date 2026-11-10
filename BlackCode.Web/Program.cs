@@ -1,50 +1,79 @@
-using BlackCode.Web.Data;
-using Microsoft.EntityFrameworkCore;
+using BlackCode.Application;
+using BlackCode.Application.Abstractions;
+using BlackCode.Domain.Usuarios;
+using BlackCode.Infrastructure;
+using BlackCode.Infrastructure.Persistence;
+using BlackCode.Web.Security;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllersWithViews();
+// ---------- MVC + protección antiforgery en TODOS los POST ----------
+builder.Services.AddControllersWithViews(options =>
+    options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()));
 
-var connectionString = builder.Configuration.GetConnectionString("BlackCode")
-    ?? throw new InvalidOperationException("No se encontró la cadena de conexión 'BlackCode'.");
+// ---------- Raíz de composición (DIP): aquí se conectan las abstracciones con sus implementaciones ----------
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<CarritoIdentidad>();
+builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddScoped<IUsuarioActual, UsuarioActualHttp>();
+builder.Services.AddApplication();
+builder.Services.AddInfrastructure(builder.Configuration);
 
-builder.Services.AddDbContext<BlackCodeContext>(options =>
-    options.UseMySql(
-        connectionString,
-        ServerVersion.AutoDetect(connectionString)));
+// ---------- Sesión con cookie (no JWT: en MVC la cookie HttpOnly es lo correcto) ----------
+builder.Services
+    .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.Cookie.Name = "bc_auth";
+        options.LoginPath = "/Cuenta/Login";
+        options.LogoutPath = "/Cuenta/Logout";
+        options.AccessDeniedPath = "/Cuenta/AccesoDenegado";
+        options.ExpireTimeSpan = TimeSpan.FromHours(8);
+        options.SlidingExpiration = true;
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.Cookie.SameSite = SameSiteMode.Lax;
+        options.Events.OnRedirectToLogin = EventosCookie.RedirigirAlLogin;
+        options.Events.OnValidatePrincipal = EventosCookie.ValidarSesion;
+    });
+builder.Services.AddAuthorization(options =>
+    options.AddPolicy("NoEsAdministrador", policy =>
+        policy.RequireAssertion(ctx =>
+            !ctx.User.IsInRole(nameof(RolUsuario.Admin)))));
 
 var app = builder.Build();
 
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Error");
+    // Aplica migraciones y carga datos de demo (los compañeros no necesitan correr Update-Database)
+    using var scope = app.Services.CreateScope();
+    await DbSeeder.SeedAsync(scope.ServiceProvider);
+}
+else
+{
+    app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();
+app.UseStaticFiles();   // sirve imágenes subidas en tiempo de ejecución (wwwroot/uploads)
 app.UseRouting();
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
 
-// Inserta los productos de demostración solo cuando la tabla ya existe y está vacía.
-// La base de datos y la tabla se crean aplicando primero las migraciones.
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<BlackCodeContext>();
-    try
-    {
-        if (await db.Database.CanConnectAsync())
-        {
-            await DbInitializer.SeedAsync(db);
-        }
-    }
-    catch (Exception ex)
-    {
-        app.Logger.LogWarning(ex,
-            "No se pudo comprobar o inicializar la base de datos. Verifica MySQL y aplica las migraciones.");
-    }
-}
+app.UseAuthentication();   // SIEMPRE antes de UseAuthorization
+app.UseAuthorization();
+
+app.MapStaticAssets();
+
+app.MapControllerRoute(
+        name: "areas",
+        pattern: "{area:exists}/{controller=Dashboard}/{action=Index}/{id?}")
+    .WithStaticAssets();
+
+app.MapControllerRoute(
+        name: "default",
+        pattern: "{controller=Home}/{action=Index}/{id?}")
+    .WithStaticAssets();
 
 app.Run();

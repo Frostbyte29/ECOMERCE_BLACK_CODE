@@ -1,0 +1,77 @@
+/* legal.css — estilos compartidos para Términos y Política de privacidad */
+
+.legal {
+    max-width: 780px;
+    margin: 3rem auto;
+    padding: 0 1.5rem 4rem;
+    color: #1a1a1a;
+    font-size: 1rem;
+    line-height: 1.75;
+}
+
+.legal__encabezado {
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1.5px solid #e5e5e5;
+}
+
+.legal__titulo {
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    margin-bottom: .5rem;
+}
+
+.legal__fecha {
+    font-size: .85rem;
+    color: #888;
+}
+
+.legal h2 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: .5px;
+    margin: 2.5rem 0 .75rem;
+    padding-bottom: .4rem;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.legal p {
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.legal ul, .legal ol {
+    margin: .5rem 0 1rem 1.5rem;
+    color: #333;
+}
+
+.legal li {
+    margin-bottom: .4rem;
+}
+
+.legal a {
+    color: #111;
+    text-decoration: underline;
+}
+
+.legal a:hover {
+    text-decoration: none;
+}
+
+.legal__volver {
+    display: inline-block;
+    margin-bottom: 1.5rem;
+    font-size: .85rem;
+    color: #666;
+    text-decoration: none;
+}
+
+.legal__volver:hover {
+    color: #111;
+}
+
+@media (max-width: 600px) {
+    .legal__titulo { font-size: 1.5rem; }
+    .legal { padding: 0 1rem 3rem; }
+}
