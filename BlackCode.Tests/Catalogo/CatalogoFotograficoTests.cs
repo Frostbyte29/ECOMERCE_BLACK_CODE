@@ -47,6 +47,20 @@ public sealed class CatalogoFotograficoTests
     }
 
     [Fact]
+    public async Task Cadenas_y_pulseras_siguen_publicadas_despues_de_aplicar_el_seeder()
+    {
+        await using var db = Db();
+        // Productos de cadena y pulsera con imagen SVG preexistente
+        var cadena   = new Producto { Nombre = "Cadena Eslabones",   Slug = "cadena-eslabones",   Precio = 39m, Estado = EstadoProducto.Publicado, Imagenes = [new() { Url = "/img/productos/cadena-eslabones.svg" }] };
+        var pulsera  = new Producto { Nombre = "Pulsera Eslabones",  Slug = "pulsera-eslabones",  Precio = 39m, Estado = EstadoProducto.Publicado, Imagenes = [new() { Url = "/img/productos/pulsera-eslabones.svg" }] };
+        db.Productos.AddRange(cadena, pulsera);
+        await db.SaveChangesAsync();
+        await CatalogoFotograficoSeeder.AplicarAsync(db, TimeProvider.System);
+        Assert.Equal(EstadoProducto.Publicado, cadena.Estado);
+        Assert.Equal(EstadoProducto.Publicado, pulsera.Estado);
+    }
+
+    [Fact]
     public async Task Retira_demo_sin_borrar_sus_variantes_ni_productos_personalizados()
     {
         await using var db = Db();

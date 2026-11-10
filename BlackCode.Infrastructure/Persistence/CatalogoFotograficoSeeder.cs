@@ -28,7 +28,7 @@ public static class CatalogoFotograficoSeeder
         }
         var colores = await db.Colores.ToListAsync(ct);
         var existentes = await db.Productos.Include(p => p.Imagenes).ToListAsync(ct);
-        string[] iniciales = ["anillo-profano", "anillo-aureo", "anillo-bruma", "anillo-tizzo", "anillo-vertice", "anillo-eslabon", "cadena-eslabones", "pulsera-eslabones"];
+        string[] iniciales = ["anillo-profano", "anillo-aureo", "anillo-bruma", "anillo-tizzo", "anillo-vertice", "anillo-eslabon"];
         foreach (var producto in existentes.Where(p => iniciales.Contains(p.Slug)
                      && p.Imagenes.Any(i => i.Url == $"/img/productos/{p.Slug}.svg")))
             producto.Estado = EstadoProducto.Borrador;

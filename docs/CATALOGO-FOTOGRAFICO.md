@@ -26,7 +26,7 @@ Se incorporan 19 diseños de las fotografías facilitadas. Los nombres, precios 
 
 ## Aplicación local
 
-Al iniciar en Development, el catálogo se incorpora una sola vez, identificado por la clave Catalogo:Fotografias:v1 en configuracion_tienda. No se crean tablas ni migraciones. Los productos iniciales que aún conservan la ilustración original se retiran a borrador, sin borrar variantes ni pedidos. Los cambios posteriores del administrador en precios, tallas, stock, fotos o estado no se sobrescriben al reiniciar.
+Al iniciar en Development, el catálogo se incorpora una sola vez, identificado por la clave Catalogo:Fotografias:v1 en configuracion_tienda. No se crean tablas ni migraciones. Los seis anillos con ilustración SVG original (anillo-profano, anillo-aureo, anillo-bruma, anillo-tizzo, anillo-vertice, anillo-eslabon) se retiran a borrador, sin borrar variantes ni pedidos. Los productos de cadenas y pulseras no se tocan y siguen publicados. Los cambios posteriores del administrador en precios, tallas, stock, fotos o estado no se sobrescriben al reiniciar.
 
 ## Imágenes de productos
 
