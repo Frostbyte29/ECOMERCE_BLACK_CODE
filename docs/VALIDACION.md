@@ -56,12 +56,11 @@ proporcionadas para BlackCODE. Se conservaron los archivos originales y su trans
 La marca se presenta desde `_Marca.cshtml`; `marca.css` selecciona el contraste según el fondo.
 
 Verificación de esta actualización:
+
 - `dotnet build BlackCode.slnx --no-restore`: 0 errores y 0 advertencias.
 - `dotnet test BlackCode.slnx --no-build --no-restore`: todas las pruebas xUnit aprobadas.
 - Navegador: inicio, login, registro, catálogo y carrito responden correctamente; imágenes locales
   cargadas y contraste del logo comprobado. Inicio, login y catálogo sin desbordamiento a 390 px.
-- Capturas: `capturas/marca-inicio.png`, `capturas/marca-login.png` y `capturas/marca-movil.png`.
 
 Esta actualización incorpora los recursos de marca; no representa una reproducción verificada
 del archivo de Figma. La comparación detallada de sus pantallas sigue pendiente.
-
