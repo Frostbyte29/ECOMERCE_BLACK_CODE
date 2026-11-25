@@ -1,0 +1,21 @@
+@model int
+@{ViewData["Title"] = "Reclamo registrado";}
+@section Styles { <partial name="_EstilosCompras" /> }
+<section class="section">
+    <div style="max-width:580px;text-align:center;margin:3rem auto;padding:0 1.25rem">
+        <div style="font-size:2.5rem;margin-bottom:1rem" aria-hidden="true">✓</div>
+        <p class="eyebrow">RECLAMO REGISTRADO</p>
+        <h1>Recibimos tu reclamo.</h1>
+        <p style="color:#555;margin:1rem 0 .5rem">
+            Tu reclamo fue registrado con el número <strong>#@Model</strong>.
+        </p>
+        <p style="color:#555;margin-bottom:2rem">
+            Te responderemos dentro del plazo que establece la ley.
+            Recibirás una respuesta al correo que indicaste.
+        </p>
+        <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+            <a asp-controller="Home" asp-action="Index" class="button">Ir al inicio</a>
+            <a asp-controller="Reclamos" asp-action="Formulario">Registrar otro reclamo</a>
+        </div>
+    </div>
+</section>

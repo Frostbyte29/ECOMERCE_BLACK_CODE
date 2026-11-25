@@ -1,0 +1,54 @@
+@model IReadOnlyList<DireccionListaViewModel>
+@{ViewData["Title"] = "Mis direcciones";}
+@section Styles { <partial name="_EstilosCompras" /> }
+<section class="section">
+    <p class="eyebrow">MI CUENTA</p>
+    <div class="section-heading">
+        <div><h1>Mis direcciones.</h1></div>
+        <a asp-controller="Direcciones" asp-action="Crear" class="button">+ Agregar</a>
+    </div>
+    @if (TempData["Ok"] is string ok) { <p class="notice">@ok</p> }
+    @if (Model.Count == 0)
+    {
+        <div class="empty">
+            <h2>Aún no tienes direcciones guardadas.</h2>
+            <p>Agrega una para agilizar tus próximas compras.</p>
+            <a asp-controller="Direcciones" asp-action="Crear" class="button">Agregar dirección →</a>
+        </div>
+    }
+    else
+    {
+        <div class="dirs-lista">
+            @foreach (var d in Model)
+            {
+                <div class="dir-card @(d.EsPredeterminada ? "dir-card--default" : "")">
+                    @if (d.EsPredeterminada) { <span class="dir-card__badge">Predeterminada</span> }
+                    <p class="dir-card__nombre">@d.NombreCompleto</p>
+                    <p class="dir-card__detalle">@d.Direccion, @d.Distrito</p>
+                    @if (d.Referencia is not null) { <p class="dir-card__ref">Ref: @d.Referencia</p> }
+                    <p class="dir-card__tel">Tel: @d.Telefono</p>
+                    <div class="dir-card__acciones">
+                        <a asp-controller="Direcciones" asp-action="Editar" asp-route-id="@d.Id">Editar</a>
+                        <form asp-controller="Direcciones" asp-action="Eliminar" method="post" style="display:inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@d.Id" />
+                            <button type="submit" class="link-btn-danger" onclick="return confirm('¿Eliminar esta dirección?')">Eliminar</button>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    <p style="margin-top:2rem"><a asp-controller="Cuenta" asp-action="Index">← Volver a mi cuenta</a></p>
+</section>
+<style>
+.dirs-lista { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:1rem; margin-top:1.5rem; }
+.dir-card { border:1.5px solid #e5e5e5; border-radius:8px; padding:1.25rem; background:#fff; }
+.dir-card--default { border-color:#111; }
+.dir-card__badge { display:inline-block; font-size:10px; letter-spacing:.5px; background:#111; color:#fff; padding:2px 8px; border-radius:3px; margin-bottom:.5rem; text-transform:uppercase; }
+.dir-card__nombre { font-weight:700; margin:0 0 .25rem; }
+.dir-card__detalle, .dir-card__ref, .dir-card__tel { margin:0 0 .2rem; font-size:.88rem; color:#555; }
+.dir-card__acciones { margin-top:.75rem; display:flex; gap:1rem; font-size:.85rem; }
+.dir-card__acciones a { color:#111; text-decoration:underline; }
+.link-btn-danger { background:none; border:none; padding:0; color:#c00; text-decoration:underline; cursor:pointer; font-size:inherit; font-family:inherit; }
+</style>

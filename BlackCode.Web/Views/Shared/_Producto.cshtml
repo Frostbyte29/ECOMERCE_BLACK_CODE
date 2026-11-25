@@ -7,4 +7,13 @@
 </a>
 <div class="product-caption"><div><p class="eyebrow">@Model.Categoria · @Model.Color</p><h3><a asp-controller="Catalogo" asp-action="Detalle" asp-route-id="@Model.Id">@Model.Nombre</a></h3></div><p class="product-price">@Dinero(Model.Precio)</p></div>
 @if(!Model.Variantes.Any(v=>v.Activo && v.Stock>0)){<small class="muted">Agotado temporalmente</small>}
+@if(User.Identity?.IsAuthenticated == true && !User.IsInRole("Admin")){
+<form asp-controller="Favoritos" asp-action="Toggle" method="post" style="margin-top:.5rem">
+@Html.AntiForgeryToken()
+<input type="hidden" name="productoId" value="@Model.Id" />
+<input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+<button type="submit" class="btn-favorito @(Model.EsFavorito?"btn-favorito--activo":"")" aria-label="@(Model.EsFavorito?"Quitar de favoritos":"Agregar a favoritos")" title="@(Model.EsFavorito?"Quitar de favoritos":"Agregar a favoritos")">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="@(Model.EsFavorito?"currentColor":"none")" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z"/></svg>
+</button>
+</form>}
 </article>

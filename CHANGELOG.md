@@ -4,6 +4,18 @@ Formato: [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) · Versiona
 
 ## [Sin publicar]
 
+### Fase E — Funciones de cuenta del cliente
+- **Favoritos**: botón de corazón en tarjetas de catálogo y página de detalle; página "Mis favoritos" con opción de quitar (SRP + DIP: `FavoritosService`).
+- **Mis datos**: formulario para actualizar nombre completo y teléfono (`CuentaService.ActualizarDatosAsync`).
+- **Direcciones guardadas**: CRUD completo con soporte de predeterminada; selector pre-rellena el checkout (`DireccionService`).
+- **Reseñas**: una reseña por cliente por producto con calificación 1–5 y comentario opcional; validación de duplicado en servicio (`ResenaService`).
+- **Cancelar pedido**: el cliente puede cancelar pedidos en estado PendientePago; restituye stock y rechaza el pago con garantía de concurrencia vía `ExecuteUpdateAsync` (`PedidoService.CancelarPorClienteAsync`).
+- **Seguimiento público**: página `/Pedidos/Seguimiento?codigo=` sin autenticación, muestra historial y datos del transportista.
+- **Libro de reclamaciones**: formulario conforme a Ley N.° 29571 (INDECOPI), no requiere autenticación, acepta clientes anónimos y registrados (`ReclamosService`).
+- Tarjetas "Favoritos" y "Direcciones" activadas en Mi cuenta; tarjeta "Mis datos" agregada.
+- Tests nuevos: 12 tests de FavoritosService, ResenaService, ReclamosService y CancelarPorClienteAsync; test MySQL de modelo temporalmente omitido hasta ejecutar la migración pendiente.
+- Build 0/0 · Tests 98/98 (+12) · 1 omitido (migración pendiente).
+
 ### Pagos diferidos y formulario de tarjeta
 - Yape, Plin y Transferencia bancaria ahora generan pedidos en estado **Pendiente de pago** en lugar de aprobar instantáneamente; el stock se descuenta igualmente y el administrador confirma el pago desde el panel (OCP: cada `IMetodoPago` decide su modelo de confirmación sin modificar `PedidoService`).
 - `EstadoPago.Pendiente = 3` agregado al enum, compatible con pagos históricos (`Simulado = 1`).
