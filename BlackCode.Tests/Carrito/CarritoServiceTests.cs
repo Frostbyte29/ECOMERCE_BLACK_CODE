@@ -74,6 +74,53 @@ public sealed class CarritoServiceTests
         Assert.Equal(3,Assert.Single((await servicio.ObtenerAsync(new(42,null))).Lineas).Cantidad);
         Assert.Empty((await servicio.ObtenerAsync(new(null,"invitado-a"))).Lineas);
     }
+    [Fact]
+    public async Task Agregar_cantidad_igual_al_stock_no_lanza_excepcion()
+    {
+        await using var db = Db();
+        var variante = new VarianteProducto { Id = 1, Talla = "8", Stock = 5, Producto = new Producto { Id = 1, Nombre = "Anillo", Precio = 49m, Estado = EstadoProducto.Publicado } };
+        db.VariantesProducto.Add(variante); await db.SaveChangesAsync();
+        var servicio = new CarritoService(db, new CalculoCarritoService(db, []), TimeProvider.System);
+        await servicio.AgregarAsync(new(null, "inv-limite"), 1, 5);
+        Assert.Equal(5, Assert.Single((await servicio.ObtenerAsync(new(null, "inv-limite"))).Lineas).Cantidad);
+    }
+
+    [Theory]
+    [InlineData(0, "entre 1 y 99")]
+    [InlineData(100, "entre 1 y 99")]
+    [InlineData(4, "stock disponible")]
+    public async Task Agregar_cantidad_fuera_de_rango_reporta_mensaje(int cantidad, string fragmento)
+    {
+        await using var db = Db();
+        var variante = new VarianteProducto { Id = 1, Talla = "9", Stock = 3, Producto = new Producto { Id = 1, Nombre = "Anillo", Precio = 49m, Estado = EstadoProducto.Publicado } };
+        db.VariantesProducto.Add(variante); await db.SaveChangesAsync();
+        var servicio = new CarritoService(db, new CalculoCarritoService(db, []), TimeProvider.System);
+        var ex = await Assert.ThrowsAsync<DomainException>(() => servicio.AgregarAsync(new(null, "inv-msg"), 1, cantidad));
+        Assert.Contains(fragmento, ex.Message);
+    }
+
+    [Fact]
+    public async Task Contar_unidades_suma_cantidades_de_todas_las_lineas()
+    {
+        await using var db = Db();
+        var v1 = new VarianteProducto { Id=1, Talla="7", Stock=10, Producto=new Producto{Id=1,Nombre="A",Precio=10m,Estado=EstadoProducto.Publicado}};
+        var v2 = new VarianteProducto { Id=2, Talla="8", Stock=10, Producto=new Producto{Id=2,Nombre="B",Precio=20m,Estado=EstadoProducto.Publicado}};
+        db.VariantesProducto.AddRange(v1, v2);
+        await db.SaveChangesAsync();
+        var servicio = new CarritoService(db, new CalculoCarritoService(db, []), TimeProvider.System);
+        await servicio.AgregarAsync(new(null, "inv-count"), 1, 2);
+        await servicio.AgregarAsync(new(null, "inv-count"), 2, 3);
+        Assert.Equal(5, await servicio.ContarUnidadesAsync(new(null, "inv-count")));
+    }
+
+    [Fact]
+    public async Task Contar_unidades_carrito_vacio_retorna_cero()
+    {
+        await using var db = Db();
+        var servicio = new CarritoService(db, new CalculoCarritoService(db, []), TimeProvider.System);
+        Assert.Equal(0, await servicio.ContarUnidadesAsync(new(null, "inv-vacio")));
+    }
+
     private sealed class DescuentoExcesivo : IReglaDescuento
     {
         public decimal Calcular(IReadOnlyList<LineaCarritoDto> lineas)=>999;

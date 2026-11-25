@@ -1,9 +1,14 @@
 @model CatalogoViewModel
-@{ViewData["Title"]="Catálogo";}
+@{
+    var _catNombre = Model.Categoria.HasValue
+        ? (Model.Categorias.FirstOrDefault(c => c.Id == Model.Categoria)?.Nombre ?? null)
+        : null;
+    ViewData["Title"] = _catNombre != null ? _catNombre + " — Catálogo" : "Catálogo";
+}
 @section Styles { <partial name="_EstilosCompras" /> }
-<section class="section catalog-page"><p class="breadcrumb"><a href="/">Inicio</a> / Colecciones</p><div class="section-heading"><div><p class="eyebrow">ELIGE TU CÓDIGO</p><h1>@(string.IsNullOrWhiteSpace(Model.Buscar)?"Todas las piezas":"Resultados de búsqueda")</h1><p class="muted">Anillos, cadenas y pulseras. Detalles que hacen la diferencia.</p></div><span>@Model.Productos.Count productos</span></div>
+<section class="section catalog-page"><p class="breadcrumb"><a href="/">Inicio</a> / Colecciones</p><div class="section-heading"><div><p class="eyebrow">ELIGE TU CÓDIGO</p><h1>@(_catNombre ?? (string.IsNullOrWhiteSpace(Model.Buscar)?"Todas las piezas":"Resultados de búsqueda"))</h1><p class="muted">Anillos, cadenas y pulseras. Detalles que hacen la diferencia.</p></div><span>@Model.Productos.Count productos</span></div>
 <div class="catalog-layout">
-<form method="get" class="filters" aria-label="Filtros de productos"><h2>Filtrar <span>☷</span></h2>
+<form method="get" class="filters" aria-label="Filtros de productos"><button type="button" class="filters-toggle" aria-expanded="false">Filtrar <span>☷</span></button><div class="filters-cuerpo"><h2>Filtrar <span>☷</span></h2>
 <label asp-for="Buscar">Buscar</label><input asp-for="Buscar" placeholder="Nombre del producto" maxlength="100"/>
 <label asp-for="Categoria">Categoría</label><select asp-for="Categoria"><option value="">Todas</option>@foreach(var c in Model.Categorias){<option value="@c.Id">@c.Nombre</option>}</select>
 <label asp-for="Color">Color</label><select asp-for="Color"><option value="">Todos</option>@foreach(var c in Model.Colores){<option value="@c.Id">@c.Nombre</option>}</select>
@@ -12,7 +17,14 @@
 <label asp-for="Talla">Talla disponible</label><select asp-for="Talla"><option value="">Todas</option>@foreach(var t in new[]{"7","8","9","10","11","Única"}){<option>@t</option>}</select>
 <label asp-for="Orden">Ordenar por</label><select asp-for="Orden"><option value="relevancia">Más relevantes</option><option value="precio-asc">Menor precio</option><option value="precio-desc">Mayor precio</option><option value="nombre">Nombre</option></select>
 <a href="/Catalogo" class="reset">Limpiar filtros</a>
-</form>
+</div></form>
 <div>@if(Model.Productos.Count==0){<div class="empty"><span>⌕</span><h2>No encontramos piezas con esos filtros.</h2><p>Prueba otro nombre o amplía el rango de precios.</p><a class="button" href="/Catalogo">Ver todo</a></div>}else{<div class="product-grid">@foreach(var p in Model.Productos){<partial name="_Producto" model="p"/>}</div>}</div>
 </div></section>
-@section Scripts{<script>(function(){var f=document.querySelector('.filters');if(!f)return;f.querySelectorAll('select').forEach(function(s){s.addEventListener('change',function(){f.submit();});});f.querySelectorAll('input').forEach(function(inp){inp.addEventListener('change',function(){f.submit();});inp.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();f.submit();}});});}());</script>}
+@section Scripts{<script>(function(){
+var t=document.querySelector('.filters-toggle');
+if(t){t.addEventListener('click',function(){var f=t.closest('.filters');var o=f.classList.toggle('abierto');t.setAttribute('aria-expanded',o?'true':'false');});}
+var f=document.querySelector('.filters');
+if(!f)return;
+f.querySelectorAll('select').forEach(function(s){s.addEventListener('change',function(){f.submit();});});
+f.querySelectorAll('input').forEach(function(inp){inp.addEventListener('change',function(){f.submit();});inp.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();f.submit();}});});
+}());</script>}

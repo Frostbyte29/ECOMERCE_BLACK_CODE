@@ -1,0 +1,40 @@
+@model MisDatosViewModel
+@{ViewData["Title"] = "Mis datos";}
+<link rel="stylesheet" href="~/css/cuenta.css" asp-append-version="true" />
+<section class="cuenta">
+    <div class="cuenta__panel">
+        <div class="cuenta__contenido">
+            <nav class="cuenta__migas" aria-label="Ruta">
+                <a asp-controller="Cuenta" asp-action="Index">Mi cuenta</a> &rsaquo; <span>Mis datos</span>
+            </nav>
+            <h1 class="cuenta__titulo">Mis datos</h1>
+            <p class="cuenta__subtitulo">Actualiza tu nombre y teléfono de contacto.</p>
+            <form asp-controller="Cuenta" asp-action="MisDatos" method="post" class="cuenta__form" novalidate>
+                <div asp-validation-summary="ModelOnly" class="cuenta__error" role="alert"></div>
+                <div>
+                    <label asp-for="NombreCompleto" class="cuenta__label"></label>
+                    <div class="cuenta__campo">
+                        <input asp-for="NombreCompleto" autocomplete="name" placeholder="Tu nombre completo" />
+                    </div>
+                    <span asp-validation-for="NombreCompleto" class="cuenta__campo-error"></span>
+                </div>
+                <div>
+                    <label asp-for="Telefono" class="cuenta__label"></label>
+                    <div class="cuenta__campo">
+                        <input asp-for="Telefono" inputmode="numeric" maxlength="9" placeholder="9 dígitos" />
+                    </div>
+                    <span asp-validation-for="Telefono" class="cuenta__campo-error"></span>
+                </div>
+                <button type="submit" class="cuenta__boton cuenta__boton--oscuro cuenta__boton--espaciado">Guardar cambios <span aria-hidden="true">→</span></button>
+                <p class="cuenta__pie">
+                    <a asp-controller="Cuenta" asp-action="Index" class="cuenta__link">← Volver a mi cuenta</a>
+                </p>
+            </form>
+        </div>
+    </div>
+    <div class="cuenta__foto cuenta__foto--login" role="img" aria-label="Joyería masculina Black Code"></div>
+</section>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/cuenta.js" asp-append-version="true"></script>
+}

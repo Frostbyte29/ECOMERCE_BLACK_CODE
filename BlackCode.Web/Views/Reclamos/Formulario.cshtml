@@ -1,0 +1,56 @@
+@model ReclamoFormViewModel
+@using BlackCode.Domain.Reclamos
+@{ViewData["Title"] = "Libro de reclamaciones";}
+@section Styles { <partial name="_EstilosCompras" /> }
+<section class="section">
+    <p class="eyebrow">CONSUMIDOR</p>
+    <div class="section-heading">
+        <div>
+            <h1>Libro de reclamaciones.</h1>
+            <p style="color:#666;font-size:.9rem;margin-top:.5rem">
+                Conforme al Código de Protección y Defensa del Consumidor (Ley N.° 29571).
+                Te responderemos dentro del plazo que establece la ley.
+            </p>
+        </div>
+    </div>
+    <form asp-controller="Reclamos" asp-action="Enviar" method="post" style="max-width:680px;margin-top:1.5rem" novalidate>
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" style="color:#c00;margin-bottom:1rem"></div>
+
+        <h3 style="font-size:.85rem;letter-spacing:.5px;text-transform:uppercase;margin:0 0 1rem">1. Identificación del consumidor</h3>
+        <div class="form-grid" style="margin-bottom:1.5rem">
+            <div class="wide"><label asp-for="NombresCompletos">Nombres y apellidos</label><input asp-for="NombresCompletos" autocomplete="name" /><span asp-validation-for="NombresCompletos"></span></div>
+            <div><label asp-for="Documento">DNI / RUC</label><input asp-for="Documento" inputmode="numeric" maxlength="20" /><span asp-validation-for="Documento"></span></div>
+            <div><label asp-for="Telefono">Teléfono (opcional)</label><input asp-for="Telefono" inputmode="numeric" maxlength="9" /><span asp-validation-for="Telefono"></span></div>
+            <div class="wide"><label asp-for="Domicilio">Domicilio</label><input asp-for="Domicilio" autocomplete="street-address" /><span asp-validation-for="Domicilio"></span></div>
+            <div class="wide"><label asp-for="Correo">Correo electrónico</label><input asp-for="Correo" type="email" autocomplete="email" /><span asp-validation-for="Correo"></span></div>
+        </div>
+
+        <h3 style="font-size:.85rem;letter-spacing:.5px;text-transform:uppercase;margin:0 0 1rem">2. Identificación del bien o servicio</h3>
+        <div class="form-grid" style="margin-bottom:1.5rem">
+            <div><label asp-for="NumeroPedido">Número de pedido (opcional)</label><input asp-for="NumeroPedido" /><span asp-validation-for="NumeroPedido"></span></div>
+            <div class="wide"><label asp-for="DescripcionBien">Descripción del bien o servicio</label><textarea asp-for="DescripcionBien" rows="3" maxlength="300"></textarea><span asp-validation-for="DescripcionBien"></span></div>
+        </div>
+
+        <h3 style="font-size:.85rem;letter-spacing:.5px;text-transform:uppercase;margin:0 0 1rem">3. Detalle del reclamo</h3>
+        <div class="form-grid" style="margin-bottom:1.5rem">
+            <div>
+                <label asp-for="Tipo">Tipo</label>
+                <select asp-for="Tipo">
+                    <option value="@((int)TipoReclamo.Reclamo)">Reclamo (disconformidad con el producto o servicio)</option>
+                    <option value="@((int)TipoReclamo.Queja)">Queja (mala atención o conducta del proveedor)</option>
+                </select>
+                <span asp-validation-for="Tipo"></span>
+            </div>
+            <div class="wide"><label asp-for="Detalle">Detalle de lo ocurrido</label><textarea asp-for="Detalle" rows="5" maxlength="1000"></textarea><span asp-validation-for="Detalle"></span></div>
+            <div class="wide"><label asp-for="PedidoCliente">¿Qué solicitas?</label><textarea asp-for="PedidoCliente" rows="4" maxlength="1000"></textarea><span asp-validation-for="PedidoCliente"></span></div>
+        </div>
+
+        <button type="submit" class="button">Registrar reclamo →</button>
+        <p style="font-size:.8rem;color:#777;margin-top:.75rem">
+            Al registrar este reclamo autorizas el tratamiento de tus datos personales conforme a nuestra
+            <a asp-controller="Legal" asp-action="Privacidad">política de privacidad</a>.
+        </p>
+    </form>
+</section>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

@@ -1,0 +1,34 @@
+@using BlackCode.Application.Features.Configuracion
+@inject IPoliticaComercialService _politicaSvc
+@{
+    ViewData["Title"] = "Contacto";
+    var _politica = await _politicaSvc.ObtenerAsync();
+}
+<link rel="stylesheet" href="~/css/legal.css" asp-append-version="true" />
+
+<article class="legal">
+    <a href="/" class="legal__volver" aria-label="Volver al inicio">← Inicio</a>
+
+    <header class="legal__encabezado">
+        <h1 class="legal__titulo">Contacto</h1>
+    </header>
+
+    <h2>¿En qué te podemos ayudar?</h2>
+    <p>Para consultas sobre pedidos, cambios, tallas o cualquier otro tema, escríbenos a través de nuestras redes. Respondemos en menos de 24 horas hábiles.</p>
+
+    @if (_politica.InstagramUrl is not null || _politica.TiktokUrl is not null || _politica.FacebookUrl is not null)
+    {
+        <h2>Nuestras redes</h2>
+        <ul>
+            @if (_politica.InstagramUrl is not null) { <li><a href="@_politica.InstagramUrl" target="_blank" rel="noopener noreferrer">Instagram</a></li> }
+            @if (_politica.TiktokUrl is not null) { <li><a href="@_politica.TiktokUrl" target="_blank" rel="noopener noreferrer">TikTok</a></li> }
+            @if (_politica.FacebookUrl is not null) { <li><a href="@_politica.FacebookUrl" target="_blank" rel="noopener noreferrer">Facebook</a></li> }
+        </ul>
+    }
+
+    <h2>Preguntas habituales</h2>
+    <p>Antes de escribirnos, revisa nuestra sección de <a href="/faq">preguntas frecuentes</a>. Es posible que tu consulta ya esté respondida.</p>
+
+    <h2>Seguimiento de pedidos</h2>
+    <p>Si ya realizaste una compra, puedes ver el estado de tu pedido desde <a href="/Pedidos">Mis pedidos</a> en tu cuenta, sin necesidad de contactarnos.</p>
+</article>

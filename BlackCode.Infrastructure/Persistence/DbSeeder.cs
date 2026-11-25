@@ -21,6 +21,7 @@ public static class DbSeeder
     {
         var db = services.GetRequiredService<AppDbContext>();
         await db.Database.MigrateAsync(ct);
+        await EnsureConfigDefaultsAsync(db, ct);
 
         if (await db.Usuarios.AnyAsync(ct))
         {
@@ -118,12 +119,52 @@ public static class DbSeeder
         db.Productos.AddRange(Accesorio("Cadena Eslabones", "cadena-eslabones", cadenas, 89m),
             Accesorio("Pulsera Eslabones", "pulsera-eslabones", pulseras, 69m));
 
-        // ---------- Configuración de la tienda ----------
-        db.ConfiguracionesTienda.AddRange(
-            new ConfiguracionTienda { Clave = "Shipping:FreeThreshold", Valor = "199.00" },
-            new ConfiguracionTienda { Clave = "Shipping:FlatCost", Valor = "15.00" });
+        // Las claves de configuración se siembran en EnsureConfigDefaultsAsync
+        // para que también lleguen a bases ya existentes.
 
         await db.SaveChangesAsync(ct);
         await CatalogoFotograficoSeeder.AplicarAsync(db, services.GetRequiredService<TimeProvider>(), ct);
+    }
+
+    /// <summary>
+    /// Siembra los valores por defecto de configuracion_tienda que falten.
+    /// Se llama siempre (antes del guard de usuarios) para que las bases ya existentes
+    /// reciban las claves nuevas sin necesidad de Drop-Database.
+    /// </summary>
+    private static async Task EnsureConfigDefaultsAsync(AppDbContext db, CancellationToken ct)
+    {
+        var existentes = await db.ConfiguracionesTienda.Select(c => c.Clave).ToListAsync(ct);
+        var pendientes = new List<ConfiguracionTienda>();
+
+        void Agregar(string clave, string valor)
+        {
+            if (!existentes.Contains(clave))
+                pendientes.Add(new ConfiguracionTienda { Clave = clave, Valor = valor });
+        }
+
+        // Envío — claves originales conservadas sin renombrar
+        Agregar("Shipping:FreeThreshold", "199.00");
+        Agregar("Shipping:FlatCost",      "15.00");
+
+        // Política comercial
+        Agregar("Policy:ShippingDays", "2 a 4 días hábiles");
+        Agregar("Policy:ReturnDays",   "7 días calendario");
+
+        // Barra de anuncio superior (vacío = no se muestra)
+        Agregar("Banner:Message1", "ENVÍOS A TODO EL PERÚ");
+        Agregar("Banner:Message2", "CAMBIOS FÁCILES");
+        Agregar("Banner:Message3", "PAGA SEGURO");
+
+        // Contacto y redes sociales (vacío = no se muestra)
+        Agregar("Contact:WhatsApp",  string.Empty);
+        Agregar("Social:Instagram",  string.Empty);
+        Agregar("Social:Tiktok",     string.Empty);
+        Agregar("Social:Facebook",   string.Empty);
+
+        if (pendientes.Count > 0)
+        {
+            db.ConfiguracionesTienda.AddRange(pendientes);
+            await db.SaveChangesAsync(ct);
+        }
     }
 }

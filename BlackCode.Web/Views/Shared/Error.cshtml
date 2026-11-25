@@ -1,2 +1,13 @@
 @model ErrorViewModel
-@{ViewData["Title"]="Algo no salió bien";}<section class="section empty"><h1>No pudimos completar esta acción.</h1><p>Vuelve a intentarlo. Si el problema continúa, comparte el código de referencia con el equipo.</p>@if(Model.ShowRequestId){<p>Referencia: @Model.RequestId</p>}<a class="button" href="/Catalogo">Volver al catálogo</a></section>
+@{ViewData["Title"] = Model.Codigo == 404 ? "Página no encontrada" : "Algo no salió bien";}
+<section class="section empty">
+@if(Model.Codigo == 404){
+    <h1>No encontramos esta página.</h1>
+    <p>Es posible que el enlace sea incorrecto o que la página haya sido movida.</p>
+}else{
+    <h1>No pudimos completar esta acción.</h1>
+    <p>Vuelve a intentarlo. Si el problema continúa, comparte el código de referencia con el equipo.</p>
+    @if(Model.ShowRequestId){<p class="small muted">Referencia: @Model.RequestId</p>}
+}
+<a class="button" href="/Catalogo">Volver al catálogo</a>
+</section>

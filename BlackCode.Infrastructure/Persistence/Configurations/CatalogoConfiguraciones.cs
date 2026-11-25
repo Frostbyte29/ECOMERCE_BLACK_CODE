@@ -1,4 +1,5 @@
 using BlackCode.Domain.Catalogo;
+using BlackCode.Domain.Usuarios;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -105,5 +106,25 @@ public sealed class ImagenProductoConfiguration : IEntityTypeConfiguration<Image
 
         b.HasOne(i => i.Producto).WithMany(p => p.Imagenes)
             .HasForeignKey(i => i.ProductoId).OnDelete(DeleteBehavior.Cascade);
+    }
+}
+
+public sealed class ResenaConfiguration : IEntityTypeConfiguration<Resena>
+{
+    public void Configure(EntityTypeBuilder<Resena> b)
+    {
+        b.ToTable("resenas");
+        b.Property(r => r.Id).HasColumnName("id");
+        b.Property(r => r.ProductoId).HasColumnName("producto_id");
+        b.Property(r => r.UsuarioId).HasColumnName("usuario_id");
+        b.HasIndex(r => new { r.ProductoId, r.UsuarioId }).IsUnique();  // un cliente, una reseña por producto
+        b.Property(r => r.Calificacion).HasColumnName("calificacion");
+        b.Property(r => r.Comentario).HasColumnName("comentario").HasMaxLength(500);
+        b.Property(r => r.CreadoUtc).HasColumnName("creado_utc");
+
+        b.HasOne(r => r.Producto).WithMany()
+            .HasForeignKey(r => r.ProductoId).OnDelete(DeleteBehavior.Cascade);
+        b.HasOne<Usuario>().WithMany()
+            .HasForeignKey(r => r.UsuarioId).OnDelete(DeleteBehavior.Cascade);
     }
 }

@@ -3,6 +3,7 @@ using BlackCode.Domain.Catalogo;
 using BlackCode.Domain.Configuracion;
 using BlackCode.Domain.Compras;
 using BlackCode.Domain.Pedidos;
+using BlackCode.Domain.Reclamos;
 using BlackCode.Domain.Usuarios;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -28,6 +29,14 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
     public DbSet<ItemPedido> ItemsPedido => Set<ItemPedido>();
     public DbSet<HistorialEstadoPedido> HistorialPedidos => Set<HistorialEstadoPedido>();
     public DbSet<Pago> Pagos => Set<Pago>();
+
+    public DbSet<DireccionGuardada> DireccionesGuardadas => Set<DireccionGuardada>();
+
+    public DbSet<Resena> Resenas => Set<Resena>();
+
+    public DbSet<SeguimientoPedido> SeguimientosPedido => Set<SeguimientoPedido>();
+
+    public DbSet<Reclamo> Reclamos => Set<Reclamo>();
 
     public DbSet<ConfiguracionTienda> ConfiguracionesTienda => Set<ConfiguracionTienda>();
 

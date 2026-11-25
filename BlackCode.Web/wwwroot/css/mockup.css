@@ -31,9 +31,6 @@ h1 { font-size: clamp(28px, 3vw, 40px); letter-spacing: -1px; }
 .auth-form h2 { font-family: Georgia, serif; font-size: 32px; }
 .auth-editorial h1 { font-size: 42px; }
 .auth-form .button { justify-content: center; }
-footer { background: #101010; color: #fff; padding-top: 38px; }
-footer p, footer a:not(.logo), footer small, .footer-bottom { color: #bbb; }
-footer .footer-bottom { border-color: #333; }
 .benefits { padding: 22px 4%; }
 .filters { top: 88px; }
 .order-summary { top: 88px; }

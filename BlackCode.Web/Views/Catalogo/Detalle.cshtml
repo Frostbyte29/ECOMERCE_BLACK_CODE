@@ -1,7 +1,290 @@
 @model ProductoViewModel
-@{ViewData["Title"]=Model.Nombre;var disponibles=Model.Variantes.Where(v=>v.Activo && v.Stock>0).ToList();}
+@using BlackCode.Application.Features.Configuracion
+@using BlackCode.Domain.Usuarios
+@inject IPoliticaComercialService _politicaSvc
+@{
+    ViewData["Title"] = Model.Nombre;
+    var _politica = await _politicaSvc.ObtenerAsync();
+    var todasImagenes = Model.Imagenes?.Count > 0 ? Model.Imagenes : new[] { Model.Imagen };
+    var imagenPrincipal = todasImagenes[0];
+    var variantesActivas = Model.Variantes.Where(v => v.Activo).ToList();
+    var variantePresel = TempData["VarianteIdDetalle"]?.ToString();
+    var cantidadPresel = TempData["CantidadDetalle"]?.ToString() ?? "1";
+}
 @section Styles { <partial name="_EstilosCompras" /> }
-<section class="section"><p class="breadcrumb"><a href="/">Inicio</a> / <a href="/Catalogo">Colecciones</a> / @Model.Nombre</p>
-<div class="detail-layout"><div class="detail-image"><img src="@Model.Imagen" alt="@Model.Nombre" /><span>BLACKCODE / OBJETOS CON IDENTIDAD</span></div><div class="detail-copy"><p class="eyebrow">@Model.Categoria · @Model.Material</p><h1>@Model.Nombre</h1><p class="detail-price">@Dinero(Model.Precio)</p><p>@Model.Descripcion</p><div class="detail-meta">Color <strong>@Model.Color</strong></div><div class="detail-meta">Material <strong>@Model.Material</strong>@if(Model.MaterialDescripcion!=null){<span> — @Model.MaterialDescripcion</span>}</div>
-@if(disponibles.Count>0){<form asp-controller="Carrito" asp-action="Agregar" method="post"><label for="varianteId">Selecciona tu talla</label><select name="varianteId" id="varianteId" required>@foreach(var v in disponibles){<option value="@v.Id">@v.Talla — @v.Stock disponibles</option>}</select><label for="cantidad">Cantidad</label><input id="cantidad" name="cantidad" type="number" value="1" min="1" max="99"/><button class="button full">Añadir al carrito <span>+</span></button></form>}else{<p class="notice">Este producto está agotado temporalmente.</p>}
-<p class="muted small">Puedes añadir productos sin crear una cuenta. El stock se confirma al finalizar tu compra.</p><details open><summary>Envíos</summary><p>Envío S/ 15.00. Gratis desde S/ 199.00. Los importes finales se muestran en tu carrito.</p></details><details><summary>Cuidados de tu pieza</summary><p>Limpia con un paño suave y evita el contacto prolongado con productos abrasivos.</p></details></div></div></section>
+<section class="section">
+    <p class="breadcrumb">
+        <a href="/">Inicio</a> /
+        <a href="/Catalogo?Categoria=@Model.CategoriaId">@Model.Categoria</a> /
+        @Model.Nombre
+    </p>
+    <div class="detail-layout">
+        <div>
+            @if (todasImagenes.Count > 1)
+            {
+                <div class="gallery">
+                    <div class="gallery-thumbs">
+                        @foreach (var img in todasImagenes)
+                        {
+                            <button type="button" class="thumb @(img == imagenPrincipal ? "active" : "")" data-src="@img" aria-label="Ver imagen">
+                                <img src="@img" alt="" />
+                            </button>
+                        }
+                    </div>
+                    <div class="main-product-image">
+                        <img id="main-img" src="@imagenPrincipal" alt="@Model.Nombre" />
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="main-product-image">
+                    <img id="main-img" src="@imagenPrincipal" alt="@Model.Nombre" />
+                </div>
+            }
+        </div>
+        <div class="product-info">
+            <p class="eyebrow">@Model.Categoria.ToUpperInvariant()</p>
+            <h1>@Model.Nombre</h1>
+            <p class="detail-price">@Dinero(Model.Precio)</p>
+            <p class="description">@Model.Descripcion</p>
+            <div class="specs">
+                <div>
+                    <span>MATERIAL</span>
+                    <b>@Model.Material</b>
+                    @if (Model.MaterialDescripcion != null)
+                    {
+                        <small style="color:#777;font-size:10px;display:block;margin-top:4px">@Model.MaterialDescripcion</small>
+                    }
+                </div>
+            </div>
+            <form asp-controller="Carrito" asp-action="Agregar" method="post" class="buy-form" id="buy-form" novalidate>
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="varianteId" id="variante-hidden" value="@(variantePresel ?? "")" />
+                <input type="hidden" name="productoId" value="@Model.Id" />
+                @if (TempData["Error"] != null)
+                {
+                    <p class="notice error">@TempData["Error"]</p>
+                }
+                <div class="size-heading">
+                    <label class="quantity-label">TALLA</label>
+                </div>
+                <div class="sizes">
+                    @foreach (var v in variantesActivas)
+                    {
+                        <label class="size-option">
+                            <input type="radio" name="_talla" value="@v.Id"
+                                   data-stock="@v.Stock" data-talla="@v.Talla"
+                                   @(v.Stock == 0 ? "disabled" : "")
+                                   @(variantePresel == v.Id.ToString() ? "checked" : "") />
+                            <span>@v.Talla</span>
+                        </label>
+                    }
+                </div>
+                <p id="talla-error" class="field-validation-error" hidden>Selecciona una talla</p>
+                <span class="quantity-label">CANTIDAD</span>
+                <div class="buy-row">
+                    <div class="stepper">
+                        <button type="button" id="btn-menos" aria-label="Reducir cantidad">−</button>
+                        <input type="number" id="cantidad" name="cantidad" value="@cantidadPresel"
+                               min="1" max="99" aria-label="Cantidad" />
+                        <button type="button" id="btn-mas" aria-label="Aumentar cantidad">+</button>
+                    </div>
+                    <span class="stock" id="stock-info" hidden>
+                        <i></i><span id="stock-texto"></span>
+                    </span>
+                </div>
+                <p id="cantidad-error" class="field-validation-error" hidden></p>
+                <button type="submit" class="button full" id="btn-agregar" @(User.IsInRole(nameof(RolUsuario.Admin)) ? "hidden" : "")>Agregar al carrito</button>
+                <div class="service-points">
+                    <div>
+                        <span><b>Medios de pago</b><small>Tarjeta, Yape, Plin y transferencia</small></span>
+                    </div>
+                    <div>
+                        <span><b>Envíos a todo el Perú</b><small>@_politica.PlazoDias</small></span>
+                    </div>
+                    <div>
+                        <span><b>Cambios fáciles</b><small>@_politica.PlazoCambios desde la recepción</small></span>
+                    </div>
+                </div>
+            </form>
+            @if (User.Identity?.IsAuthenticated == true && !User.IsInRole("Admin"))
+            {
+                <form asp-controller="Favoritos" asp-action="Toggle" method="post" style="margin-top:1rem">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="productoId" value="@Model.Id" />
+                    <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                    <button type="submit" class="btn-favorito @(Model.EsFavorito?"btn-favorito--activo":"")" aria-label="@(Model.EsFavorito?"Quitar de favoritos":"Guardar en favoritos")" title="@(Model.EsFavorito?"Quitar de favoritos":"Guardar en favoritos")">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="@(Model.EsFavorito?"currentColor":"none")" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z"/></svg>
+                        @(Model.EsFavorito ? "Quitar de favoritos" : "Guardar en favoritos")
+                    </button>
+                </form>
+            }
+        </div>
+    </div>
+    @{
+        var _resenas = ViewBag.Resenas as List<ResenaListaViewModel>;
+        bool _yaReseno = ViewBag.YaReseno is bool _r && _r;
+    }
+    @if (_resenas is not null)
+    {
+        <div class="resenas-seccion">
+            <h2>Reseñas (@_resenas.Count)</h2>
+            @if (TempData["ResenaOk"] is string _ok) { <p class="notice">@_ok</p> }
+            @if (TempData["ResenaError"] is string _err) { <p class="notice error">@_err</p> }
+            @if (_resenas.Count == 0)
+            {
+                <p class="muted">Todavía no hay reseñas para este producto.</p>
+            }
+            else
+            {
+                @foreach (var r in _resenas)
+                {
+                    <div class="resena-card">
+                        <div class="resena-card__header">
+                            <span class="resena-stars" aria-label="@r.Calificacion de 5 estrellas">@(new string('★', r.Calificacion))@(new string('☆', 5 - r.Calificacion))</span>
+                            <span class="resena-autor">@r.Autor</span>
+                            <span class="resena-fecha">@Fecha(r.Fecha)</span>
+                        </div>
+                        @if (r.Comentario is not null) { <p class="resena-card__texto">@r.Comentario</p> }
+                    </div>
+                }
+            }
+            @if (User.Identity?.IsAuthenticated == true && !User.IsInRole("Admin") && !_yaReseno)
+            {
+                <div class="resena-form">
+                    <h3>Deja tu reseña</h3>
+                    <form asp-controller="Resena" asp-action="Crear" method="post" novalidate>
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="ProductoId" value="@Model.Id" />
+                        <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                        <div style="margin-bottom:.75rem">
+                            <label for="Calificacion" style="display:block;font-size:12px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:.4rem">Calificación</label>
+                            <select id="Calificacion" name="Calificacion" style="max-width:280px">
+                                <option value="5">★★★★★ Excelente</option>
+                                <option value="4">★★★★☆ Muy bueno</option>
+                                <option value="3">★★★☆☆ Regular</option>
+                                <option value="2">★★☆☆☆ Malo</option>
+                                <option value="1">★☆☆☆☆ Muy malo</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom:.75rem">
+                            <label for="Comentario" style="display:block;font-size:12px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:.4rem">Comentario (opcional)</label>
+                            <textarea id="Comentario" name="Comentario" rows="3" maxlength="500" style="max-width:420px;resize:vertical"></textarea>
+                        </div>
+                        <button type="submit" class="button">Publicar reseña</button>
+                    </form>
+                </div>
+            }
+            else if (User.Identity?.IsAuthenticated == true && !User.IsInRole("Admin") && _yaReseno)
+            {
+                <p class="small muted" style="margin-top:1rem">Ya publicaste una reseña para este producto.</p>
+            }
+        </div>
+    }
+</section>
+@section Scripts {
+<script>
+(function () {
+    var variantes = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+        Model.Variantes.Where(v => v.Activo).Select(v => new { v.Id, v.Stock, v.Talla })));
+
+    var hiddenVar = document.getElementById('variante-hidden');
+    var cantInput = document.getElementById('cantidad');
+    var btnMenos  = document.getElementById('btn-menos');
+    var btnMas    = document.getElementById('btn-mas');
+    var stockInfo = document.getElementById('stock-info');
+    var stockTxt  = document.getElementById('stock-texto');
+    var tallaErr  = document.getElementById('talla-error');
+    var cantErr   = document.getElementById('cantidad-error');
+    var btnAgregar = document.getElementById('btn-agregar');
+    var form      = document.getElementById('buy-form');
+    var stockActual = 0;
+    var tallaActual = '';
+
+    function variantePorId(id) {
+        return variantes.find(function (v) { return v.Id === id; });
+    }
+
+    function actualizarStock(varianteId) {
+        var v = variantePorId(varianteId);
+        if (!v) return;
+        stockActual = v.Stock;
+        tallaActual = v.Talla;
+        cantInput.max = v.Stock;
+        stockInfo.removeAttribute('hidden');
+        if (v.Stock === 0) {
+            stockTxt.textContent = 'Agotado';
+            btnAgregar.disabled = true;
+            btnAgregar.textContent = 'Agotado';
+        } else {
+            btnAgregar.disabled = false;
+            btnAgregar.textContent = 'Agregar al carrito';
+            stockTxt.textContent = v.Stock <= 3
+                ? 'Últimas ' + v.Stock + ' unidades'
+                : 'En existencia (' + v.Stock + ')';
+        }
+        var qty = parseInt(cantInput.value) || 1;
+        if (v.Stock > 0 && qty > v.Stock) cantInput.value = v.Stock;
+    }
+
+    document.querySelectorAll('input[name="_talla"]').forEach(function (radio) {
+        radio.addEventListener('change', function () {
+            tallaErr.setAttribute('hidden', '');
+            hiddenVar.value = this.value;
+            actualizarStock(parseInt(this.value));
+        });
+        if (radio.checked && radio.value) {
+            hiddenVar.value = radio.value;
+            actualizarStock(parseInt(radio.value));
+        }
+    });
+
+    // Thumbnails
+    document.querySelectorAll('.thumb').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            document.querySelectorAll('.thumb').forEach(function (b) { b.classList.remove('active'); });
+            this.classList.add('active');
+            document.getElementById('main-img').src = this.dataset.src;
+        });
+    });
+
+    btnMenos.addEventListener('click', function () {
+        var v = parseInt(cantInput.value) || 1;
+        if (v > 1) { cantInput.value = v - 1; cantErr.setAttribute('hidden', ''); }
+    });
+
+    btnMas.addEventListener('click', function () {
+        var v = parseInt(cantInput.value) || 1;
+        if (stockActual === 0) return;
+        if (v < stockActual && v < 99) {
+            cantInput.value = v + 1;
+            cantErr.setAttribute('hidden', '');
+        } else {
+            cantErr.textContent = 'Solo hay ' + stockActual + ' unidades disponibles en talla ' + tallaActual;
+            cantErr.removeAttribute('hidden');
+        }
+    });
+
+    cantInput.addEventListener('change', function () {
+        if (!hiddenVar.value) return;
+        var v = parseInt(this.value) || 1;
+        if (v < 1) { this.value = 1; return; }
+        if (stockActual > 0 && v > stockActual) {
+            cantErr.textContent = 'Solo hay ' + stockActual + ' unidades disponibles en talla ' + tallaActual;
+            cantErr.removeAttribute('hidden');
+            this.value = stockActual;
+        } else {
+            cantErr.setAttribute('hidden', '');
+        }
+    });
+
+    form.addEventListener('submit', function (e) {
+        if (!hiddenVar.value) {
+            e.preventDefault();
+            tallaErr.removeAttribute('hidden');
+        }
+    });
+}());
+</script>
+}

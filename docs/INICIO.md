@@ -15,7 +15,7 @@ La configuración preparada utiliza .NET SDK 10.0.402 y MySQL Community 8.4.11.
 
 La cadena de conexión y las contraseñas se guardan únicamente en los **secretos de usuario de BlackCode.Web**.
 
-## Cuentas de demostración
+## Cuentas de acceso
 
 | Cuenta | Rol | Dónde consultar la contraseña local |
 |---|---|---|
@@ -53,7 +53,7 @@ SELECT pedido_id, estado_anterior, estado_nuevo, cambiado_utc
 FROM historial_estado_pedido ORDER BY id DESC;
 ```
 
-La instancia conserva los pedidos de demostración generados al verificar el aplicativo.
+La instancia conserva los pedidos generados al verificar el aplicativo.
 Todos los pagos son simulados; no introduzcas información real de tarjetas.
 
 ## En otra computadora
@@ -63,7 +63,7 @@ Todos los pagos son simulados; no introduzcas información real de tarjetas.
 3. Crea una base de datos y un usuario exclusivos. Elige un nombre de base y úsalos también en el paso siguiente.
 4. En secretos de usuario, configura `ConnectionStrings:Default`, `Seed:AdminPassword` y `Seed:ClientePassword`, como se describe en el README.
 5. Ajusta host, puerto (3306 por defecto), base y usuario a tu instalación.
-6. Ejecuta con el perfil https. En Development, el arranque aplica las migraciones existentes y carga los datos de demo.
+6. Ejecuta con el perfil https. En Development, el arranque aplica las migraciones existentes y carga los datos iniciales.
 
 ## Recorrido para la exposición
 

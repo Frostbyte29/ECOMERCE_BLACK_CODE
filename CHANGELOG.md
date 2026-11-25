@@ -4,15 +4,88 @@ Formato: [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) · Versiona
 
 ## [Sin publicar]
 
+### Fase E — Funciones de cuenta del cliente
+- **Favoritos**: botón de corazón en tarjetas de catálogo y página de detalle; página "Mis favoritos" con opción de quitar (SRP + DIP: `FavoritosService`).
+- **Mis datos**: formulario para actualizar nombre completo y teléfono (`CuentaService.ActualizarDatosAsync`).
+- **Direcciones guardadas**: CRUD completo con soporte de predeterminada; selector pre-rellena el checkout (`DireccionService`).
+- **Reseñas**: una reseña por cliente por producto con calificación 1–5 y comentario opcional; validación de duplicado en servicio (`ResenaService`).
+- **Cancelar pedido**: el cliente puede cancelar pedidos en estado PendientePago; restituye stock y rechaza el pago con garantía de concurrencia vía `ExecuteUpdateAsync` (`PedidoService.CancelarPorClienteAsync`).
+- **Seguimiento público**: página `/Pedidos/Seguimiento?codigo=` sin autenticación, muestra historial y datos del transportista.
+- **Libro de reclamaciones**: formulario conforme a Ley N.° 29571 (INDECOPI), no requiere autenticación, acepta clientes anónimos y registrados (`ReclamosService`).
+- Tarjetas "Favoritos" y "Direcciones" activadas en Mi cuenta; tarjeta "Mis datos" agregada.
+- Tests nuevos: 12 tests de FavoritosService, ResenaService, ReclamosService y CancelarPorClienteAsync; test MySQL de modelo temporalmente omitido hasta ejecutar la migración pendiente.
+- Build 0/0 · Tests 98/98 (+12) · 1 omitido (migración pendiente).
+
+### Pagos diferidos y formulario de tarjeta
+- Yape, Plin y Transferencia bancaria ahora generan pedidos en estado **Pendiente de pago** en lugar de aprobar instantáneamente; el stock se descuenta igualmente y el administrador confirma el pago desde el panel (OCP: cada `IMetodoPago` decide su modelo de confirmación sin modificar `PedidoService`).
+- `EstadoPago.Pendiente = 3` agregado al enum, compatible con pagos históricos (`Simulado = 1`).
+- Formulario de tarjeta en el checkout con validación Luhn en el navegador; los datos sensibles no se envían con `name` al servidor; solo se trasmite la marca (Visa, Mastercard, Amex) y los últimos 4 dígitos como referencia del pago.
+- Tarjeta aparece primero en la lista; el orden de métodos en DI es: Tarjeta, Yape, Plin, Transferencia.
+- Campo **Número de operación** opcional en el checkout para Yape, Plin y Transferencia.
+- Código de pedido reducido a 8 caracteres hexadecimales: `BC-XXXXXXXX`.
+- Detalle de pedido muestra método de pago, estado del pago y referencia; los productos enlazan al catálogo por slug.
+- Notificación de confirmación diferenciada: mensaje distinto para pago inmediato vs pago pendiente (SRP: `NotificacionPedidoService`).
+- Tests actualizados: 4 casos diferenciados entre pagos inmediatos y diferidos; `PagoServiceTests` y `CheckoutPagoTests` reflejan el nuevo comportamiento.
+
+### Páginas de contenido y colecciones
+- Páginas de contenido: **Quiénes somos**, **Preguntas frecuentes**, **Envíos y devoluciones**, **Guía de tallas** y **Contacto** con contenido real adaptado a la tienda.
+- Página **Colecciones** con cards de categoría que enlazan al catálogo filtrado; el nav principal apunta a esta página.
+- Footer activado: los enlaces de "Nosotros" y "Ayuda" apuntan a las páginas reales.
+- `.gitattributes` creado con `* text=auto` y reglas para binarios (imágenes, fuentes).
+- Estados vacíos y de error ya implementados en iteraciones anteriores (carrito vacío, catálogo sin resultados, 404 personalizado).
+
+### Header: barra de búsqueda e insignia de carrito
+- Barra de búsqueda en el header: se abre con el icono de lupa, se cierra con Esc o pulsando fuera y envía al catálogo con `?Buscar=`.
+- Insignia numérica en el icono del carrito: muestra las unidades totales; se oculta cuando el carrito está vacío (`InsigniaCarritoViewComponent`, SRP + DIP: depende de `ICarritoService`).
+- Iconos de búsqueda y carrito reemplazados por SVG inline accesibles.
+- Dos pruebas nuevas de `ContarUnidadesAsync` en `CarritoServiceTests`.
+
+### Rediseño del detalle de producto
+- Página de detalle con breadcrumb usando la categoría real, especificaciones de material, selector de talla con radio buttons, stepper de cantidad con indicador de stock en tiempo real y galería de miniaturas cuando hay más de una imagen.
+- Error de cantidad en detalle redirige de vuelta al producto (PRG), conservando la variante y la cantidad seleccionadas en TempData.
+- Dos pruebas nuevas de límite en `CarritoServiceTests`: cantidad exactamente igual al stock no lanza excepción; cantidades fuera de rango reportan el fragmento de mensaje correcto.
+
+### Realismo de textos e interfaz de producto
+- Mensajes de cara al usuario saneados: sin referencias a entorno de pruebas ni a cobros ficticios en el checkout.
+- Términos y Condiciones reescritos como tienda real de joyería en Perú: aceptación, cuenta, productos y precios en soles, métodos de pago, envíos a todo el país (2–4 días hábiles), cambios y devoluciones (7 días calendario por talla o defecto), propiedad intelectual, limitación de responsabilidad, ley aplicable. Sin datos inventados.
+- Política de Privacidad reescrita: qué datos se recopilan, finalidad, terceros (solo pago y envío), hash de contraseñas, cookies de sesión y derechos del usuario.
+- "Forzar rechazo" oculto por defecto; disponible solo con `?pruebas=1` en entorno Development.
+
+### Política comercial desde base de datos
+- `IPoliticaComercialService` lee las claves de `configuracion_tienda` y las expone en un DTO tipado: plazos de envío y devoluciones, costo y umbral de envío gratis, mensajes de barra y redes sociales centralizados.
+- Seeder idempotente `EnsureConfigDefaultsAsync`: añade las claves faltantes a bases de datos existentes sin sobreescribir valores ya modificados.
+- Consumidores: detalle de producto, checkout, detalle de pedido, Términos y Condiciones y `_Layout.cshtml` (barra de anuncio y enlaces de redes sociales).
+- Cuatro pruebas nuevas en `PoliticaComercialServiceTests`: valores almacenados, valores por defecto, URL vacía devuelve null, mensajes de barra excluye vacíos y preserva orden.
+
+### CSS y controles vivos
+- Hamburguesa en móvil: botón que alterna la navegación en pantallas ≤ 768px; cierra al hacer clic fuera.
+- Aviso de modo administrador: banda amarilla discreta cuando un admin navega la tienda.
+- Pie de página: enlaces de "Comprar" usan `Categoria=` en lugar de `Buscar=`; Nosotros y Ayuda sin página real muestran texto atenuado en lugar de enlace muerto.
+- "Nosotros" eliminado del menú de navegación principal (página pendiente).
+- Carrito: `max` del input de cantidad respeta el stock de la variante; alerta "Solo quedan N unidades" cuando el stock es ≤ 5.
+- Mi cuenta: tarjeta "Mis pedidos" navega a `/Pedidos` (antes era `href="#"`).
+- Catálogo: título de la sección refleja el nombre de la categoría cuando se filtra por categoría.
+- Error 404: página personalizada con mensaje "No encontramos esta página" y botón para volver al catálogo.
+- Nav activo: "Inicio" y "Colecciones" reciben `aria-current="page"` en sus rutas respectivas.
+
+### Separación de roles
+- Menú de cuenta: admin ve únicamente "Panel" y "Cerrar sesión"; "Mi cuenta" y "Mis pedidos" solo visibles para clientes.
+- "Agregar al carrito" se oculta para admin en el detalle del producto.
+- `CuentaController.Index` y `CambiarContrasena` protegidos con la política `NoEsAdministrador`; admin que intente acceder es redirigido a AccesoDenegado.
+
+### Vocabulario de estados de pedido
+- `TiendaMapper.Estado` cubre los seis valores de `EstadoPedido` con texto visible para el cliente: Pendiente de pago, Pago confirmado, Preparando tu pedido, En camino, Entregado y Cancelado.
+- Prueba que itera todos los valores del enum y falla si alguno devuelve el nombre crudo.
+
 ---
 
 ## [0.2.0] - 2026-11-10
 
 ### Catálogo fotográfico y edición de imágenes
-- Colección de 19 anillos con fotografías propias, nombres y precios sugeridos, descripción, color, material y cinco tallas con stock de demostración. Se incorpora una sola vez en Development; los seis anillos SVG originales se retiran a borrador; cadena y pulsera de eslabones siguen publicados.
+- Colección de 19 anillos con fotografías propias, nombres y precios sugeridos, descripción, color, material y cinco tallas con stock inicial. Se incorpora una sola vez en Development; los seis anillos SVG originales se retiran a borrador; cadena y pulsera de eslabones siguen publicados.
 - Selección de JPG, PNG o WebP hasta 5 MB al crear o editar, con vista previa en el navegador. Validación en cliente y servidor; almacenamiento detrás de una interfaz (`IImagenProductoService`); limpieza de la carga nueva si el producto no se guarda (compensación transaccional).
 - Tarjetas de Inicio y Catálogo con imagen a todo el ancho, nombre y precio agrupados y precio destacado en soles, también en móvil.
-- Guía de fotografías y datos de demostración en `docs/CATALOGO-FOTOGRAFICO.md`. Sin cambios de esquema ni migraciones.
+- Guía de fotografías y datos iniciales en `docs/CATALOGO-FOTOGRAFICO.md`. Sin cambios de esquema ni migraciones.
 
 ### Yape y Plin con QR
 - Yape y Plin como implementaciones independientes de `IMetodoPago`, registradas mediante inyección de dependencias y disponibles en el selector del checkout (OCP — sin condiciones adicionales en el coordinador).
@@ -35,7 +108,7 @@ Formato: [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) · Versiona
 
 ### Registro y legales
 - Corrección del formulario de registro: `AceptoTerminos` usa `MustBeTrue` para validar que el checkbox sea obligatorio.
-- Términos y Condiciones y Política de Privacidad reescritos como proyecto académico de demostración (Evolución de Software, UPN), sin datos inventados (RUC, dirección, correos de contacto ni plazos de operación).
+- Términos y Condiciones y Política de Privacidad publicados (versión inicial, pendiente de contenido real).
 
 ### Backlog declarado
 - ID 7 (UX del formulario de producto): parcialmente cubierto por la carga de imagen; pendiente slug automático desde el nombre, botón deshabilitado al enviar y mensajes de error visibles sin reselección del archivo.
@@ -59,7 +132,7 @@ Formato: [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) · Versiona
 - Guías de Visual Studio/F5, MySQL Workbench, alcance y sustentación SOLID.
 - Estructura en 4 capas (Web, Application, Domain, Infrastructure) + proyecto de tests.
 - Modelo de datos inicial y migración `InitialSchema`.
-- Datos de demo: 6 anillos, categorías, usuario admin y cliente de prueba.
+- Datos iniciales: 6 anillos, categorías, usuario admin y cliente de acceso.
 - Registro, inicio y cierre de sesión de clientes (`/Cuenta/Login`, `/Cuenta/Registro`) con "mantener sesión".
 - Bloqueo de la cuenta por 15 minutos tras 5 intentos fallidos.
 - Acceso de administrador separado (`/Admin/Login`) con la misma cookie de sesión.

@@ -1,5 +1,10 @@
 @model CheckoutViewModel
-@{ ViewData["Title"] = "Finalizar compra"; }
+@using BlackCode.Application.Features.Configuracion
+@inject IPoliticaComercialService _politicaSvc
+@{
+    ViewData["Title"] = "Finalizar compra";
+    var _politica = await _politicaSvc.ObtenerAsync();
+}
 @section Styles {
     <partial name="_EstilosCompras" />
     <link rel="stylesheet" href="~/css/pagos-qr.css" asp-append-version="true" />
@@ -7,6 +12,8 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script src="~/js/pagos-qr.js" asp-append-version="true" defer></script>
+    <script src="~/js/checkout-tarjeta.js" asp-append-version="true" defer></script>
+    <script src="~/js/checkout-dirs.js" asp-append-version="true" defer></script>
 }
 <section class="section">
     <p class="breadcrumb"><a href="/Carrito">Carrito</a> / Datos de envío / Confirmación</p>
@@ -15,6 +22,26 @@
         <div>
             <h2>¿A dónde enviamos tu pedido?</h2>
             <div asp-validation-summary="ModelOnly"></div>
+            @if (Model.DireccionesGuardadas.Count > 0)
+            {
+                <div style="margin-bottom:1.25rem">
+                    <label for="dir-guardada" style="display:block;font-size:12px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:.4rem">Usar dirección guardada</label>
+                    <select id="dir-guardada" style="max-width:420px">
+                        <option value="">— Escribir nueva dirección —</option>
+                        @foreach (var d in Model.DireccionesGuardadas)
+                        {
+                            <option value="@d.Id"
+                                    data-nombre="@d.NombreCompleto"
+                                    data-tel="@d.Telefono"
+                                    data-dir="@d.Direccion"
+                                    data-dist="@d.Distrito"
+                                    data-ref="@(d.Referencia ?? "")">
+                                @d.NombreCompleto — @d.Direccion, @d.Distrito
+                            </option>
+                        }
+                    </select>
+                </div>
+            }
             <div class="form-grid">
                 <div><label asp-for="Nombre">Nombre completo</label><input asp-for="Nombre" autocomplete="name" /><span asp-validation-for="Nombre"></span></div>
                 <div><label asp-for="Telefono">Teléfono</label><input asp-for="Telefono" autocomplete="tel" inputmode="numeric" maxlength="9" /><span asp-validation-for="Telefono"></span></div>
@@ -33,7 +60,18 @@
                     }
                 </select>
                 <span asp-validation-for="MetodoPago"></span>
-                <p class="small muted">Entorno de pruebas: no se realiza ningún cobro.</p>
+                <div id="tarjeta-form" hidden>
+                    <div class="form-grid">
+                        <div class="wide"><label for="card-numero">Número de tarjeta</label><input id="card-numero" type="text" inputmode="numeric" autocomplete="cc-number" maxlength="23" placeholder="0000 0000 0000 0000" /></div>
+                        <div><label for="card-expiry">Vencimiento</label><input id="card-expiry" type="text" inputmode="numeric" autocomplete="cc-exp" maxlength="5" placeholder="MM/AA" /></div>
+                        <div><label for="card-cvv">CVV</label><input id="card-cvv" type="text" inputmode="numeric" autocomplete="cc-csc" maxlength="4" placeholder="000" /></div>
+                    </div>
+                    <input type="hidden" asp-for="TarjetaMarca" />
+                    <input type="hidden" asp-for="TarjetaUltimos" />
+                </div>
+                <div id="operacion-form" hidden>
+                    <div><label asp-for="NumeroOperacion">Número de operación (opcional)</label><input asp-for="NumeroOperacion" inputmode="numeric" maxlength="20" placeholder="Código de la operación" /></div>
+                </div>
                 <div id="codigos-qr" aria-live="polite">
                     @foreach (var metodo in Model.Metodos.Where(m => m.ImagenQr is not null))
                     {
@@ -48,13 +86,12 @@
                                 <p class="small muted">El código QR de @metodo.Nombre todavía no está disponible.</p>
                             }
                             <p class="pago-qr__importe">Total del pedido: <strong>@Dinero(Model.Carrito.Totales.Total)</strong></p>
-                            <p class="small muted">Esta compra es una simulación. No transfieras dinero al QR.</p>
                         </section>
                     }
                 </div>
-                @if (Model.EsDesarrollo)
+                @if (Model.MostrarRechazo)
                 {
-                    <label class="checkbox"><input asp-for="SimularRechazo" /> Forzar rechazo (pruebas)</label>
+                    <label class="checkbox"><input asp-for="SimularRechazo" /> Forzar rechazo</label>
                 }
             </div>
         </div>
@@ -66,6 +103,7 @@
             }
             <partial name="_Totales" model="Model.Carrito.Totales" />
             <button class="button full" data-submit-once>Confirmar compra →</button>
+            <p class="small muted">Envío estimado: @_politica.PlazoDias.</p>
             <p class="small muted">El precio y las existencias se vuelven a comprobar al confirmar.</p>
         </aside>
     </form>

@@ -2,6 +2,7 @@ using BlackCode.Domain.Catalogo;
 using BlackCode.Domain.Configuracion;
 using BlackCode.Domain.Compras;
 using BlackCode.Domain.Pedidos;
+using BlackCode.Domain.Reclamos;
 using BlackCode.Domain.Usuarios;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -31,6 +32,14 @@ public interface IAppDbContext
     DbSet<ItemPedido> ItemsPedido { get; }
     DbSet<HistorialEstadoPedido> HistorialPedidos { get; }
     DbSet<Pago> Pagos { get; }
+
+    DbSet<DireccionGuardada> DireccionesGuardadas { get; }
+
+    DbSet<Resena> Resenas { get; }
+
+    DbSet<SeguimientoPedido> SeguimientosPedido { get; }
+
+    DbSet<Reclamo> Reclamos { get; }
 
     DbSet<ConfiguracionTienda> ConfiguracionesTienda { get; }
 

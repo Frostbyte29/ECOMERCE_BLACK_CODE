@@ -28,6 +28,22 @@
 | SRP | `BlackCode.Web/Models/TiendaViewModels.cs` — `CheckoutViewModel` | Una sola responsabilidad: ser el contrato de datos del formulario de checkout, con sus reglas de validación declaradas en DataAnnotations | Carlos |
 | SRP | `BlackCode.Web/ViewModels/MustBeTrueAttribute.cs` | La regla "el campo bool debe ser true" es una responsabilidad separada del ViewModel; el atributo encapsula la validación sin mezclarla con la estructura del formulario | Carlos |
 | OCP | `BlackCode.Application/Features/Catalogo/FiltrosProducto.cs` | FiltroMaterial se agrega como clase nueva que implementa IFiltroProducto; CatalogoService no se modifica para incorporar el criterio | Carlos |
+| SRP | `BlackCode.Application/Features/Favoritos/FavoritosService.cs` | Gestiona únicamente la lista de favoritos del cliente; no mezcla con catálogo ni autenticación | Carlos |
+| DIP | `BlackCode.Application/Features/Favoritos/FavoritosService.cs` | Depende de IAppDbContext (abstracción); el controlador inyecta IFavoritosService, nunca la clase concreta | Carlos |
+| SRP | `BlackCode.Application/Features/Direcciones/DireccionService.cs` | Gestiona únicamente las direcciones guardadas del cliente (CRUD + predeterminada) | Carlos |
+| SRP | `BlackCode.Application/Features/Resenas/ResenaService.cs` | Gestiona únicamente las reseñas: validar calificación, detectar duplicados y persistir | Carlos |
+| DIP | `BlackCode.Web/Controllers/FavoritosController.cs` + `DireccionesController.cs` + `ResenaController.cs` | Reciben únicamente interfaces de Application; no instancian servicios concretos ni acceden a DbContext | Carlos |
+| SRP | `BlackCode.Application/Features/Seguimiento/SeguimientoService.cs` | Consulta públicamente el historial de un pedido por código; no modifica estado ni calcula lógica de negocio | Carlos |
+| SRP | `BlackCode.Application/Features/Reclamos/ReclamosService.cs` | Registra reclamos en el libro de reclamaciones; una sola razón para cambiar (el formato del reclamo) | Carlos |
+| SRP | `BlackCode.Application/Features/Pedidos/PedidoService.cs` — `CancelarPorClienteAsync` | La cancelación por cliente está separada de la cancelación por admin; cada una tiene su contrato, sus validaciones y sus actores distintos | Carlos |
+| SRP | `BlackCode.Web/Controllers/CarritoController.cs` — acción `Agregar` | El controlador gestiona la redirección HTTP (incluido el retorno al detalle con TempData en caso de error); la lógica de carrito y de stock pertenece a ICarritoService | Carlos |
+| SRP | `BlackCode.Web/ViewComponents/InsigniaCarritoViewComponent.cs` | Responsabilidad única: obtener el conteo de unidades del carrito y renderizar la insignia en el header; la vista no calcula ni accede a datos directamente | Carlos |
+| DIP | `BlackCode.Web/ViewComponents/InsigniaCarritoViewComponent.cs` | Depende de `ICarritoService` (abstracción), no de `CarritoService` (concreto); el conteo de unidades se expone en la interfaz, no se calcula en la vista ni en el layout | Carlos |
+| SRP | `BlackCode.Application/Features/Configuracion/PoliticaComercialService.cs` | Única responsabilidad: leer las claves de `configuracion_tienda` y exponerlas como un DTO de política comercial tipado; las vistas no conocen el modelo de base de datos | Carlos |
+| DIP | `BlackCode.Application/Features/Configuracion/IPoliticaComercialService.cs` | Las vistas dependen de la interfaz inyectada (`@inject`); Application expone el contrato y registra la implementación concreta en su propio `DependencyInjection` | Carlos |
+| OCP | `BlackCode.Web/Controllers/CuentaController.cs` + `CarritoController.cs` + `PedidosController.cs` | La política `NoEsAdministrador` se define una vez en la raíz de composición y se aplica con `[Authorize(Policy)]`; añadir un endpoint nuevo no modifica la política ni su lógica | Carlos |
+| OCP | `BlackCode.Application/Features/Pedidos/PagoYapeSimulado.cs` + `PagoPlinSimulado.cs` + `PagoTransferenciaSimulado.cs` | Cada método decide su modelo de confirmación (inmediato vs diferido) devolviendo `EsPendiente`; `PedidoService` no necesita condiciones por tipo de pago | Carlos |
+| SRP | `BlackCode.Application/Features/Pedidos/NotificacionPedidoService.cs` | Responsabilidad única: generar el mensaje de confirmación según si el pago fue inmediato o queda pendiente; el controlador no construye el texto | Carlos |
 
 ## Cómo demostrar los tres principios en el carrito
 

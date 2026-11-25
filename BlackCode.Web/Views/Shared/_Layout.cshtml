@@ -1,7 +1,13 @@
 @using BlackCode.Domain.Usuarios
+@using BlackCode.Application.Features.Configuracion
+@inject IPoliticaComercialService _politicaSvc
 @{
     var _catId = Context.Request.Query["Categoria"].ToString();
     bool _enCatalogo = (Context.Request.Path.Value ?? "").StartsWith("/Catalogo");
+    bool _enInicio = Context.Request.Path.Value == "/";
+    bool _enColecciones = (Context.Request.Path.Value ?? "").StartsWith("/Catalogo/Colecciones", StringComparison.OrdinalIgnoreCase);
+    var _politica = await _politicaSvc.ObtenerAsync();
+    bool _esAdmin = User.IsInRole(nameof(RolUsuario.Admin));
 }
 <!DOCTYPE html>
 <html lang="es">
@@ -12,36 +18,64 @@
     <link rel="icon" type="image/png" href="~/img/marca/logo-negro.png" media="(prefers-color-scheme: light)" />
     <link rel="icon" type="image/png" href="~/img/marca/logo-blanco.png" media="(prefers-color-scheme: dark)" />
     <link rel="stylesheet" href="~/css/blackcode.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/header.css" asp-append-version="true" />
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
 
-<div class="announcement">
-    ENVÍOS A TODO EL PERÚ <span>|</span> CAMBIOS FÁCILES <span>|</span> PAGA SEGURO
-</div>
+@if (_politica.MensajesBarra.Count > 0)
+{
+    <div class="announcement">
+        @for (var _i = 0; _i < _politica.MensajesBarra.Count; _i++)
+        {
+            @_politica.MensajesBarra[_i]
+            @if (_i < _politica.MensajesBarra.Count - 1) { <span>|</span> }
+        }
+    </div>
+}
 
 <header class="site-header">
     <a class="brand" asp-controller="Home" asp-action="Index"><img src="~/img/marca/logo-negro.png" class="brand__logo" alt="" />BLACK <span>CODE</span></a>
 
-    <nav class="main-nav" aria-label="Navegación principal">
-        <a asp-controller="Home" asp-action="Index">Inicio</a>
-        <a asp-controller="Catalogo" asp-action="Index">Colecciones</a>
+    <nav class="main-nav" id="main-nav" aria-label="Navegación principal">
+        <a asp-controller="Home" asp-action="Index" class="@(_enInicio?"active":null)" aria-current="@(_enInicio?"page":null)">Inicio</a>
+        <a asp-controller="Catalogo" asp-action="Colecciones" class="@(_enColecciones?"active":null)" aria-current="@(_enColecciones?"page":null)">Colecciones</a>
         <a href="/Catalogo?Categoria=1" class="@(_enCatalogo&&_catId=="1"?"active":null)" aria-current="@(_enCatalogo&&_catId=="1"?"page":null)">Anillos</a>
         <a href="/Catalogo?Categoria=2" class="@(_enCatalogo&&_catId=="2"?"active":null)" aria-current="@(_enCatalogo&&_catId=="2"?"page":null)">Cadenas</a>
         <a href="/Catalogo?Categoria=3" class="@(_enCatalogo&&_catId=="3"?"active":null)" aria-current="@(_enCatalogo&&_catId=="3"?"page":null)">Pulseras</a>
-        <a href="#">Nosotros</a>
     </nav>
 
     <div class="header-actions">
-        <span class="search-icon" aria-hidden="true">⌕</span>
+        <button type="button" class="nav-toggle" id="btn-nav" aria-label="Abrir menú" aria-expanded="false" aria-controls="main-nav">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </button>
+        <button type="button" class="header-icon" id="btn-buscar" aria-label="Buscar productos" title="Buscar productos" aria-expanded="false" aria-controls="barra-busqueda">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        </button>
         @await Component.InvokeAsync("MenuCuenta")
-        <a href="#" aria-label="Favoritos">♡</a>
-        @if (!User.IsInRole(nameof(RolUsuario.Admin)))
+        @if (!_esAdmin)
         {
-            <a asp-controller="Carrito" asp-action="Index" aria-label="Carrito"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></a>
+            @await Component.InvokeAsync("InsigniaCarrito")
         }
     </div>
 </header>
+@if (_esAdmin)
+{
+    <div class="admin-aviso" role="status">Estás navegando como administrador. El carrito y la compra no están disponibles en esta vista.</div>
+}
+
+<div class="barra-busqueda" id="barra-busqueda" hidden>
+    <form action="/Catalogo" method="get" class="barra-busqueda__form" role="search">
+        <label for="barra-busqueda-input" class="visually-hidden">Buscar productos</label>
+        <input type="search" id="barra-busqueda-input" name="Buscar" class="barra-busqueda__input" placeholder="¿Qué estás buscando?" autocomplete="off" />
+        <button type="submit" class="barra-busqueda__btn" aria-label="Buscar">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        </button>
+        <button type="button" class="barra-busqueda__cerrar" id="btn-cerrar-busqueda" aria-label="Cerrar búsqueda">✕</button>
+    </form>
+</div>
 
 <main>
     @RenderBody()
@@ -56,35 +90,41 @@
         <div class="footer__col">
             <h4>Comprar</h4>
             <ul>
-                <li><a href="/Catalogo?Buscar=anillo">Anillos</a></li>
-                <li><a href="/Catalogo?Buscar=cadena">Cadenas</a></li>
-                <li><a href="/Catalogo?Buscar=pulsera">Pulseras</a></li>
-                <li><a asp-controller="Catalogo" asp-action="Index">Colecciones</a></li>
+                <li><a href="/Catalogo?Categoria=1">Anillos</a></li>
+                <li><a href="/Catalogo?Categoria=2">Cadenas</a></li>
+                <li><a href="/Catalogo?Categoria=3">Pulseras</a></li>
+                <li><a asp-controller="Catalogo" asp-action="Colecciones">Colecciones</a></li>
             </ul>
         </div>
         <div class="footer__col">
             <h4>Nosotros</h4>
             <ul>
-                <li><a href="#">Quiénes somos</a></li>
-                <li><a href="#">Nuestra historia</a></li>
+                <li><a href="/nosotros">Quiénes somos</a></li>
+                <li><a href="/guia-tallas">Guía de tallas</a></li>
+                <li><a href="/contacto">Contacto</a></li>
             </ul>
         </div>
         <div class="footer__col">
             <h4>Ayuda</h4>
             <ul>
-                <li><a href="#">Preguntas frecuentes</a></li>
-                <li><a href="#">Envíos y devoluciones</a></li>
+                <li><a href="/faq">Preguntas frecuentes</a></li>
+                <li><a href="/envios">Envíos y devoluciones</a></li>
                 <li><a asp-controller="Cuenta" asp-action="Index">Mi cuenta</a></li>
+                <li><a asp-controller="Reclamos" asp-action="Formulario">Libro de reclamaciones</a></li>
+                <li><a asp-controller="Pedidos" asp-action="Seguimiento">Seguimiento de pedido</a></li>
             </ul>
         </div>
-        <div class="footer__col">
-            <h4>Síguenos</h4>
-            <ul>
-                <li><a href="#">Instagram</a></li>
-                <li><a href="#">TikTok</a></li>
-                <li><a href="#">Facebook</a></li>
-            </ul>
-        </div>
+        @if (_politica.InstagramUrl is not null || _politica.TiktokUrl is not null || _politica.FacebookUrl is not null)
+        {
+            <div class="footer__col">
+                <h4>Síguenos</h4>
+                <ul>
+                    @if (_politica.InstagramUrl is not null) { <li><a href="@_politica.InstagramUrl" target="_blank" rel="noopener noreferrer">Instagram</a></li> }
+                    @if (_politica.TiktokUrl is not null) { <li><a href="@_politica.TiktokUrl" target="_blank" rel="noopener noreferrer">TikTok</a></li> }
+                    @if (_politica.FacebookUrl is not null) { <li><a href="@_politica.FacebookUrl" target="_blank" rel="noopener noreferrer">Facebook</a></li> }
+                </ul>
+            </div>
+        }
     </div>
     <div class="footer__bottom">
         <span>&copy; @DateTime.Now.Year BLACK CODE. Todos los derechos reservados.</span>
@@ -97,6 +137,7 @@
 
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/js/menu-cuenta.js" asp-append-version="true"></script>
+<script src="~/js/header.js" asp-append-version="true"></script>
 @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

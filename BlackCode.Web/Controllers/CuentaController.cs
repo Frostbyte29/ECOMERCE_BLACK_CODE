@@ -2,6 +2,7 @@ using BlackCode.Application.Abstractions;
 using BlackCode.Application.Features.Autenticacion;
 using BlackCode.Application.Features.Carrito;
 using BlackCode.Application.Features.Cuenta;
+using BlackCode.Web.Models;
 using BlackCode.Web.Security;
 using BlackCode.Web.ViewModels;
 using Microsoft.AspNetCore.Authentication;
@@ -88,6 +89,7 @@ public class CuentaController(
     }
 
     [Authorize]
+    [Authorize(Policy = "NoEsAdministrador")]
     [HttpGet]
     public IActionResult Index()
     {
@@ -96,10 +98,12 @@ public class CuentaController(
     }
 
     [Authorize]
+    [Authorize(Policy = "NoEsAdministrador")]
     [HttpGet]
     public IActionResult CambiarContrasena() => View(new CambiarContrasenaViewModel());
 
     [Authorize]
+    [Authorize(Policy = "NoEsAdministrador")]
     [HttpPost]
     public async Task<IActionResult> CambiarContrasena(CambiarContrasenaViewModel modelo, CancellationToken ct)
     {
@@ -115,6 +119,27 @@ public class CuentaController(
         }
 
         TempData["Ok"] = "Contraseña actualizada correctamente.";
+        return RedirectToAction(nameof(Index));
+    }
+
+    [Authorize]
+    [Authorize(Policy = "NoEsAdministrador")]
+    [HttpGet]
+    public async Task<IActionResult> MisDatos()
+    {
+        var datos = await cuenta.ObtenerDatosAsync(usuarioActual.UsuarioId!.Value);
+        return View(new MisDatosViewModel { NombreCompleto = datos?.NombreCompleto ?? "", Telefono = datos?.Telefono });
+    }
+
+    [Authorize]
+    [Authorize(Policy = "NoEsAdministrador")]
+    [HttpPost]
+    public async Task<IActionResult> MisDatos(MisDatosViewModel modelo, CancellationToken ct)
+    {
+        if (!ModelState.IsValid) return View(modelo);
+        var resultado = await cuenta.ActualizarDatosAsync(usuarioActual.UsuarioId!.Value, modelo.NombreCompleto, modelo.Telefono, ct);
+        if (!resultado.Exitoso) { ModelState.AddModelError("", resultado.Error!); return View(modelo); }
+        TempData["Ok"] = "Datos actualizados correctamente.";
         return RedirectToAction(nameof(Index));
     }
 
