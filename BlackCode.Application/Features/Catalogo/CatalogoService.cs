@@ -28,5 +28,7 @@ public sealed class CatalogoService(IAppDbContext db, IEnumerable<IFiltroProduct
     private static ProductoDto Mapear(Producto p) => new(p.Id,p.Nombre,p.Slug,p.Descripcion,p.Precio,p.Categoria.Nombre,p.Color.Nombre,
         p.Material?.Nombre ?? "",p.Material?.Descripcion,
         p.Imagenes.OrderBy(i => i.Orden).FirstOrDefault()?.Url ?? "/img/productos/anillo-profano.svg", p.Destacado,
-        p.Variantes.OrderBy(v => v.Id).Select(v => new VarianteDto(v.Id,v.Talla,v.Stock,v.Activo)).ToList());
+        p.Variantes.OrderBy(v => v.Id).Select(v => new VarianteDto(v.Id,v.Talla,v.Stock,v.Activo)).ToList(),
+        p.Categoria.Id,
+        p.Imagenes.OrderBy(i => i.Orden).Select(i => i.Url).ToList());
 }

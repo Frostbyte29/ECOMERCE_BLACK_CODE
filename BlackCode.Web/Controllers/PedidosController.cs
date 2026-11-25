@@ -15,7 +15,7 @@ public sealed class PedidosController(IPedidoService pedidos,ICarritoService car
         var c=TiendaMapper.Carrito(await carrito.ObtenerAsync(identidad.Obtener()));
         if(c.Lineas.Count==0) return RedirectToAction("Index","Carrito");
         var ultimo=await pedidos.ObtenerUltimoEnvioAsync();
-        return View(new CheckoutViewModel { Nombre=!string.IsNullOrEmpty(ultimo?.Nombre)?ultimo.Nombre:User.Identity?.Name??"",Telefono=ultimo?.Telefono??"",Direccion=ultimo?.Direccion??"",Distrito=ultimo?.Distrito??"",Referencia=ultimo?.Referencia,Carrito=c,Metodos=Metodos(),EsDesarrollo=env.IsDevelopment() });
+        return View(new CheckoutViewModel { Nombre=!string.IsNullOrEmpty(ultimo?.Nombre)?ultimo.Nombre:User.Identity?.Name??"",Telefono=ultimo?.Telefono??"",Direccion=ultimo?.Direccion??"",Distrito=ultimo?.Distrito??"",Referencia=ultimo?.Referencia,Carrito=c,Metodos=Metodos(),EsDesarrollo=env.IsDevelopment(),MostrarRechazo=env.IsDevelopment()&&Request.Query["pruebas"]=="1" });
     }
     [HttpPost] public async Task<IActionResult> Checkout(CheckoutViewModel model) {
         if(ModelState.IsValid) {
@@ -25,6 +25,7 @@ public sealed class PedidosController(IPedidoService pedidos,ICarritoService car
         model.Carrito=TiendaMapper.Carrito(await carrito.ObtenerAsync(identidad.Obtener()));
         model.Metodos=Metodos();
         model.EsDesarrollo=env.IsDevelopment();
+        model.MostrarRechazo=env.IsDevelopment()&&Request.Query["pruebas"]=="1";
         return View(model);
     }
     private static readonly IReadOnlyDictionary<string, string> ImagenesQr = new Dictionary<string, string>

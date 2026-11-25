@@ -1,5 +1,10 @@
 @model CheckoutViewModel
-@{ ViewData["Title"] = "Finalizar compra"; }
+@using BlackCode.Application.Features.Configuracion
+@inject IPoliticaComercialService _politicaSvc
+@{
+    ViewData["Title"] = "Finalizar compra";
+    var _politica = await _politicaSvc.ObtenerAsync();
+}
 @section Styles {
     <partial name="_EstilosCompras" />
     <link rel="stylesheet" href="~/css/pagos-qr.css" asp-append-version="true" />
@@ -33,7 +38,6 @@
                     }
                 </select>
                 <span asp-validation-for="MetodoPago"></span>
-                <p class="small muted">Entorno de pruebas: no se realiza ningún cobro.</p>
                 <div id="codigos-qr" aria-live="polite">
                     @foreach (var metodo in Model.Metodos.Where(m => m.ImagenQr is not null))
                     {
@@ -48,13 +52,12 @@
                                 <p class="small muted">El código QR de @metodo.Nombre todavía no está disponible.</p>
                             }
                             <p class="pago-qr__importe">Total del pedido: <strong>@Dinero(Model.Carrito.Totales.Total)</strong></p>
-                            <p class="small muted">Esta compra es una simulación. No transfieras dinero al QR.</p>
                         </section>
                     }
                 </div>
-                @if (Model.EsDesarrollo)
+                @if (Model.MostrarRechazo)
                 {
-                    <label class="checkbox"><input asp-for="SimularRechazo" /> Forzar rechazo (pruebas)</label>
+                    <label class="checkbox"><input asp-for="SimularRechazo" /> Forzar rechazo</label>
                 }
             </div>
         </div>
@@ -66,6 +69,7 @@
             }
             <partial name="_Totales" model="Model.Carrito.Totales" />
             <button class="button full" data-submit-once>Confirmar compra →</button>
+            <p class="small muted">Envío estimado: @_politica.PlazoDias.</p>
             <p class="small muted">El precio y las existencias se vuelven a comprobar al confirmar.</p>
         </aside>
     </form>

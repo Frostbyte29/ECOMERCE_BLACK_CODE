@@ -1,5 +1,6 @@
 using BlackCode.Application.Features.Autenticacion;
 using BlackCode.Application.Features.Clientes;
+using BlackCode.Application.Features.Configuracion;
 using BlackCode.Application.Features.Cuenta;
 using BlackCode.Application.Features.Catalogo;
 using BlackCode.Application.Features.Carrito;
@@ -17,6 +18,9 @@ public static class DependencyInjection
     /// </summary>
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
+        // Features/Configuracion
+        services.AddScoped<IPoliticaComercialService, PoliticaComercialService>();
+
         // Features/Autenticacion
         services.AddScoped<IAutenticacionService, AutenticacionService>();
 

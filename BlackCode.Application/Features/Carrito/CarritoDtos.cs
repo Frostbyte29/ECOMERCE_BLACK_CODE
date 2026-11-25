@@ -12,6 +12,7 @@ public record CarritoDto(IReadOnlyList<LineaCarritoDto> Lineas, TotalesDto Total
 public interface ICarritoService
 {
     Task<CarritoDto> ObtenerAsync(PropietarioCarrito propietario);
+    Task<int> ContarUnidadesAsync(PropietarioCarrito propietario);
     Task AgregarAsync(PropietarioCarrito propietario, int varianteId, int cantidad);
     Task ActualizarAsync(PropietarioCarrito propietario, int varianteId, int cantidad);
     Task FusionarAsync(string tokenAnonimo, int usuarioId);

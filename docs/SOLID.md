@@ -28,6 +28,11 @@
 | SRP | `BlackCode.Web/Models/TiendaViewModels.cs` — `CheckoutViewModel` | Una sola responsabilidad: ser el contrato de datos del formulario de checkout, con sus reglas de validación declaradas en DataAnnotations | Carlos |
 | SRP | `BlackCode.Web/ViewModels/MustBeTrueAttribute.cs` | La regla "el campo bool debe ser true" es una responsabilidad separada del ViewModel; el atributo encapsula la validación sin mezclarla con la estructura del formulario | Carlos |
 | OCP | `BlackCode.Application/Features/Catalogo/FiltrosProducto.cs` | FiltroMaterial se agrega como clase nueva que implementa IFiltroProducto; CatalogoService no se modifica para incorporar el criterio | Carlos |
+| SRP | `BlackCode.Web/Controllers/CarritoController.cs` — acción `Agregar` | El controlador gestiona la redirección HTTP (incluido el retorno al detalle con TempData en caso de error); la lógica de carrito y de stock pertenece a ICarritoService | Carlos |
+| SRP | `BlackCode.Web/ViewComponents/InsigniaCarritoViewComponent.cs` | Responsabilidad única: obtener el conteo de unidades del carrito y renderizar la insignia en el header; la vista no calcula ni accede a datos directamente | Carlos |
+| DIP | `BlackCode.Web/ViewComponents/InsigniaCarritoViewComponent.cs` | Depende de `ICarritoService` (abstracción), no de `CarritoService` (concreto); el conteo de unidades se expone en la interfaz, no se calcula en la vista ni en el layout | Carlos |
+| SRP | `BlackCode.Application/Features/Configuracion/PoliticaComercialService.cs` | Única responsabilidad: leer las claves de `configuracion_tienda` y exponerlas como un DTO de política comercial tipado; las vistas no conocen el modelo de base de datos | Carlos |
+| DIP | `BlackCode.Application/Features/Configuracion/IPoliticaComercialService.cs` | Las vistas dependen de la interfaz inyectada (`@inject`); Application expone el contrato y registra la implementación concreta en su propio `DependencyInjection` | Carlos |
 
 ## Cómo demostrar los tres principios en el carrito
 

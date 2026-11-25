@@ -1,5 +1,8 @@
+@using BlackCode.Application.Features.Configuracion
+@inject IPoliticaComercialService _politicaSvc
 @{
     ViewData["Title"] = "Términos y Condiciones";
+    var _politica = await _politicaSvc.ObtenerAsync();
 }
 <link rel="stylesheet" href="~/css/legal.css" asp-append-version="true" />
 
@@ -11,21 +14,33 @@
         <p class="legal__fecha">Vigencia: noviembre de 2026</p>
     </header>
 
-    <h2>1. Proyecto académico y tienda de demostración</h2>
-    <p>BLACK CODE es una tienda de demostración desarrollada como proyecto del curso Evolución de Software (Universidad Privada del Norte — UPN). No realiza cobros reales ni opera comercialmente. Todos los pedidos y pagos son simulados dentro de la aplicación.</p>
+    <h2>1. Aceptación</h2>
+    <p>Al acceder y realizar compras en BLACK CODE aceptas estos términos. Si no estás de acuerdo con alguna de las condiciones, no uses la plataforma.</p>
 
-    <h2>2. Uso de la plataforma</h2>
-    <p>Al usar esta plataforma aceptás que es un entorno de pruebas académicas. No debés introducir datos financieros reales ni credenciales que uses en otros servicios.</p>
+    <h2>2. Tu cuenta</h2>
+    <p>Para realizar pedidos debes crear una cuenta con nombre completo, correo electrónico, teléfono y una dirección de envío. Eres responsable de mantener la confidencialidad de tu contraseña y de las actividades realizadas desde tu cuenta.</p>
 
-    <h2>3. Registro de cuenta</h2>
-    <p>Para generar pedidos de demostración necesitás crear una cuenta con nombre, correo electrónico, teléfono y una dirección de envío. Estos datos se usan exclusivamente dentro de la aplicación para simular el flujo de compra; no se transmiten a terceros.</p>
+    <h2>3. Productos y precios</h2>
+    <p>Todos los precios están expresados en soles peruanos (S/) e incluyen los impuestos aplicables. Nos reservamos el derecho de modificar precios sin previo aviso; el precio vigente al momento de confirmar tu pedido es el que se aplica a la compra.</p>
 
-    <h2>4. Pagos</h2>
-    <p>Los métodos de pago disponibles (tarjeta, transferencia, Yape y Plin) son completamente simulados. No se procesa ningún cobro real ni se integra ninguna pasarela de pago externa.</p>
+    <h2>4. Pedidos y pagos</h2>
+    <p>Aceptamos los siguientes métodos de pago: tarjeta de débito o crédito, transferencia bancaria, Yape y Plin. Al confirmar el pedido se verifica la disponibilidad de stock; si un artículo no está disponible, nos comunicaremos contigo para coordinar una solución.</p>
 
-    <h2>5. Modificaciones</h2>
-    <p>El contenido de la plataforma puede cambiar sin previo aviso en el marco del desarrollo del proyecto académico.</p>
+    <h2>5. Envíos</h2>
+    <p>Realizamos envíos a todo el Perú. El plazo estimado de entrega es de @_politica.PlazoDias desde la confirmación del pago. El costo de envío se muestra en el resumen del pedido antes de que confirmes la compra.</p>
 
-    <h2>6. Contacto</h2>
-    <p>Consultas sobre la plataforma: dirigirse al equipo del proyecto o al docente a cargo del curso Evolución de Software, UPN.</p>
+    <h2>6. Cambios y devoluciones</h2>
+    <p>Tienes @_politica.PlazoCambios desde la recepción del pedido para solicitar un cambio o devolución, siempre que la pieza esté sin uso y con su empaque original. Aceptamos cambios por talla incorrecta o defecto de fabricación. Para iniciar el proceso, contáctanos a través de la plataforma.</p>
+
+    <h2>7. Propiedad intelectual</h2>
+    <p>El nombre, el logotipo, el diseño y los contenidos de BLACK CODE son propiedad exclusiva de la tienda. No está permitido reproducirlos ni distribuirlos sin autorización.</p>
+
+    <h2>8. Limitación de responsabilidad</h2>
+    <p>BLACK CODE no se hace responsable por demoras en la entrega causadas por el operador logístico, por eventos de fuerza mayor ni por daños indirectos derivados del uso de la plataforma.</p>
+
+    <h2>9. Modificaciones</h2>
+    <p>Nos reservamos el derecho de actualizar estos términos. Los cambios entran en vigor desde su publicación en esta página.</p>
+
+    <h2>10. Ley aplicable</h2>
+    <p>Estos términos se rigen por las leyes vigentes en la República del Perú. Cualquier controversia se resolverá ante los tribunales competentes de la ciudad de Lima.</p>
 </article>

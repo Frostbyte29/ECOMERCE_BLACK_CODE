@@ -1,6 +1,6 @@
 # Catálogo con fotografías
 
-Se incorporan 19 diseños de las fotografías facilitadas. Los nombres, precios y materiales son propuestos para la demostración; las fotografías no certifican la composición. Cada anillo comienza con tallas 7, 8, 9, 10 y 11, y 10 unidades por talla. Revisar estos datos antes de usarlos para ventas reales.
+Se incorporan 19 diseños de las fotografías facilitadas. Los nombres, precios y materiales son propuestos como datos iniciales; las fotografías no certifican la composición. Cada anillo comienza con tallas 7, 8, 9, 10 y 11, y 10 unidades por talla. Revisar estos datos antes de usarlos para ventas reales.
 
 | Producto | Precio sugerido (S/) | Fotografía original |
 |---|---:|---|
