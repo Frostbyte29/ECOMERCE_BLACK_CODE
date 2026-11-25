@@ -7,6 +7,10 @@
 .product-grid .product-caption h3 { margin: 0; font-size: 15px; line-height: 1.4; text-align: left; }
 .product-grid .product-caption .product-price { display: block; margin: 0; padding: 0; font-size: 16px; font-weight: 600; line-height: 1.5; white-space: nowrap; font-variant-numeric: tabular-nums; color: #171717; }
 .detail-image img { mix-blend-mode: normal; object-fit: contain; }
+.stepper { display: flex; align-items: center; border: 1px solid #ddd; width: fit-content; }
+.stepper button { background: none; border: 0; width: 34px; height: 38px; font-size: 18px; color: #111; padding: 0; }
+.stepper button:hover { background: #f4f4f1; }
+.stepper input { border: 0; border-left: 1px solid #ddd; border-right: 1px solid #ddd; width: 56px !important; height: 38px; text-align: center; padding: 0; min-height: 38px !important; }
 .detail-meta { gap: 12px; flex-wrap: wrap; }
 .image-editor { margin-top: 20px; padding: 20px; border: 1px solid #ddd; background: #fff; }
 .image-editor input[type=file] { max-width: 100%; }
