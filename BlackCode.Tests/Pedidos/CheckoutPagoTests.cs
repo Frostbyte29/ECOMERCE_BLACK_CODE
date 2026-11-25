@@ -80,7 +80,7 @@ public sealed class CheckoutPagoTests
         Assert.Equal(MetodoPago.Simulado, (await db.Pagos.SingleAsync()).Metodo);
     }
 
-    [Fact(Skip = "Pendiente: ejecutar Add-Migration AgregarFuncionesCuentaCliente antes de verificar.")]
+    [Fact]
     public void Modelo_mysql_conserva_el_esquema_de_las_migraciones()
     {
         using var db = new AppDbContext(new DbContextOptionsBuilder<AppDbContext>()
