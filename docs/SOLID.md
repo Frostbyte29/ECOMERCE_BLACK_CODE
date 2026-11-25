@@ -33,6 +33,7 @@
 | DIP | `BlackCode.Web/ViewComponents/InsigniaCarritoViewComponent.cs` | Depende de `ICarritoService` (abstracción), no de `CarritoService` (concreto); el conteo de unidades se expone en la interfaz, no se calcula en la vista ni en el layout | Carlos |
 | SRP | `BlackCode.Application/Features/Configuracion/PoliticaComercialService.cs` | Única responsabilidad: leer las claves de `configuracion_tienda` y exponerlas como un DTO de política comercial tipado; las vistas no conocen el modelo de base de datos | Carlos |
 | DIP | `BlackCode.Application/Features/Configuracion/IPoliticaComercialService.cs` | Las vistas dependen de la interfaz inyectada (`@inject`); Application expone el contrato y registra la implementación concreta en su propio `DependencyInjection` | Carlos |
+| OCP | `BlackCode.Web/Controllers/CuentaController.cs` + `CarritoController.cs` + `PedidosController.cs` | La política `NoEsAdministrador` se define una vez en la raíz de composición y se aplica con `[Authorize(Policy)]`; añadir un endpoint nuevo no modifica la política ni su lógica | Carlos |
 
 ## Cómo demostrar los tres principios en el carrito
 
