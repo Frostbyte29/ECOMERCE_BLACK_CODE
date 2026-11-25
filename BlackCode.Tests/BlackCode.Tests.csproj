@@ -21,6 +21,7 @@
     <ProjectReference Include="..\BlackCode.Domain\BlackCode.Domain.csproj" />
     <ProjectReference Include="..\BlackCode.Application\BlackCode.Application.csproj" />
     <ProjectReference Include="..\BlackCode.Infrastructure\BlackCode.Infrastructure.csproj" />
+    <ProjectReference Include="..\BlackCode.Web\BlackCode.Web.csproj" />
   </ItemGroup>
 
   <ItemGroup>
