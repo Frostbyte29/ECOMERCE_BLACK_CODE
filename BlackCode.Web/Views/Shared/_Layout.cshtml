@@ -1,7 +1,10 @@
 @using BlackCode.Domain.Usuarios
+@using BlackCode.Application.Features.Configuracion
+@inject IPoliticaComercialService _politicaSvc
 @{
     var _catId = Context.Request.Query["Categoria"].ToString();
     bool _enCatalogo = (Context.Request.Path.Value ?? "").StartsWith("/Catalogo");
+    var _politica = await _politicaSvc.ObtenerAsync();
 }
 <!DOCTYPE html>
 <html lang="es">
@@ -17,9 +20,16 @@
 </head>
 <body>
 
-<div class="announcement">
-    ENVÍOS A TODO EL PERÚ <span>|</span> CAMBIOS FÁCILES <span>|</span> PAGA SEGURO
-</div>
+@if (_politica.MensajesBarra.Count > 0)
+{
+    <div class="announcement">
+        @for (var _i = 0; _i < _politica.MensajesBarra.Count; _i++)
+        {
+            @_politica.MensajesBarra[_i]
+            @if (_i < _politica.MensajesBarra.Count - 1) { <span>|</span> }
+        }
+    </div>
+}
 
 <header class="site-header">
     <a class="brand" asp-controller="Home" asp-action="Index"><img src="~/img/marca/logo-negro.png" class="brand__logo" alt="" />BLACK <span>CODE</span></a>
@@ -93,14 +103,17 @@
                 <li><a asp-controller="Cuenta" asp-action="Index">Mi cuenta</a></li>
             </ul>
         </div>
-        <div class="footer__col">
-            <h4>Síguenos</h4>
-            <ul>
-                <li><a href="#">Instagram</a></li>
-                <li><a href="#">TikTok</a></li>
-                <li><a href="#">Facebook</a></li>
-            </ul>
-        </div>
+        @if (_politica.InstagramUrl is not null || _politica.TiktokUrl is not null || _politica.FacebookUrl is not null)
+        {
+            <div class="footer__col">
+                <h4>Síguenos</h4>
+                <ul>
+                    @if (_politica.InstagramUrl is not null) { <li><a href="@_politica.InstagramUrl" target="_blank" rel="noopener noreferrer">Instagram</a></li> }
+                    @if (_politica.TiktokUrl is not null) { <li><a href="@_politica.TiktokUrl" target="_blank" rel="noopener noreferrer">TikTok</a></li> }
+                    @if (_politica.FacebookUrl is not null) { <li><a href="@_politica.FacebookUrl" target="_blank" rel="noopener noreferrer">Facebook</a></li> }
+                </ul>
+            </div>
+        }
     </div>
     <div class="footer__bottom">
         <span>&copy; @DateTime.Now.Year BLACK CODE. Todos los derechos reservados.</span>

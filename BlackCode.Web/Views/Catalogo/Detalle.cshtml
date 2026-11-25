@@ -1,6 +1,9 @@
 @model ProductoViewModel
+@using BlackCode.Application.Features.Configuracion
+@inject IPoliticaComercialService _politicaSvc
 @{
     ViewData["Title"] = Model.Nombre;
+    var _politica = await _politicaSvc.ObtenerAsync();
     var todasImagenes = Model.Imagenes?.Count > 0 ? Model.Imagenes : new[] { Model.Imagen };
     var imagenPrincipal = todasImagenes[0];
     var variantesActivas = Model.Variantes.Where(v => v.Activo).ToList();
@@ -97,10 +100,10 @@
                         <span><b>Pago seguro</b><small>Tarjeta, Yape y Plin</small></span>
                     </div>
                     <div>
-                        <span><b>Envíos a todo el Perú</b><small>2 a 4 días hábiles</small></span>
+                        <span><b>Envíos a todo el Perú</b><small>@_politica.PlazoDias</small></span>
                     </div>
                     <div>
-                        <span><b>Cambios fáciles</b><small>7 días desde la recepción</small></span>
+                        <span><b>Cambios fáciles</b><small>@_politica.PlazoCambios desde la recepción</small></span>
                     </div>
                 </div>
             </form>

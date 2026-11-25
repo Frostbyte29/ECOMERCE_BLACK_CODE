@@ -21,6 +21,16 @@ Formato: [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) · Versiona
 - Política de Privacidad reescrita: qué datos se recopilan, finalidad, terceros (solo pago y envío), hash de contraseñas, cookies de sesión y derechos del usuario.
 - "Forzar rechazo" oculto por defecto; disponible solo con `?pruebas=1` en entorno Development.
 
+### Política comercial desde base de datos
+- `IPoliticaComercialService` lee las claves de `configuracion_tienda` y las expone en un DTO tipado: plazos de envío y devoluciones, costo y umbral de envío gratis, mensajes de barra y redes sociales centralizados.
+- Seeder idempotente `EnsureConfigDefaultsAsync`: añade las claves faltantes a bases de datos existentes sin sobreescribir valores ya modificados.
+- Consumidores: detalle de producto, checkout, detalle de pedido, Términos y Condiciones y `_Layout.cshtml` (barra de anuncio y enlaces de redes sociales).
+- Cuatro pruebas nuevas en `PoliticaComercialServiceTests`: valores almacenados, valores por defecto, URL vacía devuelve null, mensajes de barra excluye vacíos y preserva orden.
+
+### Vocabulario de estados de pedido
+- `TiendaMapper.Estado` cubre los seis valores de `EstadoPedido` con texto visible para el cliente: Pendiente de pago, Pago confirmado, Preparando tu pedido, En camino, Entregado y Cancelado.
+- Prueba que itera todos los valores del enum y falla si alguno devuelve el nombre crudo.
+
 ---
 
 ## [0.2.0] - 2026-11-10

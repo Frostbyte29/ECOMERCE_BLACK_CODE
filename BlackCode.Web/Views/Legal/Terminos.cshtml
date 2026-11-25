@@ -1,5 +1,8 @@
+@using BlackCode.Application.Features.Configuracion
+@inject IPoliticaComercialService _politicaSvc
 @{
     ViewData["Title"] = "Términos y Condiciones";
+    var _politica = await _politicaSvc.ObtenerAsync();
 }
 <link rel="stylesheet" href="~/css/legal.css" asp-append-version="true" />
 
@@ -24,10 +27,10 @@
     <p>Aceptamos los siguientes métodos de pago: tarjeta de débito o crédito, transferencia bancaria, Yape y Plin. Al confirmar el pedido se verifica la disponibilidad de stock; si un artículo no está disponible, nos comunicaremos contigo para coordinar una solución.</p>
 
     <h2>5. Envíos</h2>
-    <p>Realizamos envíos a todo el Perú. El plazo estimado de entrega es de 2 a 4 días hábiles desde la confirmación del pago. El costo de envío se muestra en el resumen del pedido antes de que confirmes la compra.</p>
+    <p>Realizamos envíos a todo el Perú. El plazo estimado de entrega es de @_politica.PlazoDias desde la confirmación del pago. El costo de envío se muestra en el resumen del pedido antes de que confirmes la compra.</p>
 
     <h2>6. Cambios y devoluciones</h2>
-    <p>Tienes 7 días calendario desde la recepción del pedido para solicitar un cambio o devolución, siempre que la pieza esté sin uso y con su empaque original. Aceptamos cambios por talla incorrecta o defecto de fabricación. Para iniciar el proceso, contáctanos a través de la plataforma.</p>
+    <p>Tienes @_politica.PlazoCambios desde la recepción del pedido para solicitar un cambio o devolución, siempre que la pieza esté sin uso y con su empaque original. Aceptamos cambios por talla incorrecta o defecto de fabricación. Para iniciar el proceso, contáctanos a través de la plataforma.</p>
 
     <h2>7. Propiedad intelectual</h2>
     <p>El nombre, el logotipo, el diseño y los contenidos de BLACK CODE son propiedad exclusiva de la tienda. No está permitido reproducirlos ni distribuirlos sin autorización.</p>

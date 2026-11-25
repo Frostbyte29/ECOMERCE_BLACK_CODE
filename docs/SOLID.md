@@ -31,6 +31,8 @@
 | SRP | `BlackCode.Web/Controllers/CarritoController.cs` — acción `Agregar` | El controlador gestiona la redirección HTTP (incluido el retorno al detalle con TempData en caso de error); la lógica de carrito y de stock pertenece a ICarritoService | Carlos |
 | SRP | `BlackCode.Web/ViewComponents/InsigniaCarritoViewComponent.cs` | Responsabilidad única: obtener el conteo de unidades del carrito y renderizar la insignia en el header; la vista no calcula ni accede a datos directamente | Carlos |
 | DIP | `BlackCode.Web/ViewComponents/InsigniaCarritoViewComponent.cs` | Depende de `ICarritoService` (abstracción), no de `CarritoService` (concreto); el conteo de unidades se expone en la interfaz, no se calcula en la vista ni en el layout | Carlos |
+| SRP | `BlackCode.Application/Features/Configuracion/PoliticaComercialService.cs` | Única responsabilidad: leer las claves de `configuracion_tienda` y exponerlas como un DTO de política comercial tipado; las vistas no conocen el modelo de base de datos | Carlos |
+| DIP | `BlackCode.Application/Features/Configuracion/IPoliticaComercialService.cs` | Las vistas dependen de la interfaz inyectada (`@inject`); Application expone el contrato y registra la implementación concreta en su propio `DependencyInjection` | Carlos |
 
 ## Cómo demostrar los tres principios en el carrito
 

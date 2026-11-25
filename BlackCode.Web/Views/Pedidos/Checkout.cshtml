@@ -1,5 +1,10 @@
 @model CheckoutViewModel
-@{ ViewData["Title"] = "Finalizar compra"; }
+@using BlackCode.Application.Features.Configuracion
+@inject IPoliticaComercialService _politicaSvc
+@{
+    ViewData["Title"] = "Finalizar compra";
+    var _politica = await _politicaSvc.ObtenerAsync();
+}
 @section Styles {
     <partial name="_EstilosCompras" />
     <link rel="stylesheet" href="~/css/pagos-qr.css" asp-append-version="true" />
@@ -64,6 +69,7 @@
             }
             <partial name="_Totales" model="Model.Carrito.Totales" />
             <button class="button full" data-submit-once>Confirmar compra →</button>
+            <p class="small muted">Envío estimado: @_politica.PlazoDias.</p>
             <p class="small muted">El precio y las existencias se vuelven a comprobar al confirmar.</p>
         </aside>
     </form>
