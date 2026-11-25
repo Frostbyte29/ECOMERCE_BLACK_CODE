@@ -89,6 +89,33 @@ public sealed class CheckoutPagoTests
     }
 
     [Fact]
+    public async Task CancelarPorCliente_cancela_pedido_rechaza_pago_y_restituye_stock()
+    {
+        await using var conexion = new SqliteConnection("Data Source=:memory:");
+        await conexion.OpenAsync();
+        await using var db = await PrepararAsync(conexion);
+        var id = await Servicio(db).ConfirmarAsync(Envio, false, "yape");
+        db.ChangeTracker.Clear();
+        await Servicio(db).CancelarPorClienteAsync(id);
+        db.ChangeTracker.Clear();
+        var pedido = await db.Pedidos.Include(p => p.Pago).SingleAsync(p => p.Id == id);
+        Assert.Equal(EstadoPedido.Cancelado, pedido.Estado);
+        Assert.Equal(EstadoPago.Rechazado, pedido.Pago!.Estado);
+        Assert.Equal(3, await db.VariantesProducto.Select(v => v.Stock).SingleAsync());
+    }
+
+    [Fact]
+    public async Task CancelarPorCliente_lanza_excepcion_si_estado_no_es_pendiente()
+    {
+        await using var conexion = new SqliteConnection("Data Source=:memory:");
+        await conexion.OpenAsync();
+        await using var db = await PrepararAsync(conexion);
+        var id = await Servicio(db).ConfirmarAsync(Envio, false, "tarjeta");
+        db.ChangeTracker.Clear();
+        await Assert.ThrowsAsync<DomainException>(() => Servicio(db).CancelarPorClienteAsync(id));
+    }
+
+    [Fact]
     public async Task CambiarEstado_a_Pagado_aprueba_pago_pendiente()
     {
         await using var conexion = new SqliteConnection("Data Source=:memory:");

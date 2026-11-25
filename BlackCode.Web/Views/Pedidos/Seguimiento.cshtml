@@ -1,0 +1,50 @@
+@model SeguimientoViewModel?
+@{ViewData["Title"] = "Seguimiento de pedido";}
+@section Styles { <partial name="_EstilosCompras" /> }
+<section class="section">
+    <p class="eyebrow">SEGUIMIENTO</p>
+    <h1>¿Dónde está tu pedido?</h1>
+    <form method="get" asp-controller="Pedidos" asp-action="Seguimiento">
+        <div style="display:flex;gap:.75rem;align-items:flex-end;flex-wrap:wrap;margin:1.5rem 0 2rem">
+            <div>
+                <label for="codigo" style="display:block;font-size:12px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:.4rem">Código de pedido</label>
+                <input type="text" id="codigo" name="codigo"
+                       value="@(Model?.Codigo ?? Context.Request.Query["codigo"].ToString())"
+                       placeholder="Ej. BC-1A2B3C4D" style="min-width:260px" />
+            </div>
+            <button type="submit" class="button">Consultar</button>
+        </div>
+    </form>
+    @if (Model is null && !string.IsNullOrWhiteSpace(Context.Request.Query["codigo"]))
+    {
+        <p class="notice error">No encontramos ningún pedido con ese código. Verifica que esté escrito correctamente.</p>
+    }
+    @if (Model is not null)
+    {
+        <div style="max-width:560px">
+            <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem">
+                <span class="badge">@Estado(Model.EstadoActual)</span>
+                <p class="eyebrow" style="margin:0">Pedido <strong>@Model.Codigo</strong></p>
+            </div>
+            <ol class="timeline">
+                @foreach (var e in Model.Historial)
+                {
+                    <li><strong>@Estado(e.Estado)</strong><span>@Fecha(e.Fecha)</span></li>
+                }
+            </ol>
+            @if (Model.Transportista is not null || Model.CodigoRastreo is not null)
+            {
+                <div style="margin-top:1.25rem;padding:1rem 1.25rem;background:#f9f9f7;border-radius:6px;font-size:.9rem">
+                    @if (Model.Transportista is not null)
+                    {
+                        <p style="margin:.25rem 0"><strong>Transportista:</strong> @Model.Transportista</p>
+                    }
+                    @if (Model.CodigoRastreo is not null)
+                    {
+                        <p style="margin:.25rem 0"><strong>Código de rastreo:</strong> @Model.CodigoRastreo</p>
+                    }
+                </div>
+            }
+        </div>
+    }
+</section>

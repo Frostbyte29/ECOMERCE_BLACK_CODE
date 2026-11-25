@@ -108,8 +108,80 @@
                     </div>
                 </div>
             </form>
+            @if (User.Identity?.IsAuthenticated == true && !User.IsInRole("Admin"))
+            {
+                <form asp-controller="Favoritos" asp-action="Toggle" method="post" style="margin-top:1rem">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="productoId" value="@Model.Id" />
+                    <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                    <button type="submit" class="btn-favorito @(Model.EsFavorito?"btn-favorito--activo":"")" aria-label="@(Model.EsFavorito?"Quitar de favoritos":"Guardar en favoritos")" title="@(Model.EsFavorito?"Quitar de favoritos":"Guardar en favoritos")">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="@(Model.EsFavorito?"currentColor":"none")" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z"/></svg>
+                        @(Model.EsFavorito ? "Quitar de favoritos" : "Guardar en favoritos")
+                    </button>
+                </form>
+            }
         </div>
     </div>
+    @{
+        var _resenas = ViewBag.Resenas as List<ResenaListaViewModel>;
+        bool _yaReseno = ViewBag.YaReseno is bool _r && _r;
+    }
+    @if (_resenas is not null)
+    {
+        <div class="resenas-seccion">
+            <h2>Reseñas (@_resenas.Count)</h2>
+            @if (TempData["ResenaOk"] is string _ok) { <p class="notice">@_ok</p> }
+            @if (TempData["ResenaError"] is string _err) { <p class="notice error">@_err</p> }
+            @if (_resenas.Count == 0)
+            {
+                <p class="muted">Todavía no hay reseñas para este producto.</p>
+            }
+            else
+            {
+                @foreach (var r in _resenas)
+                {
+                    <div class="resena-card">
+                        <div class="resena-card__header">
+                            <span class="resena-stars" aria-label="@r.Calificacion de 5 estrellas">@(new string('★', r.Calificacion))@(new string('☆', 5 - r.Calificacion))</span>
+                            <span class="resena-autor">@r.Autor</span>
+                            <span class="resena-fecha">@Fecha(r.Fecha)</span>
+                        </div>
+                        @if (r.Comentario is not null) { <p class="resena-card__texto">@r.Comentario</p> }
+                    </div>
+                }
+            }
+            @if (User.Identity?.IsAuthenticated == true && !User.IsInRole("Admin") && !_yaReseno)
+            {
+                <div class="resena-form">
+                    <h3>Deja tu reseña</h3>
+                    <form asp-controller="Resena" asp-action="Crear" method="post" novalidate>
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="ProductoId" value="@Model.Id" />
+                        <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                        <div style="margin-bottom:.75rem">
+                            <label for="Calificacion" style="display:block;font-size:12px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:.4rem">Calificación</label>
+                            <select id="Calificacion" name="Calificacion" style="max-width:280px">
+                                <option value="5">★★★★★ Excelente</option>
+                                <option value="4">★★★★☆ Muy bueno</option>
+                                <option value="3">★★★☆☆ Regular</option>
+                                <option value="2">★★☆☆☆ Malo</option>
+                                <option value="1">★☆☆☆☆ Muy malo</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom:.75rem">
+                            <label for="Comentario" style="display:block;font-size:12px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:.4rem">Comentario (opcional)</label>
+                            <textarea id="Comentario" name="Comentario" rows="3" maxlength="500" style="max-width:420px;resize:vertical"></textarea>
+                        </div>
+                        <button type="submit" class="button">Publicar reseña</button>
+                    </form>
+                </div>
+            }
+            else if (User.Identity?.IsAuthenticated == true && !User.IsInRole("Admin") && _yaReseno)
+            {
+                <p class="small muted" style="margin-top:1rem">Ya publicaste una reseña para este producto.</p>
+            }
+        </div>
+    }
 </section>
 @section Scripts {
 <script>

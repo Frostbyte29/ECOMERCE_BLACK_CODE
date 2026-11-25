@@ -220,6 +220,44 @@ namespace BlackCode.Infrastructure.Migrations
                     b.ToTable("productos", (string)null);
                 });
 
+            modelBuilder.Entity("BlackCode.Domain.Catalogo.Resena", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    b.Property<int>("Calificacion")
+                        .HasColumnType("int")
+                        .HasColumnName("calificacion");
+
+                    b.Property<string>("Comentario")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)")
+                        .HasColumnName("comentario");
+
+                    b.Property<DateTime>("CreadoUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("creado_utc");
+
+                    b.Property<int>("ProductoId")
+                        .HasColumnType("int")
+                        .HasColumnName("producto_id");
+
+                    b.Property<int>("UsuarioId")
+                        .HasColumnType("int")
+                        .HasColumnName("usuario_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UsuarioId");
+
+                    b.HasIndex("ProductoId", "UsuarioId")
+                        .IsUnique();
+
+                    b.ToTable("resenas", (string)null);
+                });
+
             modelBuilder.Entity("BlackCode.Domain.Catalogo.VarianteProducto", b =>
                 {
                     b.Property<int>("Id")
@@ -571,6 +609,172 @@ namespace BlackCode.Infrastructure.Migrations
                     b.ToTable("pedidos", (string)null);
                 });
 
+            modelBuilder.Entity("BlackCode.Domain.Pedidos.SeguimientoPedido", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    b.Property<string>("CodigoRastreo")
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("codigo_rastreo");
+
+                    b.Property<DateTime>("CreadoUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("creado_utc");
+
+                    b.Property<int>("PedidoId")
+                        .HasColumnType("int")
+                        .HasColumnName("pedido_id");
+
+                    b.Property<string>("Transportista")
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("transportista");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PedidoId")
+                        .IsUnique();
+
+                    b.ToTable("seguimiento_pedido", (string)null);
+                });
+
+            modelBuilder.Entity("BlackCode.Domain.Reclamos.Reclamo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Correo")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("varchar(150)")
+                        .HasColumnName("correo");
+
+                    b.Property<DateTime>("CreadoUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("creado_utc");
+
+                    b.Property<string>("DescripcionBien")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)")
+                        .HasColumnName("descripcion_bien");
+
+                    b.Property<string>("Detalle")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)")
+                        .HasColumnName("detalle");
+
+                    b.Property<string>("Documento")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("documento");
+
+                    b.Property<string>("Domicilio")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("domicilio");
+
+                    b.Property<string>("NombresCompletos")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)")
+                        .HasColumnName("nombres_completos");
+
+                    b.Property<string>("NumeroPedido")
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("numero_pedido");
+
+                    b.Property<string>("PedidoCliente")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)")
+                        .HasColumnName("pedido_cliente");
+
+                    b.Property<string>("Telefono")
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("telefono");
+
+                    b.Property<int>("Tipo")
+                        .HasColumnType("int")
+                        .HasColumnName("tipo");
+
+                    b.Property<int?>("UsuarioId")
+                        .HasColumnType("int")
+                        .HasColumnName("usuario_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UsuarioId");
+
+                    b.ToTable("reclamos", (string)null);
+                });
+
+            modelBuilder.Entity("BlackCode.Domain.Usuarios.DireccionGuardada", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreadoUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("creado_utc");
+
+                    b.Property<string>("Direccion")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("direccion");
+
+                    b.Property<string>("Distrito")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("distrito");
+
+                    b.Property<bool>("EsPredeterminada")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("es_predeterminada");
+
+                    b.Property<string>("NombreCompleto")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)")
+                        .HasColumnName("nombre_completo");
+
+                    b.Property<string>("Referencia")
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("referencia");
+
+                    b.Property<string>("Telefono")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("telefono");
+
+                    b.Property<int>("UsuarioId")
+                        .HasColumnType("int")
+                        .HasColumnName("usuario_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UsuarioId");
+
+                    b.ToTable("direcciones_guardadas", (string)null);
+                });
+
             modelBuilder.Entity("BlackCode.Domain.Usuarios.Usuario", b =>
                 {
                     b.Property<int>("Id")
@@ -675,6 +879,23 @@ namespace BlackCode.Infrastructure.Migrations
                     b.Navigation("Material");
                 });
 
+            modelBuilder.Entity("BlackCode.Domain.Catalogo.Resena", b =>
+                {
+                    b.HasOne("BlackCode.Domain.Catalogo.Producto", "Producto")
+                        .WithMany()
+                        .HasForeignKey("ProductoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BlackCode.Domain.Usuarios.Usuario", null)
+                        .WithMany()
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Producto");
+                });
+
             modelBuilder.Entity("BlackCode.Domain.Catalogo.VarianteProducto", b =>
                 {
                     b.HasOne("BlackCode.Domain.Catalogo.Producto", "Producto")
@@ -775,6 +996,26 @@ namespace BlackCode.Infrastructure.Migrations
                         .WithMany()
                         .HasForeignKey("UsuarioId")
                         .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("BlackCode.Domain.Pedidos.SeguimientoPedido", b =>
+                {
+                    b.HasOne("BlackCode.Domain.Pedidos.Pedido", "Pedido")
+                        .WithOne()
+                        .HasForeignKey("BlackCode.Domain.Pedidos.SeguimientoPedido", "PedidoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Pedido");
+                });
+
+            modelBuilder.Entity("BlackCode.Domain.Usuarios.DireccionGuardada", b =>
+                {
+                    b.HasOne("BlackCode.Domain.Usuarios.Usuario", null)
+                        .WithMany()
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 

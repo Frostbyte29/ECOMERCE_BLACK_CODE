@@ -92,3 +92,20 @@ public sealed class PagoConfiguration : IEntityTypeConfiguration<Pago>
             .HasForeignKey<Pago>(p => p.PedidoId).OnDelete(DeleteBehavior.Cascade);
     }
 }
+
+public sealed class SeguimientoPedidoConfiguration : IEntityTypeConfiguration<SeguimientoPedido>
+{
+    public void Configure(EntityTypeBuilder<SeguimientoPedido> b)
+    {
+        b.ToTable("seguimiento_pedido");
+        b.Property(s => s.Id).HasColumnName("id");
+        b.Property(s => s.PedidoId).HasColumnName("pedido_id");
+        b.HasIndex(s => s.PedidoId).IsUnique();  // una entrada de rastreo por pedido
+        b.Property(s => s.Transportista).HasColumnName("transportista").HasMaxLength(80);
+        b.Property(s => s.CodigoRastreo).HasColumnName("codigo_rastreo").HasMaxLength(80);
+        b.Property(s => s.CreadoUtc).HasColumnName("creado_utc");
+
+        b.HasOne(s => s.Pedido).WithOne()
+            .HasForeignKey<SeguimientoPedido>(s => s.PedidoId).OnDelete(DeleteBehavior.Cascade);
+    }
+}
