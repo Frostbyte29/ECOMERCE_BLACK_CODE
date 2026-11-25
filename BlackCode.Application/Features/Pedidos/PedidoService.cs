@@ -27,7 +27,7 @@ public sealed class PedidoService(IAppDbContext db, IUsuarioActual usuario, ICar
                 throw new DomainException("El stock cambió. Revisa el carrito e inténtalo nuevamente.");
         }
         var resultado = await pago.ProcesarAsync(compra.Totales.Total, simularRechazo, metodo);
-        if (!resultado.Aprobado) throw new DomainException("Pago de demostración rechazado. Tu carrito y el stock se mantienen.");
+        if (!resultado.Aprobado) throw new DomainException("El pago no pudo completarse. Tu carrito y el stock se mantienen.");
         var now = reloj.GetUtcNow().UtcDateTime;
         var pedido = new Pedido {
             Codigo = "BC-" + Guid.NewGuid().ToString("N")[..12].ToUpperInvariant(), UsuarioId = uid,
@@ -38,7 +38,7 @@ public sealed class PedidoService(IAppDbContext db, IUsuarioActual usuario, ICar
                 PrecioUnitario = l.Precio, Cantidad = l.Cantidad, TotalLinea = l.Total }).ToList(),
             Pago = new Pago { Metodo = resultado.Metodo, Estado = EstadoPago.Aprobado, Monto = compra.Totales.Total, Referencia = resultado.Referencia, CreadoUtc = now }
         };
-        pedido.CambiarEstado(EstadoPedido.Pagado,uid,now,"Pago simulado aprobado");
+        pedido.CambiarEstado(EstadoPedido.Pagado,uid,now,"Pago aprobado");
         db.Pedidos.Add(pedido); await db.SaveChangesAsync(); await tx.CommitAsync(); return pedido.Id;
     }
     public async Task<IReadOnlyList<PedidoDto>> ListarAsync(bool administracion = false) {

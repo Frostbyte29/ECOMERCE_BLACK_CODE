@@ -4,15 +4,32 @@ Formato: [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) · Versiona
 
 ## [Sin publicar]
 
+### Header: barra de búsqueda e insignia de carrito
+- Barra de búsqueda en el header: se abre con el icono de lupa, se cierra con Esc o pulsando fuera y envía al catálogo con `?Buscar=`.
+- Insignia numérica en el icono del carrito: muestra las unidades totales; se oculta cuando el carrito está vacío (`InsigniaCarritoViewComponent`, SRP + DIP: depende de `ICarritoService`).
+- Iconos de búsqueda y carrito reemplazados por SVG inline accesibles.
+- Dos pruebas nuevas de `ContarUnidadesAsync` en `CarritoServiceTests`.
+
+### Rediseño del detalle de producto
+- Página de detalle con breadcrumb usando la categoría real, especificaciones de material, selector de talla con radio buttons, stepper de cantidad con indicador de stock en tiempo real y galería de miniaturas cuando hay más de una imagen.
+- Error de cantidad en detalle redirige de vuelta al producto (PRG), conservando la variante y la cantidad seleccionadas en TempData.
+- Dos pruebas nuevas de límite en `CarritoServiceTests`: cantidad exactamente igual al stock no lanza excepción; cantidades fuera de rango reportan el fragmento de mensaje correcto.
+
+### Realismo de textos e interfaz de producto
+- Mensajes de cara al usuario saneados: sin referencias a entorno de pruebas ni a cobros ficticios en el checkout.
+- Términos y Condiciones reescritos como tienda real de joyería en Perú: aceptación, cuenta, productos y precios en soles, métodos de pago, envíos a todo el país (2–4 días hábiles), cambios y devoluciones (7 días calendario por talla o defecto), propiedad intelectual, limitación de responsabilidad, ley aplicable. Sin datos inventados.
+- Política de Privacidad reescrita: qué datos se recopilan, finalidad, terceros (solo pago y envío), hash de contraseñas, cookies de sesión y derechos del usuario.
+- "Forzar rechazo" oculto por defecto; disponible solo con `?pruebas=1` en entorno Development.
+
 ---
 
 ## [0.2.0] - 2026-11-10
 
 ### Catálogo fotográfico y edición de imágenes
-- Colección de 19 anillos con fotografías propias, nombres y precios sugeridos, descripción, color, material y cinco tallas con stock de demostración. Se incorpora una sola vez en Development; los seis anillos SVG originales se retiran a borrador; cadena y pulsera de eslabones siguen publicados.
+- Colección de 19 anillos con fotografías propias, nombres y precios sugeridos, descripción, color, material y cinco tallas con stock inicial. Se incorpora una sola vez en Development; los seis anillos SVG originales se retiran a borrador; cadena y pulsera de eslabones siguen publicados.
 - Selección de JPG, PNG o WebP hasta 5 MB al crear o editar, con vista previa en el navegador. Validación en cliente y servidor; almacenamiento detrás de una interfaz (`IImagenProductoService`); limpieza de la carga nueva si el producto no se guarda (compensación transaccional).
 - Tarjetas de Inicio y Catálogo con imagen a todo el ancho, nombre y precio agrupados y precio destacado en soles, también en móvil.
-- Guía de fotografías y datos de demostración en `docs/CATALOGO-FOTOGRAFICO.md`. Sin cambios de esquema ni migraciones.
+- Guía de fotografías y datos iniciales en `docs/CATALOGO-FOTOGRAFICO.md`. Sin cambios de esquema ni migraciones.
 
 ### Yape y Plin con QR
 - Yape y Plin como implementaciones independientes de `IMetodoPago`, registradas mediante inyección de dependencias y disponibles en el selector del checkout (OCP — sin condiciones adicionales en el coordinador).
@@ -35,7 +52,7 @@ Formato: [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) · Versiona
 
 ### Registro y legales
 - Corrección del formulario de registro: `AceptoTerminos` usa `MustBeTrue` para validar que el checkbox sea obligatorio.
-- Términos y Condiciones y Política de Privacidad reescritos como proyecto académico de demostración (Evolución de Software, UPN), sin datos inventados (RUC, dirección, correos de contacto ni plazos de operación).
+- Términos y Condiciones y Política de Privacidad publicados (versión inicial, pendiente de contenido real).
 
 ### Backlog declarado
 - ID 7 (UX del formulario de producto): parcialmente cubierto por la carga de imagen; pendiente slug automático desde el nombre, botón deshabilitado al enviar y mensajes de error visibles sin reselección del archivo.
@@ -59,7 +76,7 @@ Formato: [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) · Versiona
 - Guías de Visual Studio/F5, MySQL Workbench, alcance y sustentación SOLID.
 - Estructura en 4 capas (Web, Application, Domain, Infrastructure) + proyecto de tests.
 - Modelo de datos inicial y migración `InitialSchema`.
-- Datos de demo: 6 anillos, categorías, usuario admin y cliente de prueba.
+- Datos iniciales: 6 anillos, categorías, usuario admin y cliente de acceso.
 - Registro, inicio y cierre de sesión de clientes (`/Cuenta/Login`, `/Cuenta/Registro`) con "mantener sesión".
 - Bloqueo de la cuenta por 15 minutos tras 5 intentos fallidos.
 - Acceso de administrador separado (`/Admin/Login`) con la misma cookie de sesión.

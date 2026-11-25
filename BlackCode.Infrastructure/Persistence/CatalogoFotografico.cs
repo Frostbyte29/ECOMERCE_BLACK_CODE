@@ -2,7 +2,7 @@ namespace BlackCode.Infrastructure.Persistence;
 
 public record ProductoFotografico(string Nombre, string Slug, decimal Precio, string Color, string CodigoHex, string Descripcion, bool Destacado);
 
-// Datos de demostración editables: cada entrada representa un diseño, no una toma fotográfica.
+// Datos iniciales editables: cada entrada representa un diseño, no una toma fotográfica.
 public static class CatalogoFotografico
 {
     public static IReadOnlyList<ProductoFotografico> Productos { get; } =
