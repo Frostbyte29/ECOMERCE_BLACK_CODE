@@ -19,7 +19,16 @@ public sealed class PedidosController(IPedidoService pedidos,ICarritoService car
     }
     [HttpPost] public async Task<IActionResult> Checkout(CheckoutViewModel model) {
         if(ModelState.IsValid) {
-            try { var id=await pedidos.ConfirmarAsync(new(model.Nombre,model.Telefono,model.Direccion,model.Distrito,model.Referencia),model.SimularRechazo && env.IsDevelopment(),model.MetodoPago); var pedido=await pedidos.ObtenerAsync(id); TempData["Exito"]=notificaciones.Confirmacion(pedido!.Codigo); return RedirectToAction(nameof(Detalle),new { id }); }
+            try {
+                var refManual = model.MetodoPago == "tarjeta" && !string.IsNullOrEmpty(model.TarjetaMarca)
+                    ? $"{model.TarjetaMarca} *{model.TarjetaUltimos}"
+                    : model.NumeroOperacion;
+                var id=await pedidos.ConfirmarAsync(new(model.Nombre,model.Telefono,model.Direccion,model.Distrito,model.Referencia),model.SimularRechazo && env.IsDevelopment(),model.MetodoPago,refManual);
+                var pedido=await pedidos.ObtenerAsync(id);
+                var pagoInmediato = pedido!.PagoEstado == BlackCode.Domain.Pedidos.EstadoPago.Aprobado;
+                TempData["Exito"]=notificaciones.Confirmacion(pedido.Codigo, pagoInmediato);
+                return RedirectToAction(nameof(Detalle),new { id });
+            }
             catch(DomainException ex) { ModelState.AddModelError("",ex.Message); }
         }
         model.Carrito=TiendaMapper.Carrito(await carrito.ObtenerAsync(identidad.Obtener()));

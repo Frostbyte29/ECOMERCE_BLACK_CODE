@@ -39,5 +39,8 @@ public sealed class PagoTransferenciaSimulado : IMetodoPago
     public string Nombre => "Transferencia";
     public MetodoPago Metodo => MetodoPago.Transferencia;
     public Task<ResultadoPagoDto> ProcesarAsync(decimal monto, bool simularRechazo)
-        => Task.FromResult(new ResultadoPagoDto(monto > 0 && !simularRechazo, "DEMO-TRANSFERENCIA-" + Guid.NewGuid().ToString("N")[..12]));
+    {
+        if (monto <= 0 || simularRechazo) return Task.FromResult(new ResultadoPagoDto(false, "DEMO-TRANSFERENCIA-RECHAZADO", Metodo));
+        return Task.FromResult(new ResultadoPagoDto(false, "DEMO-TRANSFERENCIA-" + Guid.NewGuid().ToString("N")[..12], Metodo, EsPendiente: true));
+    }
 }

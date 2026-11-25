@@ -88,6 +88,7 @@ public class CuentaController(
     }
 
     [Authorize]
+    [Authorize(Policy = "NoEsAdministrador")]
     [HttpGet]
     public IActionResult Index()
     {
@@ -96,10 +97,12 @@ public class CuentaController(
     }
 
     [Authorize]
+    [Authorize(Policy = "NoEsAdministrador")]
     [HttpGet]
     public IActionResult CambiarContrasena() => View(new CambiarContrasenaViewModel());
 
     [Authorize]
+    [Authorize(Policy = "NoEsAdministrador")]
     [HttpPost]
     public async Task<IActionResult> CambiarContrasena(CambiarContrasenaViewModel modelo, CancellationToken ct)
     {

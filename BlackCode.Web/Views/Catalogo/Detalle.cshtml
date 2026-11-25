@@ -1,5 +1,6 @@
 @model ProductoViewModel
 @using BlackCode.Application.Features.Configuracion
+@using BlackCode.Domain.Usuarios
 @inject IPoliticaComercialService _politicaSvc
 @{
     ViewData["Title"] = Model.Nombre;
@@ -94,10 +95,10 @@
                     </span>
                 </div>
                 <p id="cantidad-error" class="field-validation-error" hidden></p>
-                <button type="submit" class="button full" id="btn-agregar">Agregar al carrito</button>
+                <button type="submit" class="button full" id="btn-agregar" @(User.IsInRole(nameof(RolUsuario.Admin)) ? "hidden" : "")>Agregar al carrito</button>
                 <div class="service-points">
                     <div>
-                        <span><b>Pago seguro</b><small>Tarjeta, Yape y Plin</small></span>
+                        <span><b>Medios de pago</b><small>Tarjeta, Yape, Plin y transferencia</small></span>
                     </div>
                     <div>
                         <span><b>Envíos a todo el Perú</b><small>@_politica.PlazoDias</small></span>

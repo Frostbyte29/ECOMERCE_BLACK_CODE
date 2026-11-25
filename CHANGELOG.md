@@ -4,6 +4,24 @@ Formato: [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) · Versiona
 
 ## [Sin publicar]
 
+### Pagos diferidos y formulario de tarjeta
+- Yape, Plin y Transferencia bancaria ahora generan pedidos en estado **Pendiente de pago** en lugar de aprobar instantáneamente; el stock se descuenta igualmente y el administrador confirma el pago desde el panel (OCP: cada `IMetodoPago` decide su modelo de confirmación sin modificar `PedidoService`).
+- `EstadoPago.Pendiente = 3` agregado al enum, compatible con pagos históricos (`Simulado = 1`).
+- Formulario de tarjeta en el checkout con validación Luhn en el navegador; los datos sensibles no se envían con `name` al servidor; solo se trasmite la marca (Visa, Mastercard, Amex) y los últimos 4 dígitos como referencia del pago.
+- Tarjeta aparece primero en la lista; el orden de métodos en DI es: Tarjeta, Yape, Plin, Transferencia.
+- Campo **Número de operación** opcional en el checkout para Yape, Plin y Transferencia.
+- Código de pedido reducido a 8 caracteres hexadecimales: `BC-XXXXXXXX`.
+- Detalle de pedido muestra método de pago, estado del pago y referencia; los productos enlazan al catálogo por slug.
+- Notificación de confirmación diferenciada: mensaje distinto para pago inmediato vs pago pendiente (SRP: `NotificacionPedidoService`).
+- Tests actualizados: 4 casos diferenciados entre pagos inmediatos y diferidos; `PagoServiceTests` y `CheckoutPagoTests` reflejan el nuevo comportamiento.
+
+### Páginas de contenido y colecciones
+- Páginas de contenido: **Quiénes somos**, **Preguntas frecuentes**, **Envíos y devoluciones**, **Guía de tallas** y **Contacto** con contenido real adaptado a la tienda.
+- Página **Colecciones** con cards de categoría que enlazan al catálogo filtrado; el nav principal apunta a esta página.
+- Footer activado: los enlaces de "Nosotros" y "Ayuda" apuntan a las páginas reales.
+- `.gitattributes` creado con `* text=auto` y reglas para binarios (imágenes, fuentes).
+- Estados vacíos y de error ya implementados en iteraciones anteriores (carrito vacío, catálogo sin resultados, 404 personalizado).
+
 ### Header: barra de búsqueda e insignia de carrito
 - Barra de búsqueda en el header: se abre con el icono de lupa, se cierra con Esc o pulsando fuera y envía al catálogo con `?Buscar=`.
 - Insignia numérica en el icono del carrito: muestra las unidades totales; se oculta cuando el carrito está vacío (`InsigniaCarritoViewComponent`, SRP + DIP: depende de `ICarritoService`).
@@ -26,6 +44,22 @@ Formato: [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) · Versiona
 - Seeder idempotente `EnsureConfigDefaultsAsync`: añade las claves faltantes a bases de datos existentes sin sobreescribir valores ya modificados.
 - Consumidores: detalle de producto, checkout, detalle de pedido, Términos y Condiciones y `_Layout.cshtml` (barra de anuncio y enlaces de redes sociales).
 - Cuatro pruebas nuevas en `PoliticaComercialServiceTests`: valores almacenados, valores por defecto, URL vacía devuelve null, mensajes de barra excluye vacíos y preserva orden.
+
+### CSS y controles vivos
+- Hamburguesa en móvil: botón que alterna la navegación en pantallas ≤ 768px; cierra al hacer clic fuera.
+- Aviso de modo administrador: banda amarilla discreta cuando un admin navega la tienda.
+- Pie de página: enlaces de "Comprar" usan `Categoria=` en lugar de `Buscar=`; Nosotros y Ayuda sin página real muestran texto atenuado en lugar de enlace muerto.
+- "Nosotros" eliminado del menú de navegación principal (página pendiente).
+- Carrito: `max` del input de cantidad respeta el stock de la variante; alerta "Solo quedan N unidades" cuando el stock es ≤ 5.
+- Mi cuenta: tarjeta "Mis pedidos" navega a `/Pedidos` (antes era `href="#"`).
+- Catálogo: título de la sección refleja el nombre de la categoría cuando se filtra por categoría.
+- Error 404: página personalizada con mensaje "No encontramos esta página" y botón para volver al catálogo.
+- Nav activo: "Inicio" y "Colecciones" reciben `aria-current="page"` en sus rutas respectivas.
+
+### Separación de roles
+- Menú de cuenta: admin ve únicamente "Panel" y "Cerrar sesión"; "Mi cuenta" y "Mis pedidos" solo visibles para clientes.
+- "Agregar al carrito" se oculta para admin en el detalle del producto.
+- `CuentaController.Index` y `CambiarContrasena` protegidos con la política `NoEsAdministrador`; admin que intente acceder es redirigido a AccesoDenegado.
 
 ### Vocabulario de estados de pedido
 - `TiendaMapper.Estado` cubre los seis valores de `EstadoPedido` con texto visible para el cliente: Pendiente de pago, Pago confirmado, Preparando tu pedido, En camino, Entregado y Cancelado.

@@ -8,7 +8,7 @@ namespace BlackCode.Application.Features.Pedidos;
 public sealed class PedidoService(IAppDbContext db, IUsuarioActual usuario, ICarritoService carrito, IStockGateway stock, IPagoService pago, TimeProvider reloj) : IPedidoService
 {
     private int UsuarioId => usuario.UsuarioId ?? throw new DomainException("Inicia sesión para continuar.");
-    public async Task<int> ConfirmarAsync(EnvioDto envio, bool simularRechazo, string metodo = "tarjeta") {
+    public async Task<int> ConfirmarAsync(EnvioDto envio, bool simularRechazo, string metodo = "tarjeta", string? referenciaManual = null) {
         var uid = UsuarioId;
         if (string.IsNullOrWhiteSpace(envio.Nombre) || envio.Nombre.Length > 120 || string.IsNullOrWhiteSpace(envio.Telefono) || envio.Telefono.Length > 20 ||
             string.IsNullOrWhiteSpace(envio.Direccion) || envio.Direccion.Length > 200 || string.IsNullOrWhiteSpace(envio.Distrito) || envio.Distrito.Length > 80 || envio.Referencia?.Length > 200)
@@ -27,18 +27,20 @@ public sealed class PedidoService(IAppDbContext db, IUsuarioActual usuario, ICar
                 throw new DomainException("El stock cambió. Revisa el carrito e inténtalo nuevamente.");
         }
         var resultado = await pago.ProcesarAsync(compra.Totales.Total, simularRechazo, metodo);
-        if (!resultado.Aprobado) throw new DomainException("El pago no pudo completarse. Tu carrito y el stock se mantienen.");
+        if (!resultado.Aprobado && !resultado.EsPendiente) throw new DomainException("El pago no pudo completarse. Tu carrito y el stock se mantienen.");
         var now = reloj.GetUtcNow().UtcDateTime;
+        var estadoPago = resultado.Aprobado ? EstadoPago.Aprobado : EstadoPago.Pendiente;
+        var refFinal = !string.IsNullOrEmpty(referenciaManual) ? referenciaManual : resultado.Referencia;
         var pedido = new Pedido {
-            Codigo = "BC-" + Guid.NewGuid().ToString("N")[..12].ToUpperInvariant(), UsuarioId = uid,
+            Codigo = "BC-" + Guid.NewGuid().ToString("N")[..8].ToUpperInvariant(), UsuarioId = uid,
             Subtotal = compra.Totales.Subtotal - compra.Totales.Descuento, CostoEnvio = compra.Totales.Envio, Total = compra.Totales.Total,
             EnvioNombreCompleto = envio.Nombre.Trim(), EnvioTelefono = envio.Telefono.Trim(), EnvioDireccion = envio.Direccion.Trim(),
             EnvioDistrito = envio.Distrito.Trim(), EnvioReferencia = envio.Referencia?.Trim(), CreadoUtc = now,
             Items = compra.Lineas.Select(l => new ItemPedido { VarianteId = l.VarianteId, NombreProductoCopia = l.Nombre, TallaCopia = l.Talla,
                 PrecioUnitario = l.Precio, Cantidad = l.Cantidad, TotalLinea = l.Total }).ToList(),
-            Pago = new Pago { Metodo = resultado.Metodo, Estado = EstadoPago.Aprobado, Monto = compra.Totales.Total, Referencia = resultado.Referencia, CreadoUtc = now }
+            Pago = new Pago { Metodo = resultado.Metodo, Estado = estadoPago, Monto = compra.Totales.Total, Referencia = refFinal, CreadoUtc = now }
         };
-        pedido.CambiarEstado(EstadoPedido.Pagado,uid,now,"Pago aprobado");
+        if (resultado.Aprobado) pedido.CambiarEstado(EstadoPedido.Pagado,uid,now,"Pago aprobado");
         db.Pedidos.Add(pedido); await db.SaveChangesAsync(); await tx.CommitAsync(); return pedido.Id;
     }
     public async Task<IReadOnlyList<PedidoDto>> ListarAsync(bool administracion = false) {
@@ -46,23 +48,33 @@ public sealed class PedidoService(IAppDbContext db, IUsuarioActual usuario, ICar
         if (administracion && !usuario.EsAdmin) throw new DomainException("Acceso restringido.");
         var query = db.Pedidos.AsNoTracking();
         if (!administracion) query = query.Where(p => p.UsuarioId == uid);
-        return (await query.Include(p => p.Items).Include(p => p.Historial).OrderByDescending(p => p.CreadoUtc).ToListAsync()).Select(Mapear).ToList();
+        return (await query.Include(p => p.Items).Include(p => p.Historial).Include(p => p.Pago).OrderByDescending(p => p.CreadoUtc).ToListAsync()).Select(p => Mapear(p)).ToList();
     }
     public async Task<PedidoDto?> ObtenerAsync(int id) {
         var uid = UsuarioId;
-        var p = await db.Pedidos.AsNoTracking().Include(p => p.Items).Include(p => p.Historial).SingleOrDefaultAsync(p => p.Id == id && (p.UsuarioId == uid || usuario.EsAdmin));
-        return p is null ? null : Mapear(p);
+        var p = await db.Pedidos.AsNoTracking().Include(p => p.Items).Include(p => p.Historial).Include(p => p.Pago).SingleOrDefaultAsync(p => p.Id == id && (p.UsuarioId == uid || usuario.EsAdmin));
+        if (p is null) return null;
+        var varianteIds = p.Items.Select(i => i.VarianteId).ToList();
+        var slugs = await db.VariantesProducto.AsNoTracking()
+            .Where(v => varianteIds.Contains(v.Id))
+            .Select(v => new { v.Id, v.Producto.Slug })
+            .ToDictionaryAsync(x => x.Id, x => x.Slug);
+        return Mapear(p, slugs);
     }
     public async Task CambiarEstadoAsync(int id, EstadoPedido estado) {
         if (!usuario.EsAdmin) throw new DomainException("Acceso restringido.");
         await using var tx = await db.BeginTransactionAsync();
-        var pedido = await db.Pedidos.Include(p => p.Items).SingleOrDefaultAsync(p => p.Id == id) ?? throw new DomainException("Pedido no encontrado.");
+        var pedido = await db.Pedidos.Include(p => p.Items).Include(p => p.Pago).SingleOrDefaultAsync(p => p.Id == id) ?? throw new DomainException("Pedido no encontrado.");
         var anterior = pedido.Estado;
         var now = reloj.GetUtcNow().UtcDateTime;
         pedido.CambiarEstado(estado,UsuarioId,now);
         // Comparación atómica del estado: evita dos cancelaciones y dos reposiciones simultáneas.
         var afectados = await db.Pedidos.Where(p => p.Id == id && p.Estado == anterior).ExecuteUpdateAsync(s => s.SetProperty(p => p.Estado,estado));
         if (afectados != 1) throw new DomainException("Otro administrador actualizó el pedido. Recarga la página.");
+        // Sincronizar el pago pendiente con la decisión del administrador.
+        if (pedido.Pago?.Estado == EstadoPago.Pendiente) {
+            pedido.Pago.Estado = estado == EstadoPedido.Pagado ? EstadoPago.Aprobado : EstadoPago.Rechazado;
+        }
         if (estado == EstadoPedido.Cancelado)
             foreach (var item in pedido.Items.OrderBy(i => i.VarianteId)) await stock.RestituirAsync(item.VarianteId,item.Cantidad);
         await db.SaveChangesAsync(); await tx.CommitAsync();
@@ -77,7 +89,9 @@ public sealed class PedidoService(IAppDbContext db, IUsuarioActual usuario, ICar
         var telefono=await db.Usuarios.AsNoTracking().Where(u=>u.Id==uid.Value).Select(u=>u.Telefono).FirstOrDefaultAsync();
         return telefono is not null ? new EnvioDto("",telefono,"","",null) : null;
     }
-    private static PedidoDto Mapear(Pedido p) => new(p.Id,p.Codigo,p.EnvioNombreCompleto,"",p.Estado,p.Subtotal,p.CostoEnvio,p.Total,p.CreadoUtc,p.EnvioDireccion,p.EnvioDistrito,
-        p.Items.Select(i => new LineaPedidoDto(i.NombreProductoCopia,i.TallaCopia,i.PrecioUnitario,i.Cantidad,i.TotalLinea)).ToList(),
-        p.Historial.OrderBy(h => h.CambiadoUtc).Select(h => new HistorialDto(h.EstadoNuevo.ToString(),h.CambiadoUtc)).ToList());
+    private static PedidoDto Mapear(Pedido p, IReadOnlyDictionary<int, string>? slugs = null) => new(
+        p.Id, p.Codigo, p.EnvioNombreCompleto, "", p.Estado, p.Subtotal, p.CostoEnvio, p.Total, p.CreadoUtc, p.EnvioDireccion, p.EnvioDistrito,
+        p.Items.Select(i => new LineaPedidoDto(i.NombreProductoCopia, i.TallaCopia, i.PrecioUnitario, i.Cantidad, i.TotalLinea, slugs?.GetValueOrDefault(i.VarianteId))).ToList(),
+        p.Historial.OrderBy(h => h.CambiadoUtc).Select(h => new HistorialDto(h.EstadoNuevo.ToString(), h.CambiadoUtc)).ToList(),
+        p.Pago?.Metodo, p.Pago?.Estado, p.Pago?.Referencia);
 }

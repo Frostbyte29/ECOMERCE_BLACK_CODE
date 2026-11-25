@@ -1,0 +1,16 @@
+# Normalización de saltos de línea: Git convierte a LF en el repositorio.
+* text=auto
+
+# Binarios — Git no intenta normalizar estos archivos.
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.ico  binary
+*.gif  binary
+*.webp binary
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.eot   binary
+*.pdf   binary
+*.zip   binary

@@ -12,7 +12,8 @@ public enum MetodoPago
 public enum EstadoPago
 {
     Aprobado = 1,
-    Rechazado = 2
+    Rechazado = 2,
+    Pendiente = 3   // Pago diferido: Yape, Plin, Transferencia pendientes de confirmación.
 }
 
 // Existe aunque el pago sea simulado: es el punto de extensión para una pasarela real.

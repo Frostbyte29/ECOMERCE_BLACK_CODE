@@ -57,6 +57,7 @@ else
     app.UseHsts();
 }
 
+app.UseStatusCodePagesWithReExecute("/Home/Error", "?codigo={0}");
 app.UseHttpsRedirection();
 app.UseStaticFiles();   // sirve imágenes subidas en tiempo de ejecución (wwwroot/uploads)
 app.UseRouting();

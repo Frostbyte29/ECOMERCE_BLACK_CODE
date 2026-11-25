@@ -1,0 +1,25 @@
+@model IReadOnlyList<OpcionViewModel>
+@{ ViewData["Title"] = "Colecciones"; }
+<section class="section">
+    <p class="breadcrumb"><a href="/">Inicio</a> / Colecciones</p>
+    <div class="section-heading">
+        <div>
+            <p class="eyebrow">ELIGE TU CÓDIGO</p>
+            <h1>Colecciones</h1>
+            <p class="muted">Anillos, cadenas y pulseras. Detalles que hacen la diferencia.</p>
+        </div>
+    </div>
+    <div class="colecciones-grid">
+        @foreach (var cat in Model)
+        {
+            <a href="/Catalogo?Categoria=@cat.Id" class="coleccion-card">
+                <span class="eyebrow">BLACKCODE</span>
+                <h2>@cat.Nombre</h2>
+                <span class="coleccion-card__cta">Ver piezas →</span>
+            </a>
+        }
+    </div>
+    <div style="text-align:center;margin-top:2rem">
+        <a href="/Catalogo" class="underlined">Ver todas las piezas ↗</a>
+    </div>
+</section>
