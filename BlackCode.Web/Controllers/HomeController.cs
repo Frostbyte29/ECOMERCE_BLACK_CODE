@@ -10,5 +10,5 @@ public sealed class HomeController(ICatalogoService catalogo) : Controller {
         return View(new CatalogoViewModel { Productos=datos.Productos.Select(TiendaMapper.Producto).ToList(),Categorias=datos.Categorias.Select(c => new OpcionViewModel(c.Id,c.Nombre)).ToList() });
     }
     [ResponseCache(Duration=0,Location=ResponseCacheLocation.None,NoStore=true)]
-    public IActionResult Error() => View(new ErrorViewModel { RequestId=Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+    public IActionResult Error(int? codigo = null) => View(new ErrorViewModel { RequestId=Activity.Current?.Id ?? HttpContext.TraceIdentifier, Codigo=codigo });
 }
