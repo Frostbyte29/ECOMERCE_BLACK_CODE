@@ -4,7 +4,10 @@
 @{
     var _catId = Context.Request.Query["Categoria"].ToString();
     bool _enCatalogo = (Context.Request.Path.Value ?? "").StartsWith("/Catalogo");
+    bool _enInicio = Context.Request.Path.Value == "/";
+    bool _enColecciones = _enCatalogo && string.IsNullOrEmpty(_catId);
     var _politica = await _politicaSvc.ObtenerAsync();
+    bool _esAdmin = User.IsInRole(nameof(RolUsuario.Admin));
 }
 <!DOCTYPE html>
 <html lang="es">
@@ -34,29 +37,34 @@
 <header class="site-header">
     <a class="brand" asp-controller="Home" asp-action="Index"><img src="~/img/marca/logo-negro.png" class="brand__logo" alt="" />BLACK <span>CODE</span></a>
 
-    <nav class="main-nav" aria-label="Navegación principal">
-        <a asp-controller="Home" asp-action="Index">Inicio</a>
-        <a asp-controller="Catalogo" asp-action="Index">Colecciones</a>
+    <nav class="main-nav" id="main-nav" aria-label="Navegación principal">
+        <a asp-controller="Home" asp-action="Index" class="@(_enInicio?"active":null)" aria-current="@(_enInicio?"page":null)">Inicio</a>
+        <a asp-controller="Catalogo" asp-action="Index" class="@(_enColecciones?"active":null)" aria-current="@(_enColecciones?"page":null)">Colecciones</a>
         <a href="/Catalogo?Categoria=1" class="@(_enCatalogo&&_catId=="1"?"active":null)" aria-current="@(_enCatalogo&&_catId=="1"?"page":null)">Anillos</a>
         <a href="/Catalogo?Categoria=2" class="@(_enCatalogo&&_catId=="2"?"active":null)" aria-current="@(_enCatalogo&&_catId=="2"?"page":null)">Cadenas</a>
         <a href="/Catalogo?Categoria=3" class="@(_enCatalogo&&_catId=="3"?"active":null)" aria-current="@(_enCatalogo&&_catId=="3"?"page":null)">Pulseras</a>
-        <a href="#">Nosotros</a>
     </nav>
 
     <div class="header-actions">
+        <button type="button" class="nav-toggle" id="btn-nav" aria-label="Abrir menú" aria-expanded="false" aria-controls="main-nav">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </button>
         <button type="button" class="header-icon" id="btn-buscar" aria-label="Buscar productos" title="Buscar productos" aria-expanded="false" aria-controls="barra-busqueda">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
         </button>
         @await Component.InvokeAsync("MenuCuenta")
-        <button type="button" class="header-icon" aria-label="Lista de deseos" title="Lista de deseos">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-        </button>
-        @if (!User.IsInRole(nameof(RolUsuario.Admin)))
+        @if (!_esAdmin)
         {
             @await Component.InvokeAsync("InsigniaCarrito")
         }
     </div>
 </header>
+@if (_esAdmin)
+{
+    <div class="admin-aviso" role="status">Estás navegando como administrador. El carrito y la compra no están disponibles en esta vista.</div>
+}
 
 <div class="barra-busqueda" id="barra-busqueda" hidden>
     <form action="/Catalogo" method="get" class="barra-busqueda__form" role="search">
@@ -82,24 +90,24 @@
         <div class="footer__col">
             <h4>Comprar</h4>
             <ul>
-                <li><a href="/Catalogo?Buscar=anillo">Anillos</a></li>
-                <li><a href="/Catalogo?Buscar=cadena">Cadenas</a></li>
-                <li><a href="/Catalogo?Buscar=pulsera">Pulseras</a></li>
+                <li><a href="/Catalogo?Categoria=1">Anillos</a></li>
+                <li><a href="/Catalogo?Categoria=2">Cadenas</a></li>
+                <li><a href="/Catalogo?Categoria=3">Pulseras</a></li>
                 <li><a asp-controller="Catalogo" asp-action="Index">Colecciones</a></li>
             </ul>
         </div>
         <div class="footer__col">
             <h4>Nosotros</h4>
             <ul>
-                <li><a href="#">Quiénes somos</a></li>
-                <li><a href="#">Nuestra historia</a></li>
+                <li><span class="footer__enlace-inactivo">Quiénes somos</span></li>
+                <li><span class="footer__enlace-inactivo">Nuestra historia</span></li>
             </ul>
         </div>
         <div class="footer__col">
             <h4>Ayuda</h4>
             <ul>
-                <li><a href="#">Preguntas frecuentes</a></li>
-                <li><a href="#">Envíos y devoluciones</a></li>
+                <li><span class="footer__enlace-inactivo">Preguntas frecuentes</span></li>
+                <li><span class="footer__enlace-inactivo">Envíos y devoluciones</span></li>
                 <li><a asp-controller="Cuenta" asp-action="Index">Mi cuenta</a></li>
             </ul>
         </div>

@@ -1,7 +1,12 @@
 @model CatalogoViewModel
-@{ViewData["Title"]="Catálogo";}
+@{
+    var _catNombre = Model.Categoria.HasValue
+        ? (Model.Categorias.FirstOrDefault(c => c.Id == Model.Categoria)?.Nombre ?? null)
+        : null;
+    ViewData["Title"] = _catNombre != null ? _catNombre + " — Catálogo" : "Catálogo";
+}
 @section Styles { <partial name="_EstilosCompras" /> }
-<section class="section catalog-page"><p class="breadcrumb"><a href="/">Inicio</a> / Colecciones</p><div class="section-heading"><div><p class="eyebrow">ELIGE TU CÓDIGO</p><h1>@(string.IsNullOrWhiteSpace(Model.Buscar)?"Todas las piezas":"Resultados de búsqueda")</h1><p class="muted">Anillos, cadenas y pulseras. Detalles que hacen la diferencia.</p></div><span>@Model.Productos.Count productos</span></div>
+<section class="section catalog-page"><p class="breadcrumb"><a href="/">Inicio</a> / Colecciones</p><div class="section-heading"><div><p class="eyebrow">ELIGE TU CÓDIGO</p><h1>@(_catNombre ?? (string.IsNullOrWhiteSpace(Model.Buscar)?"Todas las piezas":"Resultados de búsqueda"))</h1><p class="muted">Anillos, cadenas y pulseras. Detalles que hacen la diferencia.</p></div><span>@Model.Productos.Count productos</span></div>
 <div class="catalog-layout">
 <form method="get" class="filters" aria-label="Filtros de productos"><h2>Filtrar <span>☷</span></h2>
 <label asp-for="Buscar">Buscar</label><input asp-for="Buscar" placeholder="Nombre del producto" maxlength="100"/>

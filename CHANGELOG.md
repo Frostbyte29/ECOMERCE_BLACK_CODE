@@ -27,6 +27,22 @@ Formato: [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) · Versiona
 - Consumidores: detalle de producto, checkout, detalle de pedido, Términos y Condiciones y `_Layout.cshtml` (barra de anuncio y enlaces de redes sociales).
 - Cuatro pruebas nuevas en `PoliticaComercialServiceTests`: valores almacenados, valores por defecto, URL vacía devuelve null, mensajes de barra excluye vacíos y preserva orden.
 
+### CSS y controles vivos
+- Hamburguesa en móvil: botón que alterna la navegación en pantallas ≤ 768px; cierra al hacer clic fuera.
+- Aviso de modo administrador: banda amarilla discreta cuando un admin navega la tienda.
+- Pie de página: enlaces de "Comprar" usan `Categoria=` en lugar de `Buscar=`; Nosotros y Ayuda sin página real muestran texto atenuado en lugar de enlace muerto.
+- "Nosotros" eliminado del menú de navegación principal (página pendiente).
+- Carrito: `max` del input de cantidad respeta el stock de la variante; alerta "Solo quedan N unidades" cuando el stock es ≤ 5.
+- Mi cuenta: tarjeta "Mis pedidos" navega a `/Pedidos` (antes era `href="#"`).
+- Catálogo: título de la sección refleja el nombre de la categoría cuando se filtra por categoría.
+- Error 404: página personalizada con mensaje "No encontramos esta página" y botón para volver al catálogo.
+- Nav activo: "Inicio" y "Colecciones" reciben `aria-current="page"` en sus rutas respectivas.
+
+### Separación de roles
+- Menú de cuenta: admin ve únicamente "Panel" y "Cerrar sesión"; "Mi cuenta" y "Mis pedidos" solo visibles para clientes.
+- "Agregar al carrito" se oculta para admin en el detalle del producto.
+- `CuentaController.Index` y `CambiarContrasena` protegidos con la política `NoEsAdministrador`; admin que intente acceder es redirigido a AccesoDenegado.
+
 ### Vocabulario de estados de pedido
 - `TiendaMapper.Estado` cubre los seis valores de `EstadoPedido` con texto visible para el cliente: Pendiente de pago, Pago confirmado, Preparando tu pedido, En camino, Entregado y Cancelado.
 - Prueba que itera todos los valores del enum y falla si alguno devuelve el nombre crudo.
