@@ -11,6 +11,10 @@ public sealed class CarritoService(IAppDbContext db, ICalculoCarritoService calc
         if (string.IsNullOrWhiteSpace(p.TokenAnonimo)) throw new DomainException("No se pudo identificar tu carrito.");
         return db.Carritos.Where(c => c.UsuarioId == null && c.TokenAnonimo == p.TokenAnonimo);
     }
+    public async Task<int> ContarUnidadesAsync(PropietarioCarrito p) {
+        var carrito = await Consulta(p).AsNoTracking().Include(c => c.Items).SingleOrDefaultAsync();
+        return carrito?.Items.Sum(i => i.Cantidad) ?? 0;
+    }
     public async Task<CarritoDto> ObtenerAsync(PropietarioCarrito p) {
         var carrito = await Consulta(p).AsNoTracking().Include(c => c.Items).ThenInclude(i => i.Variante).ThenInclude(v => v.Producto).ThenInclude(p => p.Imagenes).SingleOrDefaultAsync();
         var lineas = carrito?.Items.Select(i => new LineaCarritoDto(i.VarianteId,i.Variante.ProductoId,i.Variante.Producto.Nombre,i.Variante.Talla,
