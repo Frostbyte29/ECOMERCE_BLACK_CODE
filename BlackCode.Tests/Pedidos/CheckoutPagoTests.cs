@@ -88,7 +88,41 @@ public sealed class CheckoutPagoTests
         Assert.False(db.Database.HasPendingModelChanges());
     }
 
+    [Fact]
+    public async Task CambiarEstado_a_Pagado_aprueba_pago_pendiente()
+    {
+        await using var conexion = new SqliteConnection("Data Source=:memory:");
+        await conexion.OpenAsync();
+        await using var db = await PrepararAsync(conexion);
+        var id = await Servicio(db).ConfirmarAsync(Envio, false, "yape");
+        db.ChangeTracker.Clear();
+        await ServicioAdmin(db).CambiarEstadoAsync(id, EstadoPedido.Pagado);
+        db.ChangeTracker.Clear();
+        var pago = await db.Pagos.SingleAsync(p => p.PedidoId == id);
+        Assert.Equal(EstadoPago.Aprobado, pago.Estado);
+    }
+
+    [Fact]
+    public async Task CambiarEstado_a_Cancelado_rechaza_pago_pendiente_y_restituye_stock()
+    {
+        await using var conexion = new SqliteConnection("Data Source=:memory:");
+        await conexion.OpenAsync();
+        await using var db = await PrepararAsync(conexion);
+        var id = await Servicio(db).ConfirmarAsync(Envio, false, "yape");
+        db.ChangeTracker.Clear();
+        await ServicioAdmin(db).CambiarEstadoAsync(id, EstadoPedido.Cancelado);
+        db.ChangeTracker.Clear();
+        var pago = await db.Pagos.SingleAsync(p => p.PedidoId == id);
+        Assert.Equal(EstadoPago.Rechazado, pago.Estado);
+        Assert.Equal(3, await db.VariantesProducto.Select(v => v.Stock).SingleAsync());
+    }
+
     private static PedidoService Servicio(AppDbContext db) => new(db, new UsuarioPrueba(),
+        new CarritoService(db, new CalculoCarritoService(db, [new SinDescuento()]), TimeProvider.System),
+        new StockPrueba(db), new PagoService([new PagoTarjetaSimulado(), new PagoTransferenciaSimulado(),
+            new PagoYapeSimulado(), new PagoPlinSimulado()]), TimeProvider.System);
+
+    private static PedidoService ServicioAdmin(AppDbContext db) => new(db, new AdminPrueba(),
         new CarritoService(db, new CalculoCarritoService(db, [new SinDescuento()]), TimeProvider.System),
         new StockPrueba(db), new PagoService([new PagoTarjetaSimulado(), new PagoTransferenciaSimulado(),
             new PagoYapeSimulado(), new PagoPlinSimulado()]), TimeProvider.System);
@@ -121,6 +155,13 @@ public sealed class CheckoutPagoTests
         public int? UsuarioId => 1;
         public bool EstaAutenticado => true;
         public bool EsAdmin => false;
+    }
+
+    private sealed class AdminPrueba : IUsuarioActual
+    {
+        public int? UsuarioId => 1;
+        public bool EstaAutenticado => true;
+        public bool EsAdmin => true;
     }
 
     // Sustituye el SQL específico de MySQL por una actualización compatible con la base de pruebas.

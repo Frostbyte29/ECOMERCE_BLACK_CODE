@@ -64,13 +64,17 @@ public sealed class PedidoService(IAppDbContext db, IUsuarioActual usuario, ICar
     public async Task CambiarEstadoAsync(int id, EstadoPedido estado) {
         if (!usuario.EsAdmin) throw new DomainException("Acceso restringido.");
         await using var tx = await db.BeginTransactionAsync();
-        var pedido = await db.Pedidos.Include(p => p.Items).SingleOrDefaultAsync(p => p.Id == id) ?? throw new DomainException("Pedido no encontrado.");
+        var pedido = await db.Pedidos.Include(p => p.Items).Include(p => p.Pago).SingleOrDefaultAsync(p => p.Id == id) ?? throw new DomainException("Pedido no encontrado.");
         var anterior = pedido.Estado;
         var now = reloj.GetUtcNow().UtcDateTime;
         pedido.CambiarEstado(estado,UsuarioId,now);
         // Comparación atómica del estado: evita dos cancelaciones y dos reposiciones simultáneas.
         var afectados = await db.Pedidos.Where(p => p.Id == id && p.Estado == anterior).ExecuteUpdateAsync(s => s.SetProperty(p => p.Estado,estado));
         if (afectados != 1) throw new DomainException("Otro administrador actualizó el pedido. Recarga la página.");
+        // Sincronizar el pago pendiente con la decisión del administrador.
+        if (pedido.Pago?.Estado == EstadoPago.Pendiente) {
+            pedido.Pago.Estado = estado == EstadoPedido.Pagado ? EstadoPago.Aprobado : EstadoPago.Rechazado;
+        }
         if (estado == EstadoPedido.Cancelado)
             foreach (var item in pedido.Items.OrderBy(i => i.VarianteId)) await stock.RestituirAsync(item.VarianteId,item.Cantidad);
         await db.SaveChangesAsync(); await tx.CommitAsync();
