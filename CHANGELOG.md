@@ -4,6 +4,24 @@ Formato: [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) · Versiona
 
 ## [Sin publicar]
 
+### Pagos diferidos y formulario de tarjeta
+- Yape, Plin y Transferencia bancaria ahora generan pedidos en estado **Pendiente de pago** en lugar de aprobar instantáneamente; el stock se descuenta igualmente y el administrador confirma el pago desde el panel (OCP: cada `IMetodoPago` decide su modelo de confirmación sin modificar `PedidoService`).
+- `EstadoPago.Pendiente = 3` agregado al enum, compatible con pagos históricos (`Simulado = 1`).
+- Formulario de tarjeta en el checkout con validación Luhn en el navegador; los datos sensibles no se envían con `name` al servidor; solo se trasmite la marca (Visa, Mastercard, Amex) y los últimos 4 dígitos como referencia del pago.
+- Tarjeta aparece primero en la lista; el orden de métodos en DI es: Tarjeta, Yape, Plin, Transferencia.
+- Campo **Número de operación** opcional en el checkout para Yape, Plin y Transferencia.
+- Código de pedido reducido a 8 caracteres hexadecimales: `BC-XXXXXXXX`.
+- Detalle de pedido muestra método de pago, estado del pago y referencia; los productos enlazan al catálogo por slug.
+- Notificación de confirmación diferenciada: mensaje distinto para pago inmediato vs pago pendiente (SRP: `NotificacionPedidoService`).
+- Tests actualizados: 4 casos diferenciados entre pagos inmediatos y diferidos; `PagoServiceTests` y `CheckoutPagoTests` reflejan el nuevo comportamiento.
+
+### Páginas de contenido y colecciones
+- Páginas de contenido: **Quiénes somos**, **Preguntas frecuentes**, **Envíos y devoluciones**, **Guía de tallas** y **Contacto** con contenido real adaptado a la tienda.
+- Página **Colecciones** con cards de categoría que enlazan al catálogo filtrado; el nav principal apunta a esta página.
+- Footer activado: los enlaces de "Nosotros" y "Ayuda" apuntan a las páginas reales.
+- `.gitattributes` creado con `* text=auto` y reglas para binarios (imágenes, fuentes).
+- Estados vacíos y de error ya implementados en iteraciones anteriores (carrito vacío, catálogo sin resultados, 404 personalizado).
+
 ### Header: barra de búsqueda e insignia de carrito
 - Barra de búsqueda en el header: se abre con el icono de lupa, se cierra con Esc o pulsando fuera y envía al catálogo con `?Buscar=`.
 - Insignia numérica en el icono del carrito: muestra las unidades totales; se oculta cuando el carrito está vacío (`InsigniaCarritoViewComponent`, SRP + DIP: depende de `ICarritoService`).

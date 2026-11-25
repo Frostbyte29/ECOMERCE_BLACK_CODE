@@ -41,9 +41,9 @@ public static class DependencyInjection
         services.AddScoped<ICalculoCarritoService, CalculoCarritoService>();
         services.AddSingleton<IReglaDescuento, SinDescuento>();
         services.AddSingleton<IMetodoPago, PagoTarjetaSimulado>();
-        services.AddSingleton<IMetodoPago, PagoTransferenciaSimulado>();
         services.AddSingleton<IMetodoPago, PagoYapeSimulado>();
         services.AddSingleton<IMetodoPago, PagoPlinSimulado>();
+        services.AddSingleton<IMetodoPago, PagoTransferenciaSimulado>();
         services.AddScoped<IPagoService, PagoService>();
         services.AddSingleton<INotificacionPedidoService, NotificacionPedidoService>();
         services.AddScoped<IPedidoService, PedidoService>();

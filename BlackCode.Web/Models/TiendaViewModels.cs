@@ -35,13 +35,16 @@ public class CheckoutViewModel
     public bool EsDesarrollo { get; set; }
     public bool MostrarRechazo { get; set; }
     [Required] public string MetodoPago { get; set; } = "tarjeta";
+    [StringLength(20)] public string? NumeroOperacion { get; set; }
+    [StringLength(20)] public string? TarjetaMarca { get; set; }
+    [StringLength(4)] public string? TarjetaUltimos { get; set; }
     public IReadOnlyList<MetodoPagoViewModel> Metodos { get; set; } = [];
     public CarritoViewModel Carrito { get; set; } = new([], new(0, 0, 0, 0));
 }
-public record LineaPedidoViewModel(string Producto, string Talla, decimal Precio, int Cantidad, decimal Total);
+public record LineaPedidoViewModel(string Producto, string Talla, decimal Precio, int Cantidad, decimal Total, string? ProductoSlug = null);
 public record MetodoPagoViewModel(string Codigo, string Nombre, string? ImagenQr = null, bool QrDisponible = false);
 public record HistorialViewModel(string Estado, DateTime Fecha);
-public record PedidoViewModel(int Id, string Codigo, string Cliente, string Estado, decimal Subtotal, decimal Envio, decimal Total, DateTime Fecha, string Direccion, string Distrito, IReadOnlyList<LineaPedidoViewModel> Lineas, IReadOnlyList<HistorialViewModel> Historial, IReadOnlyList<string> Siguientes);
+public record PedidoViewModel(int Id, string Codigo, string Cliente, string Estado, decimal Subtotal, decimal Envio, decimal Total, DateTime Fecha, string Direccion, string Distrito, IReadOnlyList<LineaPedidoViewModel> Lineas, IReadOnlyList<HistorialViewModel> Historial, IReadOnlyList<string> Siguientes, string? PagoMetodo = null, string? PagoEstado = null, string? PagoReferencia = null);
 public class VarianteEdicionViewModel
 {
     public int Id { get; set; }
@@ -70,9 +73,9 @@ public static class TiendaMapper
 {
     public static ProductoViewModel Producto(ProductoDto p) => new(p.Id, p.Nombre, p.Slug, p.Descripcion, p.Precio, p.Categoria, p.Color, p.Material, p.MaterialDescripcion, p.Imagen, p.Destacado, p.Variantes.Select(v => new VarianteViewModel(v.Id, v.Talla, v.Stock, v.Activo)).ToList(), p.CategoriaId, p.Imagenes);
     public static CarritoViewModel Carrito(CarritoDto c) => new(c.Lineas.Select(l => new LineaCarritoViewModel(l.VarianteId, l.ProductoId, l.Nombre, l.Talla, l.Imagen, l.Precio, l.Cantidad, l.Stock, l.Disponible)).ToList(), new(c.Totales.Subtotal, c.Totales.Descuento, c.Totales.Envio, c.Totales.Total));
-    public static PedidoViewModel Pedido(PedidoDto p) => new(p.Id, p.Codigo, p.Cliente, p.Estado.ToString(), p.Subtotal, p.Envio, p.Total, p.Fecha, p.Direccion, p.Distrito, p.Lineas.Select(l => new LineaPedidoViewModel(l.Producto, l.Talla, l.Precio, l.Cantidad, l.Total)).ToList(), p.Historial.Select(h => new HistorialViewModel(h.Estado, h.Fecha)).ToList(), BlackCode.Domain.Pedidos.TransicionesPedido.SiguientesEstados(p.Estado).Select(e => e.ToString()).ToList());
+    public static PedidoViewModel Pedido(PedidoDto p) => new(p.Id, p.Codigo, p.Cliente, p.Estado.ToString(), p.Subtotal, p.Envio, p.Total, p.Fecha, p.Direccion, p.Distrito, p.Lineas.Select(l => new LineaPedidoViewModel(l.Producto, l.Talla, l.Precio, l.Cantidad, l.Total, l.ProductoSlug)).ToList(), p.Historial.Select(h => new HistorialViewModel(h.Estado, h.Fecha)).ToList(), BlackCode.Domain.Pedidos.TransicionesPedido.SiguientesEstados(p.Estado).Select(e => e.ToString()).ToList(), p.PagoMetodo?.ToString(), p.PagoEstado?.ToString(), p.PagoReferencia);
     public static ProductoEdicionViewModel Edicion(ProductoEdicionDto p) => new() { Id = p.Id, Nombre = p.Nombre, Slug = p.Slug, Descripcion = p.Descripcion, Precio = p.Precio, CategoriaId = p.CategoriaId, ColorId = p.ColorId, MaterialId = p.MaterialId, Publicado = p.Publicado, Destacado = p.Destacado, Imagen = p.Imagen, Variantes = p.Variantes.Select(v => new VarianteEdicionViewModel { Id = v.Id, Talla = v.Talla, Stock = v.Stock, Activo = v.Activo }).ToList() };
-    public static string Estado(string valor) => valor switch { "PendientePago" => "Pendiente de pago", "Pagado" => "Pago confirmado", "EnPreparacion" => "Preparando tu pedido", "Enviado" => "En camino", "Entregado" => "Entregado", "Cancelado" => "Cancelado", _ => valor };
+    public static string Estado(string valor) => valor switch { "PendientePago" => "Pendiente de pago", "Pagado" => "Pago confirmado", "EnPreparacion" => "Preparando tu pedido", "Enviado" => "En camino", "Entregado" => "Entregado", "Cancelado" => "Cancelado", "Aprobado" => "Aprobado", "Pendiente" => "Pendiente de confirmación", "Rechazado" => "Rechazado", "Tarjeta" => "Tarjeta", "Yape" => "Yape", "Plin" => "Plin", "Transferencia" => "Transferencia", _ => valor };
     public static string Dinero(decimal valor) => "S/ " + valor.ToString("N2", System.Globalization.CultureInfo.GetCultureInfo("es-PE"));
     private static readonly TimeSpan OffsetLima = TimeSpan.FromHours(-5); // Perú no tiene horario de verano
     public static string Fecha(DateTime utc) => utc.Add(OffsetLima).ToString("dd/MM/yyyy HH:mm");

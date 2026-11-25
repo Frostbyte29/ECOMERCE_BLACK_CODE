@@ -12,6 +12,7 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script src="~/js/pagos-qr.js" asp-append-version="true" defer></script>
+    <script src="~/js/checkout-tarjeta.js" asp-append-version="true" defer></script>
 }
 <section class="section">
     <p class="breadcrumb"><a href="/Carrito">Carrito</a> / Datos de envío / Confirmación</p>
@@ -38,6 +39,18 @@
                     }
                 </select>
                 <span asp-validation-for="MetodoPago"></span>
+                <div id="tarjeta-form" hidden>
+                    <div class="form-grid">
+                        <div class="wide"><label for="card-numero">Número de tarjeta</label><input id="card-numero" type="text" inputmode="numeric" autocomplete="cc-number" maxlength="23" placeholder="0000 0000 0000 0000" /></div>
+                        <div><label for="card-expiry">Vencimiento</label><input id="card-expiry" type="text" inputmode="numeric" autocomplete="cc-exp" maxlength="5" placeholder="MM/AA" /></div>
+                        <div><label for="card-cvv">CVV</label><input id="card-cvv" type="text" inputmode="numeric" autocomplete="cc-csc" maxlength="4" placeholder="000" /></div>
+                    </div>
+                    <input type="hidden" asp-for="TarjetaMarca" />
+                    <input type="hidden" asp-for="TarjetaUltimos" />
+                </div>
+                <div id="operacion-form" hidden>
+                    <div><label asp-for="NumeroOperacion">Número de operación (opcional)</label><input asp-for="NumeroOperacion" inputmode="numeric" maxlength="20" placeholder="Código de la operación" /></div>
+                </div>
                 <div id="codigos-qr" aria-live="polite">
                     @foreach (var metodo in Model.Metodos.Where(m => m.ImagenQr is not null))
                     {

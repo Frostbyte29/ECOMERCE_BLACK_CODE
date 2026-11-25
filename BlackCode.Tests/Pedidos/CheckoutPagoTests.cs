@@ -18,11 +18,11 @@ public sealed class CheckoutPagoTests
     private static readonly EnvioDto Envio = new("Cliente", "987654321", "Av. Prueba 123", "Lima", null);
 
     [Theory]
-    [InlineData("tarjeta", MetodoPago.Tarjeta)]
-    [InlineData("transferencia", MetodoPago.Transferencia)]
-    [InlineData("yape", MetodoPago.Yape)]
-    [InlineData("plin", MetodoPago.Plin)]
-    public async Task Confirmar_guarda_metodo_correcto_y_descontar_stock(string codigo, MetodoPago esperado)
+    [InlineData("tarjeta", MetodoPago.Tarjeta, true)]
+    [InlineData("transferencia", MetodoPago.Transferencia, false)]
+    [InlineData("yape", MetodoPago.Yape, false)]
+    [InlineData("plin", MetodoPago.Plin, false)]
+    public async Task Confirmar_guarda_metodo_correcto_y_descontar_stock(string codigo, MetodoPago esperado, bool pagoInmediato)
     {
         await using var conexion = new SqliteConnection("Data Source=:memory:");
         await conexion.OpenAsync();
@@ -33,12 +33,12 @@ public sealed class CheckoutPagoTests
         var pago = await db.Pagos.SingleAsync(p => p.PedidoId == id);
         Assert.Equal(esperado, pago.Metodo);
         Assert.Equal(54m, pago.Monto);
-        Assert.Equal(EstadoPago.Aprobado, pago.Estado);
+        Assert.Equal(pagoInmediato ? EstadoPago.Aprobado : EstadoPago.Pendiente, pago.Estado);
         Assert.Equal(2, await db.VariantesProducto.Select(v => v.Stock).SingleAsync());
         Assert.Empty(await db.Carritos.ToListAsync());
         var pedido = await servicio.ObtenerAsync(id);
         Assert.NotNull(pedido);
-        Assert.Equal(EstadoPedido.Pagado, pedido.Estado);
+        Assert.Equal(pagoInmediato ? EstadoPedido.Pagado : EstadoPedido.PendientePago, pedido.Estado);
         Assert.Equal(54m, pedido.Total);
     }
 

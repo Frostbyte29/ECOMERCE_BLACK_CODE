@@ -29,14 +29,15 @@ public sealed class ExtensibilidadTests
         Assert.Equal("Económico", Assert.Single((await catalogo.ConsultarAsync(new())).Productos).Nombre);
     }
     [Theory]
-    [InlineData("tarjeta", "DEMO-TARJETA-")]
-    [InlineData("transferencia", "DEMO-TRANSFERENCIA-")]
-    public async Task Pagos_selecciona_implementacion_y_respeta_rechazo(string codigo, string prefijo)
+    [InlineData("tarjeta", "DEMO-TARJETA-", true)]
+    [InlineData("transferencia", "DEMO-TRANSFERENCIA-", false)]
+    public async Task Pagos_selecciona_implementacion_y_respeta_rechazo(string codigo, string prefijo, bool pagoInmediato)
     {
         var servicio = new PagoService([new PagoTarjetaSimulado(), new PagoTransferenciaSimulado()]);
-        var aprobado = await servicio.ProcesarAsync(99m, false, codigo);
-        Assert.True(aprobado.Aprobado);
-        Assert.StartsWith(prefijo, aprobado.Referencia);
+        var resultado = await servicio.ProcesarAsync(99m, false, codigo);
+        Assert.Equal(pagoInmediato, resultado.Aprobado);
+        Assert.Equal(!pagoInmediato, resultado.EsPendiente);
+        Assert.StartsWith(prefijo, resultado.Referencia);
         Assert.False((await servicio.ProcesarAsync(99m, true, codigo)).Aprobado);
     }
     [Fact]

@@ -34,6 +34,8 @@
 | SRP | `BlackCode.Application/Features/Configuracion/PoliticaComercialService.cs` | Única responsabilidad: leer las claves de `configuracion_tienda` y exponerlas como un DTO de política comercial tipado; las vistas no conocen el modelo de base de datos | Carlos |
 | DIP | `BlackCode.Application/Features/Configuracion/IPoliticaComercialService.cs` | Las vistas dependen de la interfaz inyectada (`@inject`); Application expone el contrato y registra la implementación concreta en su propio `DependencyInjection` | Carlos |
 | OCP | `BlackCode.Web/Controllers/CuentaController.cs` + `CarritoController.cs` + `PedidosController.cs` | La política `NoEsAdministrador` se define una vez en la raíz de composición y se aplica con `[Authorize(Policy)]`; añadir un endpoint nuevo no modifica la política ni su lógica | Carlos |
+| OCP | `BlackCode.Application/Features/Pedidos/PagoYapeSimulado.cs` + `PagoPlinSimulado.cs` + `PagoTransferenciaSimulado.cs` | Cada método decide su modelo de confirmación (inmediato vs diferido) devolviendo `EsPendiente`; `PedidoService` no necesita condiciones por tipo de pago | Carlos |
+| SRP | `BlackCode.Application/Features/Pedidos/NotificacionPedidoService.cs` | Responsabilidad única: generar el mensaje de confirmación según si el pago fue inmediato o queda pendiente; el controlador no construye el texto | Carlos |
 
 ## Cómo demostrar los tres principios en el carrito
 

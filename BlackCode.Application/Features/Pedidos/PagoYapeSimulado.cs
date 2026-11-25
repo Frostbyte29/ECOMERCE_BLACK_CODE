@@ -10,6 +10,8 @@ public sealed class PagoYapeSimulado : IMetodoPago
     public MetodoPago Metodo => MetodoPago.Yape;
 
     public Task<ResultadoPagoDto> ProcesarAsync(decimal monto, bool simularRechazo)
-        => Task.FromResult(new ResultadoPagoDto(monto > 0 && !simularRechazo,
-            "DEMO-YAPE-" + Guid.NewGuid().ToString("N")[..12], Metodo));
+    {
+        if (monto <= 0 || simularRechazo) return Task.FromResult(new ResultadoPagoDto(false, "DEMO-YAPE-RECHAZADO", Metodo));
+        return Task.FromResult(new ResultadoPagoDto(false, "DEMO-YAPE-" + Guid.NewGuid().ToString("N")[..12], Metodo, EsPendiente: true));
+    }
 }
