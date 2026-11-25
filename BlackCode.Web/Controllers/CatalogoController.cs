@@ -11,6 +11,10 @@ public sealed class CatalogoController(ICatalogoService catalogo) : Controller {
         model.Materiales = dto.Materiales.Select(x => new OpcionViewModel(x.Id,x.Nombre)).ToList();
         return View(model);
     }
+    public async Task<IActionResult> Colecciones() {
+        var dto = await catalogo.ConsultarAsync(new());
+        return View(dto.Categorias.Select(c => new OpcionViewModel(c.Id, c.Nombre)).ToList());
+    }
     public async Task<IActionResult> Detalle(int id) {
         var p = await catalogo.ObtenerAsync(id); return p is null ? NotFound() : View(TiendaMapper.Producto(p));
     }

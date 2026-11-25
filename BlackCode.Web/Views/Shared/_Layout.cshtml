@@ -5,7 +5,7 @@
     var _catId = Context.Request.Query["Categoria"].ToString();
     bool _enCatalogo = (Context.Request.Path.Value ?? "").StartsWith("/Catalogo");
     bool _enInicio = Context.Request.Path.Value == "/";
-    bool _enColecciones = _enCatalogo && string.IsNullOrEmpty(_catId);
+    bool _enColecciones = (Context.Request.Path.Value ?? "").StartsWith("/Catalogo/Colecciones", StringComparison.OrdinalIgnoreCase);
     var _politica = await _politicaSvc.ObtenerAsync();
     bool _esAdmin = User.IsInRole(nameof(RolUsuario.Admin));
 }
@@ -39,7 +39,7 @@
 
     <nav class="main-nav" id="main-nav" aria-label="Navegación principal">
         <a asp-controller="Home" asp-action="Index" class="@(_enInicio?"active":null)" aria-current="@(_enInicio?"page":null)">Inicio</a>
-        <a asp-controller="Catalogo" asp-action="Index" class="@(_enColecciones?"active":null)" aria-current="@(_enColecciones?"page":null)">Colecciones</a>
+        <a asp-controller="Catalogo" asp-action="Colecciones" class="@(_enColecciones?"active":null)" aria-current="@(_enColecciones?"page":null)">Colecciones</a>
         <a href="/Catalogo?Categoria=1" class="@(_enCatalogo&&_catId=="1"?"active":null)" aria-current="@(_enCatalogo&&_catId=="1"?"page":null)">Anillos</a>
         <a href="/Catalogo?Categoria=2" class="@(_enCatalogo&&_catId=="2"?"active":null)" aria-current="@(_enCatalogo&&_catId=="2"?"page":null)">Cadenas</a>
         <a href="/Catalogo?Categoria=3" class="@(_enCatalogo&&_catId=="3"?"active":null)" aria-current="@(_enCatalogo&&_catId=="3"?"page":null)">Pulseras</a>
@@ -93,21 +93,22 @@
                 <li><a href="/Catalogo?Categoria=1">Anillos</a></li>
                 <li><a href="/Catalogo?Categoria=2">Cadenas</a></li>
                 <li><a href="/Catalogo?Categoria=3">Pulseras</a></li>
-                <li><a asp-controller="Catalogo" asp-action="Index">Colecciones</a></li>
+                <li><a asp-controller="Catalogo" asp-action="Colecciones">Colecciones</a></li>
             </ul>
         </div>
         <div class="footer__col">
             <h4>Nosotros</h4>
             <ul>
-                <li><span class="footer__enlace-inactivo">Quiénes somos</span></li>
-                <li><span class="footer__enlace-inactivo">Nuestra historia</span></li>
+                <li><a href="/nosotros">Quiénes somos</a></li>
+                <li><a href="/guia-tallas">Guía de tallas</a></li>
+                <li><a href="/contacto">Contacto</a></li>
             </ul>
         </div>
         <div class="footer__col">
             <h4>Ayuda</h4>
             <ul>
-                <li><span class="footer__enlace-inactivo">Preguntas frecuentes</span></li>
-                <li><span class="footer__enlace-inactivo">Envíos y devoluciones</span></li>
+                <li><a href="/faq">Preguntas frecuentes</a></li>
+                <li><a href="/envios">Envíos y devoluciones</a></li>
                 <li><a asp-controller="Cuenta" asp-action="Index">Mi cuenta</a></li>
             </ul>
         </div>

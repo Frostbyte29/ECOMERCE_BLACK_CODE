@@ -1,0 +1,35 @@
+@using BlackCode.Application.Features.Configuracion
+@inject IPoliticaComercialService _politicaSvc
+@{
+    ViewData["Title"] = "Envíos y devoluciones";
+    var _politica = await _politicaSvc.ObtenerAsync();
+}
+<link rel="stylesheet" href="~/css/legal.css" asp-append-version="true" />
+
+<article class="legal">
+    <a href="/" class="legal__volver" aria-label="Volver al inicio">← Inicio</a>
+
+    <header class="legal__encabezado">
+        <h1 class="legal__titulo">Envíos y devoluciones</h1>
+    </header>
+
+    <h2>Zonas de envío</h2>
+    <p>Realizamos envíos a todo el Perú. El costo y el plazo se calculan automáticamente al finalizar tu compra según la dirección de destino.</p>
+
+    <h2>Plazos de entrega</h2>
+    <p>El plazo estimado es de <strong>@_politica.PlazoDias</strong> desde la confirmación del pago. Los pedidos con pago inmediato (tarjeta) se procesan el mismo día. Los pedidos con pago por Yape, Plin o transferencia se procesan una vez confirmada la operación.</p>
+
+    <h2>Seguimiento</h2>
+    <p>Puedes revisar el estado de tu pedido en cualquier momento desde <a href="/Pedidos">Mis pedidos</a>. Cuando tu paquete sea despachado, el estado cambia a "En camino".</p>
+
+    <h2>Cambios y devoluciones</h2>
+    <p>Tienes <strong>@_politica.PlazoCambios</strong> desde la recepción del pedido para solicitar un cambio o devolución. Las condiciones son:</p>
+    <ul>
+        <li>La pieza debe estar sin uso y con su empaque original.</li>
+        <li>Aceptamos cambios por talla incorrecta o defecto de fabricación.</li>
+        <li>No procesamos devoluciones por cambio de opinión una vez usada la pieza.</li>
+    </ul>
+
+    <h2>Cómo iniciar un cambio</h2>
+    <p>Contáctanos desde <a href="/contacto">Contacto</a> indicando tu número de pedido y el motivo. Te respondemos en menos de 24 horas hábiles.</p>
+</article>

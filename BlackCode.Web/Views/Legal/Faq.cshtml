@@ -1,0 +1,36 @@
+@using BlackCode.Application.Features.Configuracion
+@inject IPoliticaComercialService _politicaSvc
+@{
+    ViewData["Title"] = "Preguntas frecuentes";
+    var _politica = await _politicaSvc.ObtenerAsync();
+}
+<link rel="stylesheet" href="~/css/legal.css" asp-append-version="true" />
+
+<article class="legal">
+    <a href="/" class="legal__volver" aria-label="Volver al inicio">← Inicio</a>
+
+    <header class="legal__encabezado">
+        <h1 class="legal__titulo">Preguntas frecuentes</h1>
+    </header>
+
+    <h2>¿Cómo elijo mi talla de anillo?</h2>
+    <p>Puedes medirte el dedo con una cinta métrica o una tira de papel y comparar el resultado con nuestra <a href="/guia-tallas">guía de tallas</a>. También puedes usar un anillo que ya te quede bien y medir su diámetro interior.</p>
+
+    <h2>¿Los materiales son resistentes al agua?</h2>
+    <p>Sí. Usamos acero quirúrgico 316L e inoxidable, aptos para contacto con agua. Puedes llevarlos en la ducha o en la piscina sin que pierdan su acabado.</p>
+
+    <h2>¿Cuánto tarda el envío?</h2>
+    <p>El plazo estimado de entrega es de <strong>@_politica.PlazoDias</strong> desde la confirmación del pago. El costo de envío se calcula al finalizar la compra según la dirección de destino.</p>
+
+    <h2>¿Puedo cambiar o devolver un producto?</h2>
+    <p>Tienes <strong>@_politica.PlazoCambios</strong> desde la recepción del pedido para solicitar un cambio o devolución, siempre que la pieza esté sin uso y con su empaque original. Aceptamos cambios por talla incorrecta o defecto de fabricación. Para iniciar el proceso, <a href="/contacto">contáctanos</a>.</p>
+
+    <h2>¿Qué métodos de pago aceptan?</h2>
+    <p>Aceptamos tarjeta de débito o crédito, Yape, Plin y transferencia bancaria. Todos los pagos se verifican antes de procesar el pedido.</p>
+
+    <h2>¿Puedo seguir mi pedido?</h2>
+    <p>Sí. Desde <a href="/Pedidos">Mis pedidos</a> en tu cuenta puedes ver el estado actual de cada compra y el historial de cambios.</p>
+
+    <h2>¿Qué pasa si mi talla no está disponible?</h2>
+    <p>Las piezas con stock agotado no se pueden añadir al carrito. Si quieres que te avisemos cuando vuelva a estar disponible, escríbenos desde <a href="/contacto">Contacto</a>.</p>
+</article>
