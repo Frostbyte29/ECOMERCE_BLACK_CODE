@@ -30,4 +30,26 @@ public sealed class CuentaService(
         await db.SaveChangesAsync(ct);
         return ResultadoOperacion.Ok();
     }
+
+    public async Task<DatosClienteDto?> ObtenerDatosAsync(int usuarioId, CancellationToken ct = default)
+    {
+        var u = await db.Usuarios.AsNoTracking().FirstOrDefaultAsync(x => x.Id == usuarioId, ct);
+        return u is null ? null : new DatosClienteDto(u.NombreCompleto, u.Telefono);
+    }
+
+    public async Task<ResultadoOperacion> ActualizarDatosAsync(int usuarioId, string nombreCompleto, string? telefono, CancellationToken ct = default)
+    {
+        if (string.IsNullOrWhiteSpace(nombreCompleto) || nombreCompleto.Length > 120)
+            return ResultadoOperacion.Fallo("El nombre debe tener entre 1 y 120 caracteres.");
+        if (telefono is not null && (telefono.Length > 20 || !telefono.All(char.IsDigit)))
+            return ResultadoOperacion.Fallo("El teléfono no es válido.");
+
+        var usuario = await db.Usuarios.FirstOrDefaultAsync(u => u.Id == usuarioId, ct);
+        if (usuario is null) return ResultadoOperacion.Fallo("Usuario no encontrado.");
+
+        usuario.NombreCompleto = nombreCompleto.Trim();
+        usuario.Telefono = string.IsNullOrWhiteSpace(telefono) ? null : telefono.Trim();
+        await db.SaveChangesAsync(ct);
+        return ResultadoOperacion.Ok();
+    }
 }

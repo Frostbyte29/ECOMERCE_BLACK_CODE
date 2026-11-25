@@ -6,6 +6,11 @@ using BlackCode.Application.Features.Catalogo;
 using BlackCode.Application.Features.Carrito;
 using BlackCode.Application.Features.Pedidos;
 using BlackCode.Application.Features.Administracion;
+using BlackCode.Application.Features.Favoritos;
+using BlackCode.Application.Features.Direcciones;
+using BlackCode.Application.Features.Resenas;
+using BlackCode.Application.Features.Seguimiento;
+using BlackCode.Application.Features.Reclamos;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BlackCode.Application;
@@ -20,6 +25,13 @@ public static class DependencyInjection
     {
         // Features/Configuracion
         services.AddScoped<IPoliticaComercialService, PoliticaComercialService>();
+
+        // Features/Favoritos, Direcciones, Resenas, Seguimiento, Reclamos
+        services.AddScoped<IFavoritosService, FavoritosService>();
+        services.AddScoped<IDireccionService, DireccionService>();
+        services.AddScoped<IResenaService, ResenaService>();
+        services.AddScoped<ISeguimientoService, SeguimientoService>();
+        services.AddScoped<IReclamosService, ReclamosService>();
 
         // Features/Autenticacion
         services.AddScoped<IAutenticacionService, AutenticacionService>();

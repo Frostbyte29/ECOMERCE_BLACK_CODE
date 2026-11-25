@@ -79,6 +79,26 @@ public sealed class PedidoService(IAppDbContext db, IUsuarioActual usuario, ICar
             foreach (var item in pedido.Items.OrderBy(i => i.VarianteId)) await stock.RestituirAsync(item.VarianteId,item.Cantidad);
         await db.SaveChangesAsync(); await tx.CommitAsync();
     }
+    public async Task CancelarPorClienteAsync(int id) {
+        var uid = UsuarioId;
+        await using var tx = await db.BeginTransactionAsync();
+        var pedido = await db.Pedidos.Include(p => p.Items).Include(p => p.Pago)
+            .SingleOrDefaultAsync(p => p.Id == id && p.UsuarioId == uid)
+            ?? throw new DomainException("Pedido no encontrado.");
+        if (pedido.Estado != EstadoPedido.PendientePago)
+            throw new DomainException("Solo puedes cancelar pedidos pendientes de pago.");
+        var now = reloj.GetUtcNow().UtcDateTime;
+        pedido.CambiarEstado(EstadoPedido.Cancelado, uid, now, "Cancelado por el cliente");
+        // Comparación atómica: evita doble cancelación simultánea.
+        var afectados = await db.Pedidos.Where(p => p.Id == id && p.Estado == EstadoPedido.PendientePago)
+            .ExecuteUpdateAsync(s => s.SetProperty(p => p.Estado, EstadoPedido.Cancelado));
+        if (afectados != 1) throw new DomainException("El pedido ya fue procesado. Recarga la página.");
+        if (pedido.Pago?.Estado == EstadoPago.Pendiente)
+            pedido.Pago.Estado = EstadoPago.Rechazado;
+        foreach (var item in pedido.Items.OrderBy(i => i.VarianteId))
+            await stock.RestituirAsync(item.VarianteId, item.Cantidad);
+        await db.SaveChangesAsync(); await tx.CommitAsync();
+    }
     public async Task<EnvioDto?> ObtenerUltimoEnvioAsync() {
         var uid=usuario.UsuarioId;
         if(uid is null) return null;
